@@ -32,14 +32,18 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode.tests;
 
+import android.util.Log;
+
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.internal.system.Deadline;
+import org.firstinspires.ftc.teamcode.system.Intake;
 
 import java.util.concurrent.TimeUnit;
 
@@ -64,15 +68,16 @@ import java.util.concurrent.TimeUnit;
 @TeleOp(name = "Color Sorting Test", group = "Sensor")
 public class ColorSortingTest extends LinearOpMode {
 
-    private final int READ_PERIOD = 1;
+
 
     @Override
     public void runOpMode()
     {
         HuskyLens huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
-        Servo servo = hardwareMap.get(Servo.class, "sorter");
+        Servo greenSorter = hardwareMap.get(Servo.class, "greenSorter");
+        Servo purpleSorter = hardwareMap.get(Servo.class, "purpleSorter");
 
-        DcMotor intake = hardwareMap.get(DcMotor.class, "intake");
+        Intake intake = new Intake(hardwareMap.get(DcMotorEx.class, "intakeMotor"));
 
         /*
          * This sample rate limits the reads solely to allow a user time to observe
@@ -141,10 +146,25 @@ public class ColorSortingTest extends LinearOpMode {
              *
              * Returns an empty array if no objects are seen.
              */
-            intake.setPower(0.8);
+            intake.setVelocity(2500 * gamepad1.left_stick_y);
+
+            if (gamepad1.aWasPressed()) {
+                greenSorter.setPosition(0.8);
+                purpleSorter.setPosition(0.6);
+            } else if (gamepad1.bWasPressed()) {
+                greenSorter.setPosition(0.6);
+                purpleSorter.setPosition(0.6);
+            } else if (gamepad1.yWasPressed()) {
+                purpleSorter.setPosition(0.8);
+                greenSorter.setPosition(0.6);
+            } else if (gamepad1.xWasPressed()) {
+                purpleSorter.setPosition(0.8);
+                greenSorter.setPosition(0.8);
+            }
 
             HuskyLens.Block[] blocks = huskyLens.blocks();
             telemetry.addData("Block count", blocks.length);
+            telemetry.addData("Purple Position", purpleSorter.getPosition());
             HuskyLens.Block largestBlock = null;
             int largestSize = 0;
             for (HuskyLens.Block block : blocks) {
@@ -154,19 +174,10 @@ public class ColorSortingTest extends LinearOpMode {
                     largestSize = currSize;
                     largestBlock = block;
                 }
-                /*
-                 * Here inside the FOR loop, you could save or evaluate specific info for the currently recognized Bounding Box:
-                 * - blocks[i].width and blocks[i].height   (size of box, in pixels)
-                 * - blocks[i].left and blocks[i].top       (edges of box)
-                 * - blocks[i].x and blocks[i].y            (center location)
-                 * - blocks[i].id                           (Color ID)
-                 *
-                 * These values have Java type int (integer).
-                 */
             }
 
             if (largestBlock != null) {
-                servo.setPosition(((largestBlock.id - 1) * 0.2) + 0.8);
+                Log.d("Husky Cam", "ID: " + largestBlock.id);
             }
 
             telemetry.update();
