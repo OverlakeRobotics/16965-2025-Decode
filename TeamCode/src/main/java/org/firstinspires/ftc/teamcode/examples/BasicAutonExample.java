@@ -1,24 +1,20 @@
-package org.firstinspires.ftc.teamcode.tests;
-
-import android.util.Log;
+package org.firstinspires.ftc.teamcode.examples;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
 
+// Example that drives 2000 counts forward then 2000 counts to the left.
 @Config
-@TeleOp(name = "Basic OpMode", group = "TeleOp")
-public class BasicOpMode extends OpMode {
+@Autonomous(name = "Basic Auton Example", group = "Autonomous")
+public class BasicAutonExample extends OpMode {
 
     private BasicHolonomicDrivetrain driveTrain;
-    private double lastTime;
     public static double velocity = 1000;
-    private final ElapsedTime runtime = new ElapsedTime();
 
     @Override
     public void init() {
@@ -28,19 +24,19 @@ public class BasicOpMode extends OpMode {
                 hardwareMap.get(DcMotorEx.class, "frontLeft"),
                 hardwareMap.get(DcMotorEx.class, "frontRight")
         );
-
-        DcMotor intake = hardwareMap.get(DcMotorEx.class, "intake");
-        intake.setPower(0.8);
-
-        driveTrain.setVelocityDrive(velocity, 0, 0);
     }
 
     @Override
     public void loop() {
         driveTrain.drive();
-        double currentTime = runtime.seconds();
-        double dt = currentTime - lastTime;
-        telemetry.addData("Delta Time", dt);
-        lastTime = currentTime;
+
+        if (!driveTrain.isDriving()) {
+            driveTrain.setPositionDrive(2000, 90, velocity);
+        }
+    }
+
+    @Override
+    public void start() {
+            driveTrain.setPositionDrive(2000, 0, velocity);
     }
 }

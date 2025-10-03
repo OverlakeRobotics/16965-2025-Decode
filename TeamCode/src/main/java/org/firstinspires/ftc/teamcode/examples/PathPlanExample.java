@@ -1,44 +1,25 @@
-package org.firstinspires.ftc.teamcode.tests;
-
-import android.util.Log;
+package org.firstinspires.ftc.teamcode.examples;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
-import org.firstinspires.ftc.teamcode.components.IMUOdometry;
-import org.firstinspires.ftc.teamcode.components.SparkFunOTOSOdometry;
 import org.firstinspires.ftc.teamcode.drivers.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 import org.firstinspires.ftc.teamcode.system.PathServer;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Config
-@TeleOp(name = "Path Planner", group = "TeleOp")
+@Autonomous(name = "Path Planning Example", group = "Autonomous")
 public class PathPlanExample extends OpMode {
-    public static class Offsets {
-        public double yOffset = -168.0; // mm
-        public double xOffset = -84.0; // mm
-    }
-
-    public static Offsets OFFSETS = new Offsets();
+    public double yOffset = -168.0; // mm
+    public double xOffset = -84.0; // mm
 
     public static int velocity;
     public static double tolerance;
@@ -55,7 +36,7 @@ public class PathPlanExample extends OpMode {
     @Override
     public void init() {
         GoBildaPinpointDriver pinpointDriver = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpointDriver.setOffsets(OFFSETS.xOffset, OFFSETS.yOffset);
+        pinpointDriver.setOffsets(xOffset, yOffset);
         driveTrain = new OdometryHolonomicDrivetrain(
                 hardwareMap.get(DcMotorEx.class, "backLeft"),
                 hardwareMap.get(DcMotorEx.class, "backRight"),

@@ -1,35 +1,23 @@
-package org.firstinspires.ftc.teamcode.tests;
-
-import android.util.Log;
+package org.firstinspires.ftc.teamcode.examples;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
-import org.firstinspires.ftc.teamcode.components.IMUOdometry;
-import org.firstinspires.ftc.teamcode.components.SparkFunOTOSOdometry;
 import org.firstinspires.ftc.teamcode.drivers.GoBildaPinpointDriver;
-import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 @Config
-@TeleOp(name = "Odometry OpMode", group = "TeleOp")
-public class OdometryOpMode extends OpMode {
+@Autonomous(name = "Odometry Auton Example", group = "Autonomous")
+public class OdometryAutonExample extends OpMode {
     // Change to your actual offsets. See GoBildaPinpointDriver.setOffsets() for details on measuring offsets.
-    public static class Offsets {
-        public double yOffset = -168.0;
-        public double xOffset = -84.0;
-    }
-
-    public static Offsets OFFSETS = new Offsets();
+    public double yOffset = -168.0;
+    public double xOffset = -84.0;
 
     public static int velocity = 2000;
 
@@ -46,31 +34,29 @@ public class OdometryOpMode extends OpMode {
 
     @Override
     public void init() {
-        IMU gyro = hardwareMap.get(IMU.class, "imu");
-        // Change this to match orientation of IMU on the robot
-        IMU.Parameters params = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP));
-        gyro.initialize(params);
-        gyro.resetYaw();
-
         GoBildaPinpointDriver pinpointDriver = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpointDriver.setOffsets(OFFSETS.xOffset, OFFSETS.yOffset);
+        pinpointDriver.setOffsets(xOffset, yOffset);
         driveTrain = new OdometryHolonomicDrivetrain(
                 hardwareMap.get(DcMotorEx.class, "backLeft"),
                 hardwareMap.get(DcMotorEx.class, "backRight"),
                 hardwareMap.get(DcMotorEx.class, "frontLeft"),
                 hardwareMap.get(DcMotorEx.class, "frontRight"),
-//                new IMUOdometry(gyro)
                 new GoBildaPinpointOdometry(pinpointDriver)
         );
     }
 
+    // This OpMode manually sets the target position of the drive train to the next point after
+    // the robot reaches the current target point. This applies slowdown to each point and is mainly
+    // used to demonstrate some more of the driveTrain class's capabilities. Practically, you will normally
+    // use driveTrain.setPositionDrive(Pose2D[] path, velocity, tolerance) in start() and then just
+    // call driveTrain.updatePosition() and driveTrain.drive() in loop().
     @Override
     public void loop() {
         driveTrain.updatePosition();
         driveTrain.drive();
 
         Pose2D pos = driveTrain.getPosition();
-        Log.d("Position", "X: " + pos.getX(DistanceUnit.INCH) + ", Y: " + pos.getY(DistanceUnit.INCH) + ", Heading: " + pos.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("Position", "X: " + pos.getX(DistanceUnit.INCH) + ", Y: " + pos.getY(DistanceUnit.INCH) + ", Heading: " + pos.getHeading(AngleUnit.DEGREES));
 
         if (driveTrain.getDistanceToDestination() < inchesToChangeDirection) {
             currentPoint++;
@@ -83,8 +69,6 @@ public class OdometryOpMode extends OpMode {
     @Override
     public void start() {
         driveTrain.updatePosition();
-//        driveTrain.setPositionDriveCorrection(2500, 0, velocity, 30);
         driveTrain.setPositionDrive(drivePoints[currentPoint], velocity);
-//        driveTrain.setPositionDrive(wantedPosition, velocity);
     }
 }
