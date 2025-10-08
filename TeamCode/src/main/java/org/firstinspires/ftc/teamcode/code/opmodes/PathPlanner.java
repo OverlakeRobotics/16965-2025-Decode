@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.system.PathServer;
 import java.util.Arrays;
 
 @Config
-@Autonomous(name = "Path Planning Example", group = "Autonomous")
+@Autonomous(name = "Path Planner", group = "Autonomous")
 public class PathPlanner extends OpMode {
     public double yOffset = -168.0; // mm
     public double xOffset = -84.0; // mm
