@@ -17,8 +17,8 @@ public class GoBildaPinpointOdometry implements OdometryModule {
     public GoBildaPinpointOdometry(GoBildaPinpointDriver pinpoint) {
         this.pinpoint = pinpoint;
 
-        positionPriority = 3;
-        headingPriority = 2;
+        positionPriority = 0;
+        headingPriority = 1;
         doPositionReset = true;
         doHeadingReset = false;
     }

@@ -22,8 +22,8 @@ public class SparkFunOTOSOdometry implements OdometryModule {
 //        sparkFunSensor.setAngularUnit(AngleUnit.DEGREES);
         this.sparkFunSensor = sparkFunSensor;
 
-        positionPriority = 1;
-        headingPriority = 3;
+        positionPriority = 2;
+        headingPriority = 0;
         doPositionReset = true;
         doHeadingReset = false;
     }
