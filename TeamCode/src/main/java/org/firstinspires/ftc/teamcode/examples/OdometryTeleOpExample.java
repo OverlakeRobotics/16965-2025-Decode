@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
-import org.firstinspires.ftc.teamcode.drivers.GoBildaPinpointDriver;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 
@@ -41,7 +41,7 @@ public class OdometryTeleOpExample extends OpMode {
     @Override
     public void init() {
         GoBildaPinpointDriver pinpointDriver = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpointDriver.setOffsets(xOffset, yOffset);
+        pinpointDriver.setOffsets(xOffset, yOffset, DistanceUnit.MM);
         driveTrain = new OdometryHolonomicDrivetrain(
                 hardwareMap.get(DcMotorEx.class, "backLeft"),
                 hardwareMap.get(DcMotorEx.class, "backRight"),

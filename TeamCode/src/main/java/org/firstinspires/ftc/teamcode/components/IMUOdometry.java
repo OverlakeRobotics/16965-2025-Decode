@@ -20,8 +20,8 @@ public class IMUOdometry implements OdometryModule {
     public IMUOdometry(IMU imu) {
         this.imu = imu;
 
-        positionPriority = Integer.MIN_VALUE;
-        headingPriority = 2;
+        positionPriority = Integer.MAX_VALUE;
+        headingPriority = 1;
         doPositionReset = false;
         doHeadingReset = false;
     }

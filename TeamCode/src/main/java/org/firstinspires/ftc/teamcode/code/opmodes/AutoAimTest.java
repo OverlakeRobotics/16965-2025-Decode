@@ -14,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
-import org.firstinspires.ftc.teamcode.drivers.GoBildaPinpointDriver;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 import java.util.List;
@@ -56,7 +56,7 @@ public class AutoAimTest extends OpMode {
         limelight.start();
 
         GoBildaPinpointDriver pinpointDriver = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpointDriver.setOffsets(xOffset, yOffset);
+        pinpointDriver.setOffsets(xOffset, yOffset, DistanceUnit.MM);
         driveTrain = new OdometryHolonomicDrivetrain(
                 hardwareMap.get(DcMotorEx.class, "backLeft"),
                 hardwareMap.get(DcMotorEx.class, "backRight"),

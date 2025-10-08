@@ -17,14 +17,14 @@ public class OdometryCollection implements OdometryModule {
     private boolean isHeadingAccurate;
     public OdometryCollection(List<OdometryModule> odometryModules) {
         this.odometryModules = odometryModules;
-        positionPriority = Integer.MIN_VALUE;
-        headingPriority = Integer.MIN_VALUE;
+        positionPriority = Integer.MAX_VALUE;
+        headingPriority = Integer.MAX_VALUE;
         for (OdometryModule module : odometryModules) {
-            if (module.getPositionPriority() > positionPriority) {
+            if (module.getPositionPriority() < positionPriority) {
                 positionPriority = module.getPositionPriority();
             }
 
-            if (module.getHeadingPriority() > headingPriority) {
+            if (module.getHeadingPriority() < headingPriority) {
                 headingPriority = module.getHeadingPriority();
             }
         }
@@ -39,43 +39,47 @@ public class OdometryCollection implements OdometryModule {
             module.updatePosition();
         }
 
-        Pose2D highestPriorityPosition = null;
-        int highestPositionPriority = Integer.MIN_VALUE;
-        OdometryModule highestPositionPriorityModule = null;
-        Pose2D highestPriorityHeading = null;
-        int highestHeadingPriority = Integer.MIN_VALUE;
-        OdometryModule highestHeadingPriorityModule = null;
+        Pose2D bestPosition = null;
+        int bestPositionPriority = Integer.MAX_VALUE;
+        OdometryModule bestPositionModule = null;
+        Pose2D bestHeading = null;
+        int bestHeadingPriority = Integer.MAX_VALUE;
+        OdometryModule bestHeadingModule = null;
 
         for (OdometryModule module : odometryModules) {
-            if (module.isPositionAccurate() && module.getPositionPriority() > highestPositionPriority) {
-                highestPriorityPosition = module.getPosition();
-                highestPositionPriority = module.getPositionPriority();
-                highestPositionPriorityModule = module;
+            if (module.isPositionAccurate() && module.getPositionPriority() < bestPositionPriority) {
+                bestPosition = module.getPosition();
+                bestPositionPriority = module.getPositionPriority();
+                bestPositionModule = module;
             }
 
-            if (module.isHeadingAccurate() && module.getHeadingPriority() > highestHeadingPriority) {
-                highestPriorityHeading = module.getPosition();
-                highestHeadingPriority = module.getHeadingPriority();
-                highestHeadingPriorityModule = module;
+            if (module.isHeadingAccurate() && module.getHeadingPriority() < bestHeadingPriority) {
+                bestHeading = module.getPosition();
+                bestHeadingPriority = module.getHeadingPriority();
+                bestHeadingModule = module;
             }
         }
 
-        if (highestPriorityPosition == null) {
+        if (bestPosition == null) {
             isPositionAccurate = false;
             for (OdometryModule module : odometryModules) {
-                if (module.getPositionPriority() == highestPositionPriority) {
-                    highestPriorityPosition = module.getPosition();
+                if (module.getPositionPriority() < bestPositionPriority) {
+                    bestPosition = module.getPosition();
+                    bestPositionPriority = module.getPositionPriority();
+                    bestPositionModule = module;
                 }
             }
         } else {
             isPositionAccurate = true;
         }
 
-        if (highestPriorityHeading == null) {
+        if (bestHeading == null) {
             isHeadingAccurate = false;
             for (OdometryModule module : odometryModules) {
-                if (module.getHeadingPriority() == highestHeadingPriority) {
-                    highestPriorityHeading = module.getPosition();
+                if (module.getHeadingPriority() < bestHeadingPriority) {
+                    bestHeading = module.getPosition();
+                    bestHeadingPriority = module.getHeadingPriority();
+                    bestHeadingModule = module;
                 }
             }
         } else {
@@ -83,26 +87,26 @@ public class OdometryCollection implements OdometryModule {
         }
 
         for (OdometryModule module : odometryModules) {
-            if (module.doPositionResetToHigherPriority() && highestPriorityPosition != null &&
-                    highestPositionPriorityModule != module) {
+            if (module.doPositionResetToHigherPriority() && bestPosition != null &&
+                    bestPositionModule != module) {
                 Pose2D modulePosition = module.getPosition();
-                module.setPosition(new Pose2D(DistanceUnit.INCH, highestPriorityPosition.getX(DistanceUnit.INCH),
-                        highestPriorityPosition.getY(DistanceUnit.INCH), AngleUnit.DEGREES,
+                module.setPosition(new Pose2D(DistanceUnit.INCH, bestPosition.getX(DistanceUnit.INCH),
+                        bestPosition.getY(DistanceUnit.INCH), AngleUnit.DEGREES,
                         modulePosition.getHeading(AngleUnit.DEGREES)));
             }
 
-            if (module.doHeadingResetToHigherPriority() && highestPriorityHeading != null && highestPositionPriorityModule != module) {
+            if (module.doHeadingResetToHigherPriority() && bestHeading != null && bestHeadingModule != module) {
                 Pose2D modulePosition = module.getPosition();
                 module.setPosition(new Pose2D(DistanceUnit.INCH, modulePosition.getX(DistanceUnit.INCH),
                         modulePosition.getY(DistanceUnit.INCH), AngleUnit.DEGREES,
-                        highestPriorityHeading.getHeading(AngleUnit.DEGREES)));
+                        bestHeading.getHeading(AngleUnit.DEGREES)));
             }
         }
 
-        if (highestPriorityPosition != null && highestPriorityHeading != null) {
-            position = new Pose2D(DistanceUnit.INCH, highestPriorityPosition.getX(DistanceUnit.INCH),
-                    highestPriorityPosition.getY(DistanceUnit.INCH), AngleUnit.DEGREES,
-                    highestPriorityHeading.getHeading(AngleUnit.DEGREES));
+        if (bestPosition != null && bestHeading != null) {
+            position = new Pose2D(DistanceUnit.INCH, bestPosition.getX(DistanceUnit.INCH),
+                    bestPosition.getY(DistanceUnit.INCH), AngleUnit.DEGREES,
+                    bestHeading.getHeading(AngleUnit.DEGREES));
         }
     }
 

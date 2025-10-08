@@ -4,7 +4,7 @@ package org.firstinspires.ftc.teamcode.components;
 
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.drivers.GoBildaPinpointDriver;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.system.OdometryModule;
 
 public class GoBildaPinpointOdometry implements OdometryModule {
@@ -17,8 +17,8 @@ public class GoBildaPinpointOdometry implements OdometryModule {
     public GoBildaPinpointOdometry(GoBildaPinpointDriver pinpoint) {
         this.pinpoint = pinpoint;
 
-        positionPriority = 3;
-        headingPriority = 2;
+        positionPriority = 0;
+        headingPriority = 0;
         doPositionReset = true;
         doHeadingReset = false;
     }
