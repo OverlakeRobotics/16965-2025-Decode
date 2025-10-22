@@ -4,6 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -24,6 +26,11 @@ public class TeleOpTest extends OpMode {
     private boolean intakeOn = false;
     private boolean intakeReversed = false;
 
+    private DcMotorEx shooterMotor;
+    private Servo hoodServo;
+    private int shooterVelocity;
+    private double hoodPos;
+
     @Override
     public void init() {
         GoBildaPinpointDriver pinpointDriver = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
@@ -39,6 +46,11 @@ public class TeleOpTest extends OpMode {
         driveTrain.setCountsToSlowDown(500);
 
         intake = new Intake(hardwareMap.get(DcMotorEx.class, "intakeMotor"));
+
+        shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter");
+        hoodServo = hardwareMap.get(Servo.class, "hood");
+        shooterVelocity = 0;
+        hoodPos = 0.5;
     }
 
     @Override
@@ -61,6 +73,33 @@ public class TeleOpTest extends OpMode {
         } else {
             intake.setVelocity(0);
         }
+
+        // Shooter controls (gamepad2)
+        if (gamepad1.rightBumperWasPressed()) {
+            shooterVelocity += 100;
+        } else if (gamepad1.leftBumperWasPressed()) {
+            shooterVelocity -= 100;
+        } else if (gamepad1.bWasPressed()) {
+            shooterVelocity = 0;
+        }
+
+        shooterMotor.setVelocity(shooterVelocity);
+
+        // Hood servo controls (gamepad2)
+        if (gamepad1.dpadUpWasPressed()) {
+            hoodPos -= 0.02;
+        } else if (gamepad1.dpadDownWasPressed()) {
+            hoodPos += 0.02;
+        }
+
+        hoodPos = Range.clip(hoodPos, 0, 1);
+        hoodServo.setPosition(hoodPos);
+
+        // Telemetry for shooter
+        telemetry.addData("Wanted Shooter Velocity", shooterVelocity);
+        telemetry.addData("Actual Shooter Velocity", shooterMotor.getVelocity());
+        telemetry.addData("Shooter Power", shooterMotor.getPower());
+        telemetry.addData("Hood Servo Position", hoodPos);
 
         driveTrain.updatePosition();
         driveTrain.setVelocityDrive(
