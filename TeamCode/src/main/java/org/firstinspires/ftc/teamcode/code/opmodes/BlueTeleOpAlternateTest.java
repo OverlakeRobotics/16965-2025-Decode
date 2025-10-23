@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode.code.opmodes;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -15,17 +18,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.code.parts.Intake;
 import org.firstinspires.ftc.teamcode.code.parts.Shooter;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
-
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 import java.util.List;
 
 @Config
-@TeleOp(name = "Blue TeleOp", group = "TeleOp")
-public class BlueTeleOp extends OpMode {
+@TeleOp(name = "Blue TeleOp Alternate Test", group = "TeleOp")
+public class BlueTeleOpAlternateTest extends OpMode {
+    public static final double g = 386.08858; // in/s^2
+    public static final double rhinoWheelRadius = 1.88976; // in
+    // TODO: Tune this value
+    public static final double k_slip = 0.90; // estimated slip factor
+    public static final double motorTicksPerRev = 28 * 4d;
     private Limelight3A limelight;
 
     public static final double yOffset = -168.0; // mm
@@ -47,9 +51,6 @@ public class BlueTeleOp extends OpMode {
 
     public static final int targetID = 20;
 
-    // TODO: Find actual constant to multiply by (currently 0.9), also check that the ticks per revolution of 112 is correct
-    private static final double ticksToLaunchVelocity = (2 * Math.PI / 112) * (48.0 / 254.0) * 0.9; // In inches/s
-
     public int currentPreset = -1;
 
     public double velocity = 2000;
@@ -67,6 +68,64 @@ public class BlueTeleOp extends OpMode {
     private double shooterVelocity;
     private double shooterAngle;
 
+    // TODO: Check angle and velocity calculations
+    // Distances should be passed in as inches due to FTC standard units
+    // theta is the launch angle in degrees, where launching straight up is 0 degrees (hood flat) and straight forward is 90 degrees (hood vertical)
+    // Returns -1 if no valid solution (i.e. not possible given the angle)
+    public double getShooterVelocity(double horizontalDist, double verticalDist, double theta) {
+        // Convert theta to radians
+        theta = Math.toRadians(theta);
+        // Impossible
+        if (verticalDist >= horizontalDist / Math.tan(theta) || theta <= 0 || horizontalDist <= 0) {
+            return -1;
+        }
+        // First calculate the required launch velocity (derived from kinematics assuming no air resistance)
+        double v = Math.sqrt(
+                g * Math.pow(horizontalDist, 2) /
+                        (2 * Math.pow(Math.sin(theta), 2) * (horizontalDist / Math.tan(theta) - verticalDist))
+        );
+        // Then calculate RPM from linear velocity
+        double rpm = (v * 60) / (2 * Math.PI * rhinoWheelRadius * k_slip);
+        // Scale to motor ticks per second
+        // TODO: Check ticks/sec calculation
+        return rpm * motorTicksPerRev / 60;
+    }
+
+    public double getBestHoodAngleDegrees(double horizontalDist, double verticalDist) {
+        // Guard bad input
+        if (!(horizontalDist > 0)) return Double.NaN;
+
+        final double minTheta = 8.0;    // base angle when very close
+        final double k = 28.0;  // overall rise (increase for steeper far shots)
+        final double midpointDist = 36.0;  // midpoint distance (in)
+        final double rampFactor = 24.0;  // how quickly it ramps (in)
+
+        final double minHoodDeg = 0.5;     // avoid exact 0°
+        final double maxHoodDeg = 45.0;    // your mechanical cap
+        final double epsPhysDeg = 0.5;     // safety margin vs physics cap
+
+        // 1) Base angle from smooth monotone map
+        double thetaBase = minTheta + k * Math.toDegrees(Math.atan((horizontalDist - midpointDist) / rampFactor));
+
+        // 2) Physics cap
+        // Feasible iff horizontalDist / tan(theta) > verticalDist.
+        // For Δh>0, that implies theta < atan(D/Δh).
+        double thetaPhysCapDeg = Math.toDegrees(Math.atan(horizontalDist / verticalDist)) - epsPhysDeg;
+        if (thetaPhysCapDeg < minHoodDeg) return Double.NaN; // no feasible angle in 0–45°
+
+        // 3) Apply mech + physics caps
+        double theta = Range.clip(thetaBase, minHoodDeg, maxHoodDeg);
+        if (theta > thetaPhysCapDeg) {
+            theta = Math.max(minHoodDeg, Math.min(maxHoodDeg, thetaPhysCapDeg));
+        }
+
+        // 4) Final feasibility sanity check (numerical guard)
+        double th = Math.toRadians(theta);
+        double denomGeom = horizontalDist / Math.tan(th) - verticalDist; // must be > 0
+        if (denomGeom <= 1e-6) return Double.NaN;
+
+        return theta;
+    }
 
     @Override
     public void init() {
@@ -93,24 +152,6 @@ public class BlueTeleOp extends OpMode {
                 hardwareMap.get(Servo.class, "hood"),
                 hardwareMap.get(Servo.class, "blocker")
         );
-    }
-
-    // TODO: Check if this works
-    // All inches parameters
-    public static double solveLaunchAngle(double x, double v) {
-        double g = 0.249174; // Gravity in inches/s^2
-
-        double v2 = v * v;
-        double gTerm = g * x * x / (2 * v2);
-        double discriminant = x * x - 4 * gTerm * (gTerm + goalDZ);
-
-        if (discriminant < 0) {
-            return Double.NaN;
-        }
-
-        double tanTheta1 = (x - Math.sqrt(discriminant)) / (2 * gTerm);
-
-        return Math.toDegrees(Math.atan(tanTheta1));
     }
 
     @Override
@@ -189,8 +230,8 @@ public class BlueTeleOp extends OpMode {
         }
 
         if (autoLock) {
-            shooterVelocity = Math.min(1000 + (distance / 144) * 800, 1800);
-            shooterAngle = solveLaunchAngle(distance, shooterVelocity * ticksToLaunchVelocity);
+            shooterAngle = getBestHoodAngleDegrees(distance, goalDZ);
+            shooterVelocity = getShooterVelocity(distance, goalDZ, shooterAngle);
         }
 
         // Shooter and Intake
