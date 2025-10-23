@@ -25,9 +25,13 @@ public class TeleOpTest extends OpMode {
     private Intake intake;
     private boolean intakeOn = false;
     private boolean intakeReversed = false;
+    private boolean intakeSlow = false;
+    private int intakeNormalVelocity = 2000;
+    private int intakeSlowVelocity = 1000;
 
     private DcMotorEx shooterMotor;
     private Servo hoodServo;
+    private Servo shooterBlocker;
     private int shooterVelocity;
     private double hoodPos;
 
@@ -49,8 +53,11 @@ public class TeleOpTest extends OpMode {
 
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter");
         hoodServo = hardwareMap.get(Servo.class, "hood");
+        shooterBlocker = hardwareMap.get(Servo.class, "blocker");
+        shooterBlocker.setDirection(Servo.Direction.REVERSE);
         shooterVelocity = 0;
         hoodPos = 0.5;
+        shooterBlocker.setPosition(0.0);
     }
 
     @Override
@@ -66,15 +73,23 @@ public class TeleOpTest extends OpMode {
         }
         if (intakeOn) {
             if (intakeReversed) {
-                intake.setVelocity(-2000);
+                if (intakeSlow) {
+                    intake.setVelocity(-intakeSlowVelocity);
+                } else {
+                    intake.setVelocity(-intakeNormalVelocity);
+                }
             } else {
-                intake.setVelocity(2000);
+                if (intakeSlow) {
+                    intake.setVelocity(intakeSlowVelocity);
+                } else {
+                    intake.setVelocity(intakeNormalVelocity);
+                }
             }
         } else {
             intake.setVelocity(0);
         }
 
-        // Shooter controls (gamepad2)
+        // Shooter controls
         if (gamepad1.rightBumperWasPressed()) {
             shooterVelocity += 100;
         } else if (gamepad1.leftBumperWasPressed()) {
@@ -85,7 +100,7 @@ public class TeleOpTest extends OpMode {
 
         shooterMotor.setVelocity(shooterVelocity);
 
-        // Hood servo controls (gamepad2)
+        // Hood servo controls
         if (gamepad1.dpadUpWasPressed()) {
             hoodPos -= 0.02;
         } else if (gamepad1.dpadDownWasPressed()) {
@@ -94,6 +109,15 @@ public class TeleOpTest extends OpMode {
 
         hoodPos = Range.clip(hoodPos, 0, 1);
         hoodServo.setPosition(hoodPos);
+
+        // Shooter Block controls
+        if (gamepad1.dpadLeftWasPressed()) {
+            shooterBlocker.setPosition(0.15); // Open
+            intakeSlow = true;
+        } else if (gamepad1.dpadLeftWasReleased()) {
+            shooterBlocker.setPosition(0.0); // Closed
+            intakeSlow = false;
+        }
 
         // Telemetry for shooter
         telemetry.addData("Wanted Shooter Velocity", shooterVelocity);
