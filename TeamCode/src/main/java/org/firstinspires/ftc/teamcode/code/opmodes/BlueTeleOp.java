@@ -11,32 +11,44 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.teamcode.code.parts.Intake;
+import org.firstinspires.ftc.teamcode.code.parts.Shooter;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
+
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 import java.util.List;
 
 @Config
-@TeleOp(name = "Auto Aim Test", group = "TeleOp")
-public class AutoAimTest extends OpMode {
+@TeleOp(name = "Blue TeleOp", group = "TeleOp")
+public class BlueTeleOp extends OpMode {
     private Limelight3A limelight;
 
-    public double yOffset = -168.0; // mm
-    public double xOffset = -84.0; // mm
+    public static final double yOffset = -168.0; // mm
+    public static final double xOffset = -84.0; // mm
 
-    public double goalX = 60;
-    public double goalY = 54;
+    public static final double goalX = 60;
+    public static final double goalY = 54;
+
+    public static final double goalDZ = 20;
 
     // Positive angle is to the left, positive x is forward, and positive y is left
     // This is the center of the bot when the program is initialized
-    public Pose2D startPos = new Pose2D(DistanceUnit.INCH, -63, 15, AngleUnit.DEGREES, 0);
-    public Pose2D[] presetPositions = {
+    public static final Pose2D startPos = new Pose2D(DistanceUnit.INCH, -63, 15, AngleUnit.DEGREES, 0);
+
+    public static final Pose2D[] presetPositions = {
             new Pose2D(DistanceUnit.INCH, -54, 0, AngleUnit.DEGREES, 0),
             new Pose2D(DistanceUnit.INCH, 27, 21, AngleUnit.DEGREES, 0),
     };
+
+    public static final int targetID = 20;
+
+    // TODO: Find actual constant to multiply by (currently 0.9)
+    private static final double ticksToLaunchVelocity = (2 * Math.PI / 112) * (48.0 / 254.0) * 0.9; // In inches/s
 
     public int currentPreset = -1;
 
@@ -44,9 +56,17 @@ public class AutoAimTest extends OpMode {
 
     private OdometryHolonomicDrivetrain driveTrain;
 
-    public static final int targetID = 20;
 
     private boolean autoLock = false;
+
+    private Intake intake;
+    private boolean intakeOn = false;
+    private boolean intakeReversed = false;
+
+    private Shooter shooter;
+    private double shooterVelocity;
+    private double shooterAngle;
+
 
     @Override
     public void init() {
@@ -66,6 +86,31 @@ public class AutoAimTest extends OpMode {
         );
         driveTrain.setPosition(startPos);
         driveTrain.setCountsToSlowDown(500);
+
+        intake = new Intake(hardwareMap.get(DcMotorEx.class, "intakeMotor"));
+        shooter = new Shooter(
+                hardwareMap.get(DcMotorEx.class, "shooter"),
+                hardwareMap.get(Servo.class, "hood"),
+                hardwareMap.get(Servo.class, "blocker")
+        );
+    }
+
+    // TODO: Check if this works
+    // All inches parameters
+    public static double solveLaunchAngle(double x, double v) {
+        double g = 0.249174; // Gravity in inches/s^2
+
+        double v2 = v * v;
+        double gTerm = g * x * x / (2 * v2);
+        double discriminant = x * x - 4 * gTerm * (gTerm + goalDZ);
+
+        if (discriminant < 0) {
+            return Double.NaN;
+        }
+
+        double tanTheta1 = (x - Math.sqrt(discriminant)) / (2 * gTerm);
+
+        return Math.toDegrees(Math.atan(tanTheta1));
     }
 
     @Override
@@ -75,11 +120,7 @@ public class AutoAimTest extends OpMode {
         if (result.isValid()) {
             List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
             for (LLResultTypes.FiducialResult tag : aprilTags) {
-                Pose3D robotPose = tag.getRobotPoseTargetSpace();
-                Position pos = robotPose.getPosition();
                 telemetry.addData("April Tag", "ID: %d, Family: %s, X: %.2f, Y: %.2f", tag.getFiducialId(), tag.getFamily(), tag.getTargetXDegrees(), tag.getTargetYDegrees());
-                telemetry.addData("Tag Robot Pose", "X: %.2f, Y: %.2f, Z: %.2f, H: %.2f", pos.x, pos.y, pos.z, robotPose.getOrientation().getYaw(AngleUnit.DEGREES));
-
                 if (tag.getFiducialId() == targetID) {
                     targetApril = tag;
                     break;
@@ -93,19 +134,23 @@ public class AutoAimTest extends OpMode {
         telemetry.addData("Position", "X: %.2f, Y: %.2f, H: %.2f", currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH), currentPos.getHeading(AngleUnit.DEGREES));
 
         double wantedHeading;
+        double distance;
         if (targetApril != null) {
             wantedHeading = driveTrain.getPosition().getHeading(AngleUnit.DEGREES) - targetApril.getTargetXDegrees();
+            Position relativePose = targetApril.getRobotPoseTargetSpace().getPosition();
+            distance = Math.hypot(relativePose.x, relativePose.y);
         } else {
             Pose2D pos = driveTrain.getPosition();
-            wantedHeading = Math.toDegrees(Math.atan2(
-                    goalY - pos.getY(DistanceUnit.INCH),
-                    goalX - pos.getX(DistanceUnit.INCH)
-            ));
+            double dy = goalY - pos.getY(DistanceUnit.INCH);
+            double dx = goalX - pos.getX(DistanceUnit.INCH);
+            wantedHeading = Math.toDegrees(Math.atan2(dy, dx));
+            distance = Math.hypot(dx, dy);
         }
 
-        if (gamepad1.a) {
+        // Preset & Auto Lock
+        if (gamepad2.a) {
             currentPreset = 0;
-        } else if (gamepad1.b) {
+        } else if (gamepad2.b) {
             currentPreset = 1;
         }
 
@@ -141,6 +186,58 @@ public class AutoAimTest extends OpMode {
 
             driveTrain.setVelocityDriveFieldCentric(-gamepad1.left_stick_y * velocity, -gamepad1.left_stick_x * velocity, turn);
         }
+
+        if (autoLock) {
+            shooterVelocity = Math.min(1000 + (distance / 144) * 800, 1800);
+            shooterAngle = solveLaunchAngle(distance, shooterVelocity * ticksToLaunchVelocity);
+        }
+
+        // Shooter and Intake
+        if (gamepad1.rightBumperWasPressed()) {
+            shooterVelocity = Math.round(shooterVelocity / 100) * 100;
+            shooterVelocity += 100;
+        }
+        if (gamepad1.leftBumperWasPressed()){
+            shooterVelocity = Math.round(shooterVelocity / 100) * 100;
+            shooterVelocity -= 100;
+        }
+
+        if (gamepad1.dpadUpWasPressed()) {
+            shooterAngle += 2;
+        }
+        if (gamepad1.dpadDownWasPressed()) {
+            shooterAngle -= 2;
+        }
+
+        if (gamepad1.xWasPressed()) {
+            intakeOn = !intakeOn;
+        }
+        if (gamepad1.bWasPressed()) {
+            intakeReversed = !intakeReversed;
+        }
+
+        double intakeVelocity = intakeOn ? (intakeReversed ? -2000 : 2000) : 0;
+
+        if (gamepad1.a) {
+            shooter.open();
+            intakeVelocity = 0;
+
+            if (Math.abs(1 - (shooter.getVelocity() / shooterVelocity)) < 0.03) {
+                intakeVelocity = 1000;
+            }
+        } else {
+            shooter.close();
+        }
+
+        shooterAngle = Range.clip(shooterAngle, 0, 60);
+        shooterVelocity = Range.clip(shooterVelocity, 0, 2000);
+
+        intake.setVelocity(intakeVelocity);
+        shooter.setVelocity(shooterVelocity);
+        shooter.setVelocity(shooterAngle);
+
+        telemetry.addData("Shooter Angle", shooterAngle);
+        telemetry.addData("Shooter Velocity", shooterVelocity);
 
         telemetry.update();
         driveTrain.drive();
