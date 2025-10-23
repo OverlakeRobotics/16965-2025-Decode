@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Config
 public class BasicHolonomicDrivetrain {
     public static final double MAX_STOP_VELOCITY = 1e-2;
-    public static final int MAX_VELOCITY = 3000;
+    public static final int MAX_VELOCITY = 2800;
     public static final double FORWARD_TO_STRAFE_RATIO = /* 1.0822; */ 1.19148;
     public static final double FORWARD_COUNTS_PER_INCH = 30;
     private final DcMotorEx backLeft;

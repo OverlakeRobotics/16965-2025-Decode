@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.Range;
 
 @Config
 public class Shooter {
-    private static final double MAX_VELOCITY = 2880;
+    private static final double MAX_VELOCITY = 2800;
     private final DcMotorEx shooterMotor;
     private final Servo hoodServo;
     private final Servo blocker;
@@ -22,7 +22,7 @@ public class Shooter {
     }
 
     public void setVelocity(double velocity) {
-        shooterMotor.setVelocity(Math.min(velocity, MAX_VELOCITY));
+        shooterMotor.setVelocity(Range.clip(velocity, -MAX_VELOCITY, MAX_VELOCITY));
     }
 
     public double getVelocity() {
