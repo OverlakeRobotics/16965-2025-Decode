@@ -223,7 +223,7 @@ public class BlueTeleOp extends OpMode {
             shooter.open();
             intakeVelocity = 0;
 
-            if (Math.abs(1 - (shooter.getVelocity() / shooterVelocity)) < 0.03) {
+            if (Math.abs(shooter.getVelocity() - shooterVelocity) <= 40) {
                 intakeVelocity = 1000;
             }
         } else {
