@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.Range;
 
 @Config
 public class Intake {
-    private static final double MAX_VELOCITY = 2880;
+    private static final double MAX_VELOCITY = 2800;
     private final DcMotorEx intakeMotor;
 
     public Intake(DcMotorEx intakeMotor) {
