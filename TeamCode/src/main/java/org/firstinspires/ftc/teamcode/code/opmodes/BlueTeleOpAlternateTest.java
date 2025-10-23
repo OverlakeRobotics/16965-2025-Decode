@@ -29,7 +29,7 @@ public class BlueTeleOpAlternateTest extends OpMode {
     public static final double rhinoWheelRadius = 1.88976; // in
     // TODO: Tune this value
     public static final double k_slip = 0.90; // estimated slip factor
-    public static final double motorTicksPerRev = 28 * 4d;
+    public static final double motorTicksPerRev = 28d;
     private Limelight3A limelight;
 
     public static final double yOffset = -168.0; // mm
@@ -38,7 +38,7 @@ public class BlueTeleOpAlternateTest extends OpMode {
     public static final double goalX = 60;
     public static final double goalY = 54;
     // TODO: Measure actual vertical distance from launcher to goal entrance
-    public static final double goalDZ = 20;
+    public static final double goalDZ = 23;
 
     // Positive angle is to the left, positive x is forward, and positive y is left
     // This is the center of the bot when the program is initialized
@@ -77,7 +77,7 @@ public class BlueTeleOpAlternateTest extends OpMode {
         theta = Math.toRadians(theta);
         // Impossible
         if (verticalDist >= horizontalDist / Math.tan(theta) || theta <= 0 || horizontalDist <= 0) {
-            return -1;
+            return -100;
         }
         // First calculate the required launch velocity (derived from kinematics assuming no air resistance)
         double v = Math.sqrt(
@@ -97,8 +97,8 @@ public class BlueTeleOpAlternateTest extends OpMode {
 
         final double minTheta = 8.0;    // base angle when very close
         final double k = 28.0;  // overall rise (increase for steeper far shots)
-        final double midpointDist = 36.0;  // midpoint distance (in)
-        final double rampFactor = 24.0;  // how quickly it ramps (in)
+        final double midpointDist = 160.0;  // midpoint distance (in)
+        final double rampFactor = 60.0;  // how quickly it ramps (in)
 
         final double minHoodDeg = 0.5;     // avoid exact 0°
         final double maxHoodDeg = 45.0;    // your mechanical cap
@@ -110,19 +110,19 @@ public class BlueTeleOpAlternateTest extends OpMode {
         // 2) Physics cap
         // Feasible iff horizontalDist / tan(theta) > verticalDist.
         // For Δh>0, that implies theta < atan(D/Δh).
-        double thetaPhysCapDeg = Math.toDegrees(Math.atan(horizontalDist / verticalDist)) - epsPhysDeg;
-        if (thetaPhysCapDeg < minHoodDeg) return Double.NaN; // no feasible angle in 0–45°
+//        double thetaPhysCapDeg = Math.toDegrees(Math.atan(horizontalDist / verticalDist)) - epsPhysDeg;
+//        if (thetaPhysCapDeg < minHoodDeg) return Double.NaN; // no feasible angle in 0–45°
 
         // 3) Apply mech + physics caps
         double theta = Range.clip(thetaBase, minHoodDeg, maxHoodDeg);
-        if (theta > thetaPhysCapDeg) {
-            theta = Math.max(minHoodDeg, Math.min(maxHoodDeg, thetaPhysCapDeg));
-        }
+//        if (theta > thetaPhysCapDeg) {
+//            theta = Math.max(minHoodDeg, Math.min(maxHoodDeg, thetaPhysCapDeg));
+//        }
 
         // 4) Final feasibility sanity check (numerical guard)
-        double th = Math.toRadians(theta);
-        double denomGeom = horizontalDist / Math.tan(th) - verticalDist; // must be > 0
-        if (denomGeom <= 1e-6) return Double.NaN;
+//        double th = Math.toRadians(theta);
+//        double denomGeom = horizontalDist / Math.tan(th) - verticalDist; // must be > 0
+//        if (denomGeom <= 1e-6) return Double.NaN;
 
         return theta;
     }
@@ -276,7 +276,7 @@ public class BlueTeleOpAlternateTest extends OpMode {
 
         intake.setVelocity(intakeVelocity);
         shooter.setVelocity(shooterVelocity);
-        shooter.setVelocity(shooterAngle);
+        shooter.setAngle(shooterAngle);
 
         telemetry.addData("Shooter Angle", shooterAngle);
         telemetry.addData("Shooter Velocity", shooterVelocity);

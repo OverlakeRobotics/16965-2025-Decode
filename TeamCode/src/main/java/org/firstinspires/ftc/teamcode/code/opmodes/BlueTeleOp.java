@@ -34,7 +34,7 @@ public class BlueTeleOp extends OpMode {
     public static final double goalX = 60;
     public static final double goalY = 54;
     // TODO: Measure actual vertical distance from launcher to goal entrance
-    public static final double goalDZ = 20;
+    public static final double goalDZ = 23;
 
     // Positive angle is to the left, positive x is forward, and positive y is left
     // This is the center of the bot when the program is initialized
@@ -48,7 +48,7 @@ public class BlueTeleOp extends OpMode {
     public static final int targetID = 20;
 
     // TODO: Find actual constant to multiply by (currently 0.9), also check that the ticks per revolution of 112 is correct
-    private static final double ticksToLaunchVelocity = (2 * Math.PI / 112) * (48.0 / 254.0) * 0.9; // In inches/s
+    private static final double ticksToLaunchVelocity = (2 * Math.PI / 28) * (48.0 / 254.0) * 0.9; // In inches/s
 
     public int currentPreset = -1;
 
@@ -235,7 +235,7 @@ public class BlueTeleOp extends OpMode {
 
         intake.setVelocity(intakeVelocity);
         shooter.setVelocity(shooterVelocity);
-        shooter.setVelocity(shooterAngle);
+        shooter.setAngle(shooterAngle);
 
         telemetry.addData("Shooter Angle", shooterAngle);
         telemetry.addData("Shooter Velocity", shooterVelocity);
