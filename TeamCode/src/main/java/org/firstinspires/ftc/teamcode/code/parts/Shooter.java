@@ -19,6 +19,7 @@ public class Shooter {
 
         this.hoodServo = hoodServo;
         this.blocker = blocker;
+        this.blocker.setDirection(Servo.Direction.REVERSE);
     }
 
     public void setVelocity(double velocity) {
@@ -31,7 +32,7 @@ public class Shooter {
 
     // TODO: Make this set correct angle
     public void setAngle(double angle) {
-        hoodServo.setPosition(Range.clip(angle / 100, 0, 1));
+        hoodServo.setPosition(Range.clip((90 - angle) / 100, 0, 1));
     }
 
     public void open() {

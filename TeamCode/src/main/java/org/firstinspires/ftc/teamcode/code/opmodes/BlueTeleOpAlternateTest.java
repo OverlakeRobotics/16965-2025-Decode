@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.code.opmodes;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -28,8 +30,9 @@ public class BlueTeleOpAlternateTest extends OpMode {
     public static final double g = 386.08858; // in/s^2
     public static final double rhinoWheelRadius = 1.88976; // in
     // TODO: Tune this value
-    public static final double k_slip = 0.90; // estimated slip factor
+    public static double k_slip = 0.38; // estimated slip factor
     public static final double motorTicksPerRev = 28d;
+    public static double maxShooterVelocity = 1800;
     private Limelight3A limelight;
 
     public static final double yOffset = -168.0; // mm
@@ -38,7 +41,7 @@ public class BlueTeleOpAlternateTest extends OpMode {
     public static final double goalX = 60;
     public static final double goalY = 54;
     // TODO: Measure actual vertical distance from launcher to goal entrance
-    public static final double goalDZ = 23;
+    public static final double goalDZ = 30;
 
     // Positive angle is to the left, positive x is forward, and positive y is left
     // This is the center of the bot when the program is initialized
@@ -88,7 +91,11 @@ public class BlueTeleOpAlternateTest extends OpMode {
         double rpm = (v * 60) / (2 * Math.PI * rhinoWheelRadius * k_slip);
         // Scale to motor ticks per second
         // TODO: Check ticks/sec calculation
-        return rpm * motorTicksPerRev / 60;
+        double rawTPS = rpm * motorTicksPerRev / 60;
+        if (rawTPS > maxShooterVelocity) {
+            Log.d("Above Max Shooter", "raw vel: " + rawTPS);
+        }
+        return Range.clip(rpm * motorTicksPerRev / 60, 0, maxShooterVelocity);
     }
 
     public double getBestHoodAngleDegrees(double horizontalDist, double verticalDist) {
@@ -176,18 +183,22 @@ public class BlueTeleOpAlternateTest extends OpMode {
 
         double wantedHeading;
         // TODO: Check if distance needs to be increased by a factor so it's to the inside of the goal
-        double distance;
+        Pose2D pos = driveTrain.getPosition();
+        double dy = goalY - pos.getY(DistanceUnit.INCH);
+        double dx = goalX - pos.getX(DistanceUnit.INCH);
+        double distance = Math.hypot(dx, dy);
         if (targetApril != null) {
             wantedHeading = driveTrain.getPosition().getHeading(AngleUnit.DEGREES) - targetApril.getTargetXDegrees();
-            Position relativePose = targetApril.getRobotPoseTargetSpace().getPosition();
-            distance = Math.hypot(relativePose.x, relativePose.y);
+//            Position relativePose = targetApril.getRobotPoseTargetSpace().getPosition();
+//            distance = Math.hypot(relativePose.x, relativePose.y);
         } else {
-            Pose2D pos = driveTrain.getPosition();
-            double dy = goalY - pos.getY(DistanceUnit.INCH);
-            double dx = goalX - pos.getX(DistanceUnit.INCH);
+//            Pose2D pos = driveTrain.getPosition();
+//            double dy = goalY - pos.getY(DistanceUnit.INCH);
+//            double dx = goalX - pos.getX(DistanceUnit.INCH);
             wantedHeading = Math.toDegrees(Math.atan2(dy, dx));
-            distance = Math.hypot(dx, dy);
+//            distance = Math.hypot(dx, dy);
         }
+        Log.d("Distance", Double.toString(distance));
 
         // Preset & Auto Lock
         if (gamepad2.a) {
@@ -230,7 +241,8 @@ public class BlueTeleOpAlternateTest extends OpMode {
         }
 
         if (autoLock) {
-            shooterAngle = getBestHoodAngleDegrees(distance, goalDZ);
+            shooterAngle = Math.min(10 + (distance / 144) * 30, 40);
+//            shooterAngle = getBestHoodAngleDegrees(distance, goalDZ);
             shooterVelocity = getShooterVelocity(distance, goalDZ, shooterAngle);
         }
 
@@ -242,6 +254,9 @@ public class BlueTeleOpAlternateTest extends OpMode {
         if (gamepad1.leftBumperWasPressed()){
             shooterVelocity = Math.round(shooterVelocity / 100) * 100;
             shooterVelocity -= 100;
+        }
+        if (gamepad1.dpadRightWasPressed()) {
+            shooterVelocity = 0;
         }
 
         if (gamepad1.dpadUpWasPressed()) {
@@ -265,13 +280,13 @@ public class BlueTeleOpAlternateTest extends OpMode {
             intakeVelocity = 0;
 
             if (Math.abs(1 - (shooter.getVelocity() / shooterVelocity)) < 0.03) {
-                intakeVelocity = 1000;
+                intakeVelocity = 2000;
             }
         } else {
             shooter.close();
         }
 
-        shooterAngle = Range.clip(shooterAngle, 0, 60);
+        shooterAngle = Range.clip(shooterAngle, 0, 90);
         shooterVelocity = Range.clip(shooterVelocity, 0, 2000);
 
         intake.setVelocity(intakeVelocity);
@@ -279,7 +294,7 @@ public class BlueTeleOpAlternateTest extends OpMode {
         shooter.setAngle(shooterAngle);
 
         telemetry.addData("Shooter Angle", shooterAngle);
-        telemetry.addData("Shooter Velocity", shooterVelocity);
+        telemetry.addData("Shooter Velocity", shooter.getVelocity());
 
         telemetry.update();
         driveTrain.drive();
