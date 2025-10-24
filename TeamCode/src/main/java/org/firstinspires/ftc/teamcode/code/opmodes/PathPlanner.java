@@ -1,13 +1,18 @@
 package org.firstinspires.ftc.teamcode.code.opmodes;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.code.parts.Intake;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
@@ -15,6 +20,7 @@ import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 import org.firstinspires.ftc.teamcode.system.PathServer;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Config
 @Autonomous(name = "Path Planner", group = "Autonomous")
@@ -26,6 +32,8 @@ public class PathPlanner extends OpMode {
     public static double tolerance;
 
     private OdometryHolonomicDrivetrain driveTrain;
+    private Intake intake;
+    private Limelight3A limelight;
     public Pose2D[] positions;
     public PathServer.Tag[] tags;
     private int lastTagIndex = 0;
@@ -33,6 +41,10 @@ public class PathPlanner extends OpMode {
     private double lastTime = 0;
     private double pauseTimeLeft = 0;
     public int addIndex = 0;
+    private int autoAlignIndex = -1;
+    private int targetAprilID = 20;
+    public double goalX = 60;
+    public double goalY = 54;
 
     @Override
     public void init() {
@@ -45,6 +57,9 @@ public class PathPlanner extends OpMode {
                 hardwareMap.get(DcMotorEx.class, "frontRight"),
                 new GoBildaPinpointOdometry(pinpointDriver)
         );
+
+        intake = new Intake(hardwareMap.get(DcMotorEx.class, "intakeMotor"));
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
         PathServer.startServer();
     }
@@ -60,13 +75,29 @@ public class PathPlanner extends OpMode {
         driveTrain.setPositionDrive(positions, velocity, tolerance);
     }
 
+    public double getAutoAlignAngle() {
+        Pose2D pos = driveTrain.getPosition();
+        LLResult result = limelight.getLatestResult();
+        if (result.isValid()) {
+            List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult tag : aprilTags) {
+                if (tag.getFiducialId() == targetAprilID) {
+                    return driveTrain.getPosition().getHeading(AngleUnit.DEGREES) - tag.getTargetXDegrees();
+                }
+            }
+        }
+
+        return Math.toDegrees(Math.atan2(
+                goalY - pos.getY(DistanceUnit.INCH),
+                goalX - pos.getX(DistanceUnit.INCH)
+        ));
+    }
 
     @Override
     public void loop() {
         driveTrain.updatePosition();
         PathServer.setRobotPose(driveTrain.getPosition());
         if (pauseTimeLeft <= 0) {
-            // Usual routine, driving
             driveTrain.drive();
             int nextPointIndex = driveTrain.getNextPointIndex();
 
@@ -84,13 +115,35 @@ public class PathPlanner extends OpMode {
                         pauseIndexIncrement = nextPointIndex;
                         driveTrain.stop();
                         break;
+                    case "intake":
+                        if (currTag.value <= 0) {
+                            intake.stop();
+                        } else {
+                            intake.setVelocity(currTag.value);
+                        }
+                        break;
+                    case "autoAlignRed": {
+                        autoAlignIndex = nextPointIndex;
+                        targetAprilID = 23;
+                        goalY = 54;
+                        Pose2D curTarget = positions[nextPointIndex];
+                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH), curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, getAutoAlignAngle());
+                        break;
+                    }
+                    case "autoAlignBlue": {
+                        autoAlignIndex = nextPointIndex;
+                        targetAprilID = 20;
+                        goalY = -54;
+                        Pose2D curTarget = positions[nextPointIndex];
+                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH), curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, getAutoAlignAngle());
+                        break;
+                    }
                 }
                 lastTagIndex++;
             }
 
             addIndex += pauseIndexIncrement;
         } else {
-            // Stopped for a pause
             pauseTimeLeft -= runtime.seconds() - lastTime;
             if (pauseTimeLeft <= 0) {
                 pauseTimeLeft = 0;
