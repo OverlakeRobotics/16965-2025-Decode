@@ -66,7 +66,6 @@ public class PathPlanExample extends OpMode {
         driveTrain.updatePosition();
         PathServer.setRobotPose(driveTrain.getPosition());
         if (pauseTimeLeft <= 0) {
-            // Usual routine, driving
             driveTrain.drive();
             int nextPointIndex = driveTrain.getNextPointIndex();
 
@@ -90,7 +89,6 @@ public class PathPlanExample extends OpMode {
 
             addIndex += pauseIndexIncrement;
         } else {
-            // Stopped for a pause
             pauseTimeLeft -= runtime.seconds() - lastTime;
             if (pauseTimeLeft <= 0) {
                 pauseTimeLeft = 0;
