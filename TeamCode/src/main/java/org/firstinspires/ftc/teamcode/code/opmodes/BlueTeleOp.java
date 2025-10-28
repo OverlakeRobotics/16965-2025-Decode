@@ -33,10 +33,12 @@ public class BlueTeleOp extends OpMode {
     public static final double yOffset = -168.0; // mm
     public static final double xOffset = -84.0; // mm
 
-    public static final double goalX = 60;
-    public static final double goalY = 54;
+    public static final double aprilX = 60;
+    public static final double aprilY = 54;
+    public static final double goalX = 70;
+    public static final double goalY = 70;
     // TODO: Measure actual vertical distance from launcher to goal entrance
-    public static final double goalDZ = 30;
+    public static final double goalDZ = 28;
 
     // Positive angle is to the left, positive x is forward, and positive y is left
     // This is the center of the bot when the program is initialized
@@ -48,7 +50,7 @@ public class BlueTeleOp extends OpMode {
     };
 
     public static final int targetID = 20;
-    public static double kSlip = 0.7;
+    public static double kSlip = 0.3;
     public static double hoodOffset = 0.0;
 
     // TODO: Find actual constant to multiply by (currently 0.9), also check that the ticks per revolution of 112 is correct
@@ -99,41 +101,26 @@ public class BlueTeleOp extends OpMode {
         );
     }
 
-    // TODO: Check if this works
-    // All inches parameters
-//    public static double solveLaunchAngle(double x, double v) {
-//        double g = 386.22047; // Gravity in inches/s^2
-//
-//        double v2 = v * v;
-//        double gTerm = g * x * x / (2 * v2);
-//        double discriminant = x * x - 4 * gTerm * (gTerm + goalDZ);
-//
-//        if (discriminant < 0) {
-//            return Double.NaN;
-//        }
-//
-//        double tanTheta1 = (x + Math.sqrt(discriminant)) / (2 * gTerm);
-//
-//        return 90 - Math.toDegrees(Math.atan(tanTheta1));
-//    }
-
-    public static double solveLaunchAngle(double xIn, double dzIn, double vIn) {
-        Log.d("langle", "x: " + xIn);
-        Log.d("langle", "z: " + dzIn);
-        Log.d("langle", "v: " + vIn);
+    public static double solveLaunchAngle(double x, double v) {
         // All inputs must be in inches and inches/second
         final double g = 386.22047; // in/s^2
 
-        double v2 = vIn * vIn;
-        double v4 = v2 * v2;
-        double term = v4 - g * (g * xIn * xIn + 2.0 * v2 * dzIn);
-        Log.d("solve", "term: " + term);
+        Log.d("Angle", "Vel: " + v);
+        Log.d("Angle", "Dist: " + x);
 
+        double xSquared = x * x;
+        double vSquared = v * v;
+        double gTerm = g * xSquared / (2 * vSquared);
 
-        if (term < 0) return Double.NaN; // physically impossible for given v
+        double discriminant = xSquared - (4 * gTerm * (goalDZ + gTerm));
 
-        double tanTheta = (v2 - Math.sqrt(term)) / (g * xIn); // low arc
-        return 90 - Math.toDegrees(Math.atan(tanTheta));
+        if (discriminant < 0) {
+            return Double.NaN;
+        }
+
+        double sol = (x + Math.sqrt(discriminant)) / (2 * gTerm);
+
+        return 90 - Math.toDegrees(Math.atan(sol));
     }
 
 
@@ -164,15 +151,10 @@ public class BlueTeleOp extends OpMode {
         double dx = goalX - pos.getX(DistanceUnit.INCH);
         double distance = Math.hypot(dx, dy);
         if (targetApril != null) {
-            wantedHeading = driveTrain.getPosition().getHeading(AngleUnit.DEGREES) - targetApril.getTargetXDegrees();
-//            Position relativePose = targetApril.getRobotPoseTargetSpace().getPosition();
-//            distance = Math.hypot(relativePose.x, relativePose.y);
+            double aprilAngle = driveTrain.getPosition().getHeading(AngleUnit.DEGREES) - targetApril.getTargetXDegrees();
+            wantedHeading = aprilAngle - Math.atan2(goalX - (aprilX - distance * Math.cos(aprilAngle)), goalY - (aprilY - distance * Math.sin(aprilAngle)));
         } else {
-//            Pose2D pos = driveTrain.getPosition();
-//            double dy = goalY - pos.getY(DistanceUnit.INCH);
-//            double dx = goalX - pos.getX(DistanceUnit.INCH);
             wantedHeading = Math.toDegrees(Math.atan2(dy, dx));
-//            distance = Math.hypot(dx, dy);
         }
         Log.d("Distance", Double.toString(distance));
 
@@ -217,9 +199,9 @@ public class BlueTeleOp extends OpMode {
         }
 
         if (autoLock) {
-            shooterVelocity = Math.min(1000 + (distance / 144) * 800, 1800);
+            shooterVelocity = Math.min(900 + (distance / 156) * 900, 1800);
             Log.d("Shooter", "Vel: " + shooterVelocity);
-            shooterAngle = solveLaunchAngle(distance, goalDZ, shooterVelocity * ticksToLaunchVelocity) - hoodOffset;
+            shooterAngle = solveLaunchAngle(distance, shooterVelocity * ticksToLaunchVelocity) - hoodOffset;
         }
 
         // Shooter and Intake

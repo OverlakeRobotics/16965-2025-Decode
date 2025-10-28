@@ -30,7 +30,7 @@ public class BlueTeleOpAlternateTest extends OpMode {
     public static final double g = 386.08858; // in/s^2
     public static final double rhinoWheelRadius = 1.88976; // in
     // TODO: Tune this value
-    public static double k_slip = 0.38; // estimated slip factor
+    public static double k_slip = 0.42; // estimated slip factor
     public static final double motorTicksPerRev = 28d;
     public static double maxShooterVelocity = 1800;
     private Limelight3A limelight;
@@ -38,10 +38,15 @@ public class BlueTeleOpAlternateTest extends OpMode {
     public static final double yOffset = -168.0; // mm
     public static final double xOffset = -84.0; // mm
 
-    public static final double goalX = 60;
-    public static final double goalY = 54;
+    public static final double aprilX = 60;
+    public static final double aprilY = 54;
+    public static final double goalX = 70;
+    public static final double goalY = 70;
     // TODO: Measure actual vertical distance from launcher to goal entrance
-    public static final double goalDZ = 30;
+    public static double goalDZ = 30;
+
+    public static double angleMin = 5;
+    public static double angleMax = 35;
 
     // Positive angle is to the left, positive x is forward, and positive y is left
     // This is the center of the bot when the program is initialized
@@ -87,6 +92,7 @@ public class BlueTeleOpAlternateTest extends OpMode {
                 g * Math.pow(horizontalDist, 2) /
                         (2 * Math.pow(Math.sin(theta), 2) * (horizontalDist / Math.tan(theta) - verticalDist))
         );
+
         // Then calculate RPM from linear velocity
         double rpm = (v * 60) / (2 * Math.PI * rhinoWheelRadius * k_slip);
         // Scale to motor ticks per second
@@ -188,15 +194,10 @@ public class BlueTeleOpAlternateTest extends OpMode {
         double dx = goalX - pos.getX(DistanceUnit.INCH);
         double distance = Math.hypot(dx, dy);
         if (targetApril != null) {
-            wantedHeading = driveTrain.getPosition().getHeading(AngleUnit.DEGREES) - targetApril.getTargetXDegrees();
-//            Position relativePose = targetApril.getRobotPoseTargetSpace().getPosition();
-//            distance = Math.hypot(relativePose.x, relativePose.y);
+            double aprilAngle = driveTrain.getPosition().getHeading(AngleUnit.DEGREES) - targetApril.getTargetXDegrees();
+            wantedHeading = aprilAngle - Math.atan2(goalX - (aprilX - distance * Math.cos(aprilAngle)), goalY - (aprilY - distance * Math.sin(aprilAngle)));
         } else {
-//            Pose2D pos = driveTrain.getPosition();
-//            double dy = goalY - pos.getY(DistanceUnit.INCH);
-//            double dx = goalX - pos.getX(DistanceUnit.INCH);
             wantedHeading = Math.toDegrees(Math.atan2(dy, dx));
-//            distance = Math.hypot(dx, dy);
         }
         Log.d("Distance", Double.toString(distance));
 
@@ -241,7 +242,7 @@ public class BlueTeleOpAlternateTest extends OpMode {
         }
 
         if (autoLock) {
-            shooterAngle = Math.min(10 + (distance / 144) * 30, 40);
+            shooterAngle = Math.min(angleMin + (distance / 144) * (angleMax - angleMin), angleMax);
 //            shooterAngle = getBestHoodAngleDegrees(distance, goalDZ);
             shooterVelocity = getShooterVelocity(distance, goalDZ, shooterAngle);
         }
@@ -279,7 +280,7 @@ public class BlueTeleOpAlternateTest extends OpMode {
             shooter.open();
             intakeVelocity = 0;
 
-            if (Math.abs(1 - (shooter.getVelocity() / shooterVelocity)) < 0.03) {
+            if (Math.abs(shooter.getVelocity() - shooterVelocity) <= 40) {
                 intakeVelocity = 2000;
             }
         } else {
