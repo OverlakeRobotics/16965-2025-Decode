@@ -104,42 +104,6 @@ public class BlueTeleOpAlternateTest extends OpMode {
         return Range.clip(rpm * motorTicksPerRev / 60, 0, maxShooterVelocity);
     }
 
-    public double getBestHoodAngleDegrees(double horizontalDist, double verticalDist) {
-        // Guard bad input
-        if (!(horizontalDist > 0)) return Double.NaN;
-
-        final double minTheta = 8.0;    // base angle when very close
-        final double k = 28.0;  // overall rise (increase for steeper far shots)
-        final double midpointDist = 160.0;  // midpoint distance (in)
-        final double rampFactor = 60.0;  // how quickly it ramps (in)
-
-        final double minHoodDeg = 0.5;     // avoid exact 0°
-        final double maxHoodDeg = 45.0;    // your mechanical cap
-        final double epsPhysDeg = 0.5;     // safety margin vs physics cap
-
-        // 1) Base angle from smooth monotone map
-        double thetaBase = minTheta + k * Math.toDegrees(Math.atan((horizontalDist - midpointDist) / rampFactor));
-
-        // 2) Physics cap
-        // Feasible iff horizontalDist / tan(theta) > verticalDist.
-        // For Δh>0, that implies theta < atan(D/Δh).
-//        double thetaPhysCapDeg = Math.toDegrees(Math.atan(horizontalDist / verticalDist)) - epsPhysDeg;
-//        if (thetaPhysCapDeg < minHoodDeg) return Double.NaN; // no feasible angle in 0–45°
-
-        // 3) Apply mech + physics caps
-        double theta = Range.clip(thetaBase, minHoodDeg, maxHoodDeg);
-//        if (theta > thetaPhysCapDeg) {
-//            theta = Math.max(minHoodDeg, Math.min(maxHoodDeg, thetaPhysCapDeg));
-//        }
-
-        // 4) Final feasibility sanity check (numerical guard)
-//        double th = Math.toRadians(theta);
-//        double denomGeom = horizontalDist / Math.tan(th) - verticalDist; // must be > 0
-//        if (denomGeom <= 1e-6) return Double.NaN;
-
-        return theta;
-    }
-
     @Override
     public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -159,7 +123,7 @@ public class BlueTeleOpAlternateTest extends OpMode {
         driveTrain.setPosition(startPos);
         driveTrain.setCountsToSlowDown(500);
 
-        intake = new Intake(hardwareMap.get(DcMotorEx.class, "intakeMotor"));
+        intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
         shooter = new Shooter(
                 hardwareMap.get(DcMotorEx.class, "shooter"),
                 hardwareMap.get(Servo.class, "hood"),

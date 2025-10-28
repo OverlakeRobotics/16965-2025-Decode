@@ -7,12 +7,15 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.code.helpers.AutoAligner;
 import org.firstinspires.ftc.teamcode.code.parts.Intake;
+import org.firstinspires.ftc.teamcode.code.parts.Shooter;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
@@ -33,6 +36,8 @@ public class PathPlanner extends OpMode {
 
     private OdometryHolonomicDrivetrain driveTrain;
     private Intake intake;
+    private Shooter shooter;
+    private AutoAligner autoAligner;
     private Limelight3A limelight;
     public Pose2D[] positions;
     public PathServer.Tag[] tags;
@@ -45,6 +50,7 @@ public class PathPlanner extends OpMode {
     private int targetAprilID = 20;
     public double goalX = 60;
     public double goalY = 54;
+    private double wantedShooterVelocity = 0;
 
     @Override
     public void init() {
@@ -58,8 +64,12 @@ public class PathPlanner extends OpMode {
                 new GoBildaPinpointOdometry(pinpointDriver)
         );
 
-        intake = new Intake(hardwareMap.get(DcMotorEx.class, "intakeMotor"));
+        intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
+        shooter = new Shooter(hardwareMap.get(DcMotorEx.class, "shooter"),
+                            hardwareMap.get(Servo.class, "hood"),
+                            hardwareMap.get(Servo.class, "blocker"));
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        autoAligner = new AutoAligner(driveTrain, limelight, false);
 
         PathServer.startServer();
     }
@@ -75,24 +85,6 @@ public class PathPlanner extends OpMode {
         driveTrain.setPositionDrive(positions, velocity, tolerance);
     }
 
-    public double getAutoAlignAngle() {
-        Pose2D pos = driveTrain.getPosition();
-        LLResult result = limelight.getLatestResult();
-        if (result.isValid()) {
-            List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
-            for (LLResultTypes.FiducialResult tag : aprilTags) {
-                if (tag.getFiducialId() == targetAprilID) {
-                    return driveTrain.getPosition().getHeading(AngleUnit.DEGREES) - tag.getTargetXDegrees();
-                }
-            }
-        }
-
-        return Math.toDegrees(Math.atan2(
-                goalY - pos.getY(DistanceUnit.INCH),
-                goalX - pos.getX(DistanceUnit.INCH)
-        ));
-    }
-
     @Override
     public void loop() {
         driveTrain.updatePosition();
@@ -100,6 +92,20 @@ public class PathPlanner extends OpMode {
         if (pauseTimeLeft <= 0) {
             driveTrain.drive();
             int nextPointIndex = driveTrain.getNextPointIndex();
+
+            if (nextPointIndex == autoAlignIndex && nextPointIndex != -1) {
+                Pose2D curTarget = positions[nextPointIndex];
+                positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH),
+                        curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getAutoAlignAngle());
+                double hoodAngle = autoAligner.getOptimalHoodAngle();
+                shooter.setAngle(hoodAngle);
+                wantedShooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
+                shooter.setVelocity(wantedShooterVelocity);
+            } else {
+                wantedShooterVelocity = 0;
+                shooter.setVelocity(wantedShooterVelocity);
+                autoAlignIndex = -1;
+            }
 
             int pauseIndexIncrement = 0;
 
@@ -127,7 +133,7 @@ public class PathPlanner extends OpMode {
                         targetAprilID = 23;
                         goalY = 54;
                         Pose2D curTarget = positions[nextPointIndex];
-                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH), curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, getAutoAlignAngle());
+                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH), curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getAutoAlignAngle());
                         break;
                     }
                     case "autoAlignBlue": {
@@ -135,8 +141,30 @@ public class PathPlanner extends OpMode {
                         targetAprilID = 20;
                         goalY = -54;
                         Pose2D curTarget = positions[nextPointIndex];
-                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH), curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, getAutoAlignAngle());
+                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH), curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getAutoAlignAngle());
                         break;
+                    }
+                    case "launchVelocity": {
+                        shooter.setVelocity(currTag.value);
+                        break;
+                    }
+                    case "launchAngle": {
+                        shooter.setAngle(currTag.value);
+                        break;
+                    }
+                    case "launchArtifacts": {
+                        double startTime = runtime.seconds();
+                        double intakeVelocity = 0;
+                        while (runtime.seconds() - startTime < currTag.value) {
+                            shooter.open();
+                            intakeVelocity = 0;
+
+                            if (Math.abs(shooter.getVelocity() - wantedShooterVelocity) <= 40) {
+                                intakeVelocity = 2000;
+                            }
+                            intake.setVelocity(intakeVelocity);
+                        }
+                        shooter.close();
                     }
                 }
                 lastTagIndex++;

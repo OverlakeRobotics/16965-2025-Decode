@@ -93,7 +93,7 @@ public class BlueTeleOp extends OpMode {
         driveTrain.setPosition(startPos);
         driveTrain.setCountsToSlowDown(500);
 
-        intake = new Intake(hardwareMap.get(DcMotorEx.class, "intakeMotor"));
+        intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
         shooter = new Shooter(
                 hardwareMap.get(DcMotorEx.class, "shooter"),
                 hardwareMap.get(Servo.class, "hood"),
