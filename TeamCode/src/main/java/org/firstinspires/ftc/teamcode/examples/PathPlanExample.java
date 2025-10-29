@@ -91,6 +91,8 @@ public class PathPlanExample extends OpMode {
                 lastTagIndex++;
             }
         } else {
+            driveTrain.setPositionDrive(positions[pausedIndex - 1], velocity);
+
             pauseTimeLeft -= runtime.seconds() - lastTime;
             if (pauseTimeLeft <= 0) {
                 pauseTimeLeft = 0;
