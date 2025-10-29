@@ -140,7 +140,7 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     // Parameters:
     //      - Pose2D[] path: The path for the robot to follow as an array of Pose2Ds.
     //      - double velocity: How fast the robot should follow the path.
-    public void setPositionDrive(Pose2D[] path, double velocity) {
+    public void setPositionDrive(Pose2D[] path, double velocity, int initialPointIndex) {
         double[] distances = new double[path.length];
         for (int i = path.length - 2; i >= 0; i--) {
             distances[i] = distances[i + 1] + dist(path[i], path[i + 1]);
@@ -149,18 +149,22 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
         pathDistances = distances;
 
         currentPath = path;
-        setPositionDrive(currentPath[0], velocity);
-        currentPoint = 0;
+        setPositionDrive(currentPath[initialPointIndex], velocity);
+        currentPoint = initialPointIndex;
     }
 
-    // Behavior: Overloads setPositionDrive to include a tolerance when setting a path drive.
+    // Behavior: Overloads setPositionDrive to default as 0 as the initial point.
+    public void setPositionDrive(Pose2D[] path, double velocity) {
+        setPositionDrive(path, velocity, 0);
+    }
+
+    // Behavior: Sets the tolerance parameter for driving along a path.
     // Parameters:
     //      - double tolerance: How far the robot can deviate from the path in inches. A lower tolerance
     //                          will make the robot slower and jittery but more accurate, while a
     //                          tolerance that is higher will be smoother but less accurate.
-    public void setPositionDrive(Pose2D[] path, double velocity, double tolerance) {
+    public void setTolerance(double tolerance) {
         pathTolerance = tolerance;
-        setPositionDrive(path, velocity);
     }
 
     // Behavior: Gets the distance from the current position to the wanted position.
@@ -169,6 +173,7 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
         return Math.hypot(wantedPosition.getX(DistanceUnit.INCH) - currentPosition.getX(DistanceUnit.INCH),
                           wantedPosition.getY(DistanceUnit.INCH) - currentPosition.getY(DistanceUnit.INCH));
     }
+
 
     // Behavior: Overrides getPositionDriveDistanceLeft to make the distance count the entire path's
     //           length when doing a path drive.
