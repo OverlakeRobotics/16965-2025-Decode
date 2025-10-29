@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.code.opmodes;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -123,7 +125,7 @@ public class PathPlanner extends OpMode {
                         break;
                     case "pause":
                         pauseTimeLeft += currTag.value;
-                        pausedIndex = nextPointIndex;
+                        pausedIndex = nextPointIndex + 1;
                         driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
                         break;
                     case "intake":
@@ -161,6 +163,7 @@ public class PathPlanner extends OpMode {
                         pausedIndex = nextPointIndex;
                         driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
                         isShooting = true;
+                        break;
                     }
                 }
                 lastTagIndex++;
@@ -182,7 +185,8 @@ public class PathPlanner extends OpMode {
 
             if (pauseTimeLeft <= 0) {
                 pauseTimeLeft = 0;
-                driveTrain.setPositionDrive(positions, velocity, pausedIndex);
+                // Initial point index is wrong or something.
+                driveTrain.setPositionDrive(positions, velocity, pausedIndex - 1);
                 if (isShooting) {
                     shooter.close();
                     intake.setVelocity(0);
