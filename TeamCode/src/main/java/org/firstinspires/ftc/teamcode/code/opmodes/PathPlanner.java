@@ -45,9 +45,10 @@ public class PathPlanner extends OpMode {
     private final ElapsedTime runtime = new ElapsedTime();
     private double lastTime = 0;
     private double pauseTimeLeft = 0;
-    public int addIndex = 0;
+    private int pausedIndex = 0;
     private int autoAlignIndex = -1;
     private double wantedShooterVelocity = 0;
+    private boolean isShooting;
 
     @Override
     public void init() {
@@ -72,14 +73,21 @@ public class PathPlanner extends OpMode {
     }
 
     @Override
+    public void init_loop() {
+        driveTrain.updatePosition();
+        PathServer.setRobotPose(driveTrain.getPosition());
+    }
+
+    @Override
     public void start() {
         velocity = (int) (PathServer.getVelocity() * BasicHolonomicDrivetrain.FORWARD_COUNTS_PER_INCH);
         tolerance = PathServer.getTolerance();
+        driveTrain.setTolerance(tolerance);
         positions = PathServer.getPath();
         driveTrain.setPosition(PathServer.getStartPose());
         tags = PathServer.getTags();
         Arrays.sort(tags);
-        driveTrain.setPositionDrive(positions, velocity, tolerance);
+        driveTrain.setPositionDrive(positions, velocity);
         shooter.close();
     }
 
@@ -103,9 +111,7 @@ public class PathPlanner extends OpMode {
                 autoAlignIndex = -1;
             }
 
-            int pauseIndexIncrement = 0;
-
-            while (lastTagIndex < tags.length && tags[lastTagIndex].index <= nextPointIndex + addIndex) {
+            while (lastTagIndex < tags.length && tags[lastTagIndex].index <= nextPointIndex) {
                 PathServer.Tag currTag = tags[lastTagIndex];
                 switch (currTag.name) {
                     case "velocity":
@@ -113,9 +119,8 @@ public class PathPlanner extends OpMode {
                         break;
                     case "pause":
                         pauseTimeLeft += currTag.value;
-                        positions = Arrays.copyOfRange(positions, nextPointIndex, positions.length);
-                        pauseIndexIncrement = nextPointIndex;
-                        driveTrain.stop();
+                        pausedIndex = nextPointIndex;
+                        driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
                         break;
                     case "intake":
                         if (currTag.value <= 0) {
@@ -147,30 +152,39 @@ public class PathPlanner extends OpMode {
                         break;
                     }
                     case "launchArtifacts": {
-                        double startTime = runtime.seconds();
-                        double intakeVelocity;
-                        while (runtime.seconds() - startTime < currTag.value) {
-                            shooter.open();
-                            intakeVelocity = 0;
-
-                            if (Math.abs(shooter.getVelocity() - wantedShooterVelocity) <= 40) {
-                                intakeVelocity = 2000;
-                            }
-                            intake.setVelocity(intakeVelocity);
-                        }
-                        intake.setVelocity(0);
-                        shooter.close();
+                        shooter.open();
+                        pauseTimeLeft = currTag.value;
+                        pausedIndex = nextPointIndex;
+                        driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
+                        isShooting = true;
                     }
                 }
                 lastTagIndex++;
             }
 
-            addIndex += pauseIndexIncrement;
         } else {
             pauseTimeLeft -= runtime.seconds() - lastTime;
+            driveTrain.setPositionDrive(positions[pausedIndex - 1], velocity);
+
+            if (isShooting) {
+                shooter.open();
+                double intakeVelocity = 0;
+
+                if (Math.abs(shooter.getVelocity() - wantedShooterVelocity) <= 40) {
+                    intakeVelocity = 2000;
+                }
+
+                intake.setVelocity(intakeVelocity);
+            }
+
             if (pauseTimeLeft <= 0) {
                 pauseTimeLeft = 0;
-                driveTrain.setPositionDrive(positions, velocity, tolerance);
+                driveTrain.setPositionDrive(positions, velocity, pausedIndex);
+                if (isShooting) {
+                    shooter.close();
+                    intake.setVelocity(0);
+                    isShooting = false;
+                }
             }
         }
         lastTime = runtime.seconds();
