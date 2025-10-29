@@ -91,6 +91,16 @@ public class PathPlanner extends OpMode {
         shooter.close();
     }
 
+    public void autoAim(int pointIndex) {
+        Pose2D curTarget = positions[pointIndex];
+        positions[pointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH),
+                curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getAutoAlignAngle());
+        double hoodAngle = autoAligner.getOptimalHoodAngle();
+        shooter.setAngle(hoodAngle);
+        wantedShooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
+        shooter.setVelocity(wantedShooterVelocity);
+    }
+
     @Override
     public void loop() {
         driveTrain.updatePosition();
@@ -100,13 +110,7 @@ public class PathPlanner extends OpMode {
             int nextPointIndex = driveTrain.getNextPointIndex();
 
             if (nextPointIndex == autoAlignIndex && nextPointIndex != -1) {
-                Pose2D curTarget = positions[nextPointIndex];
-                positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH),
-                        curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getAutoAlignAngle());
-                double hoodAngle = autoAligner.getOptimalHoodAngle();
-                shooter.setAngle(hoodAngle);
-                wantedShooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
-                shooter.setVelocity(wantedShooterVelocity);
+                autoAim(nextPointIndex);
             } else {
                 autoAlignIndex = -1;
             }
@@ -129,14 +133,14 @@ public class PathPlanner extends OpMode {
                             intake.setVelocity(currTag.value);
                         }
                         break;
-                    case "autoAlignRed": {
+                    case "autoAimRed": {
                         autoAlignIndex = nextPointIndex;
                         autoAligner.setRed();
                         Pose2D curTarget = positions[nextPointIndex];
                         positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH), curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getAutoAlignAngle());
                         break;
                     }
-                    case "autoAlignBlue": {
+                    case "autoAimBlue": {
                         autoAlignIndex = nextPointIndex;
                         autoAligner.setBlue();
                         Pose2D curTarget = positions[nextPointIndex];
@@ -161,13 +165,10 @@ public class PathPlanner extends OpMode {
                 }
                 lastTagIndex++;
             }
-
         } else {
-            pauseTimeLeft -= runtime.seconds() - lastTime;
-            driveTrain.setPositionDrive(positions[pausedIndex - 1], velocity);
-
             if (isShooting) {
                 shooter.open();
+                autoAim(pausedIndex - 1);
                 double intakeVelocity = 0;
 
                 if (Math.abs(shooter.getVelocity() - wantedShooterVelocity) <= 40) {
@@ -177,6 +178,8 @@ public class PathPlanner extends OpMode {
                 intake.setVelocity(intakeVelocity);
             }
 
+            pauseTimeLeft -= runtime.seconds() - lastTime;
+
             if (pauseTimeLeft <= 0) {
                 pauseTimeLeft = 0;
                 driveTrain.setPositionDrive(positions, velocity, pausedIndex);
@@ -185,6 +188,9 @@ public class PathPlanner extends OpMode {
                     intake.setVelocity(0);
                     isShooting = false;
                 }
+            } else {
+                driveTrain.setPositionDrive(positions[pausedIndex - 1], velocity);
+
             }
         }
         lastTime = runtime.seconds();
