@@ -36,7 +36,7 @@ public class Shooter {
     }
 
     public void open() {
-        blocker.setPosition(0.15);
+        blocker.setPosition(0.18);
     }
 
     public void close() {

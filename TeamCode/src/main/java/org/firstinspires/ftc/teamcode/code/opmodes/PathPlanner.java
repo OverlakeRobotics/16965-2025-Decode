@@ -35,6 +35,8 @@ public class PathPlanner extends OpMode {
 
     public static int velocity;
     public static double tolerance;
+    public static double shooterDelay = 0.75;
+    public static double shooterVelocityTolerance = 40;
 
     private OdometryHolonomicDrivetrain driveTrain;
     private Intake intake;
@@ -51,6 +53,7 @@ public class PathPlanner extends OpMode {
     private int autoAlignIndex = -1;
     private double wantedShooterVelocity = 0;
     private boolean isShooting;
+    private double shootStartTime;
 
     @Override
     public void init() {
@@ -119,14 +122,25 @@ public class PathPlanner extends OpMode {
 
             while (lastTagIndex < tags.length && tags[lastTagIndex].index <= nextPointIndex) {
                 PathServer.Tag currTag = tags[lastTagIndex];
+                boolean breakFromLoop = false;
                 switch (currTag.name) {
                     case "velocity":
                         driveTrain.setVelocity((int) (currTag.value * BasicHolonomicDrivetrain.FORWARD_COUNTS_PER_INCH));
                         break;
                     case "pause":
-                        pauseTimeLeft += currTag.value;
-                        pausedIndex = nextPointIndex + 1;
-                        driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
+                        pauseTimeLeft = currTag.value;
+                        lastTime = runtime.seconds();
+                        while (pauseTimeLeft >= 0) {
+                            double time = runtime.seconds();
+                            pauseTimeLeft -= time - lastTime;
+                            lastTime = time;
+
+                            driveTrain.updatePosition();
+                            driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
+                            driveTrain.drive();
+                        }
+
+                        driveTrain.setPositionDrive(positions, velocity, nextPointIndex);
                         break;
                     case "intake":
                         if (currTag.value <= 0) {
@@ -163,18 +177,19 @@ public class PathPlanner extends OpMode {
                         pausedIndex = nextPointIndex;
                         driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
                         isShooting = true;
+                        shootStartTime = runtime.time();
                         break;
                     }
                 }
                 lastTagIndex++;
             }
         } else {
-            if (isShooting) {
+            if (isShooting && runtime.seconds() - shootStartTime > shooterDelay) {
                 shooter.open();
                 autoAim(pausedIndex - 1);
                 double intakeVelocity = 0;
 
-                if (Math.abs(shooter.getVelocity() - wantedShooterVelocity) <= 40) {
+                if (Math.abs(shooter.getVelocity() - wantedShooterVelocity) <= shooterVelocityTolerance) {
                     intakeVelocity = 2000;
                 }
 
@@ -186,7 +201,7 @@ public class PathPlanner extends OpMode {
             if (pauseTimeLeft <= 0) {
                 pauseTimeLeft = 0;
                 // Initial point index is wrong or something.
-                driveTrain.setPositionDrive(positions, velocity, pausedIndex - 1);
+                driveTrain.setPositionDrive(positions, velocity, pausedIndex);
                 if (isShooting) {
                     shooter.close();
                     intake.setVelocity(0);

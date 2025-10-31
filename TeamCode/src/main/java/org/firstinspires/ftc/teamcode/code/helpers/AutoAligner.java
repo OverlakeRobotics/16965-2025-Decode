@@ -47,7 +47,7 @@ public class AutoAligner {
 
     public void setBlue() {
         goalX = 70;
-        goalY = 70;
+        goalY = 65;
         aprilX = 60;
         aprilY = 54;
         targetAprilID = 20;
@@ -55,7 +55,7 @@ public class AutoAligner {
 
     public void setRed() {
         goalX = 70;
-        goalY = -70;
+        goalY = -65;
         aprilX = 60;
         aprilY = -54;
         targetAprilID = 23;
