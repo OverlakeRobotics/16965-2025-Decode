@@ -20,8 +20,12 @@ public class BlueAutonomousFar extends AutoBase {
     }
 
     @Override
-    public void start() throws IOException {
-        super.jsonReader = new FileReader(jsonPath);
+    public void start() {
+        try {
+            super.jsonReader = new FileReader(jsonPath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         super.start();
     }
 }

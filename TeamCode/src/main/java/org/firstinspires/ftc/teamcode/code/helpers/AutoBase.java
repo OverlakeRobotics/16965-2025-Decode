@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.code.helpers;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -29,7 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 @Config
-public class AutoBase {
+public abstract class AutoBase extends OpMode {
     public double yOffset = -168.0; // mm
     public double xOffset = -84.0; // mm
 
@@ -111,6 +112,7 @@ public class AutoBase {
         br.close();
     }
 
+    @Override
     public void init() {
         GoBildaPinpointDriver pinpointDriver = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpointDriver.setOffsets(xOffset, yOffset, DistanceUnit.MM);
@@ -130,11 +132,13 @@ public class AutoBase {
         autoAligner = new AutoAligner(driveTrain, limelight, false);
     }
 
+    @Override
     public void init_loop() {
         driveTrain.updatePosition();
     }
 
-    public void start() throws IOException {
+    @Override
+    public void start() {
         if (readJson) {
             try {
                 parseJsonFromPathname();
@@ -159,6 +163,7 @@ public class AutoBase {
         shooter.setVelocity(wantedShooterVelocity);
     }
 
+    @Override
     public void loop() {
         driveTrain.updatePosition();
 
@@ -180,7 +185,7 @@ public class AutoBase {
                         break;
                     case "pause":
                         pauseTimeLeft += currTag.value;
-                        pausedIndex = nextPointIndex + 1;
+                        pausedIndex = nextPointIndex;
                         driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
                         break;
                     case "intake":
@@ -249,12 +254,12 @@ public class AutoBase {
                 }
             } else {
                 driveTrain.setPositionDrive(positions[pausedIndex - 1], velocity);
-
             }
         }
         lastTime = runtime.seconds();
     }
 
+    @Override
     public void stop() {
 
     }

@@ -24,7 +24,7 @@ public class PathPlanner extends AutoBase {
     }
 
     @Override
-    public void start() throws IOException {
+    public void start() {
         super.velocity = (int) (PathServer.getVelocity() * BasicHolonomicDrivetrain.FORWARD_COUNTS_PER_INCH);
         super.tolerance = PathServer.getTolerance();
         super.startPose = PathServer.getStartPose();
