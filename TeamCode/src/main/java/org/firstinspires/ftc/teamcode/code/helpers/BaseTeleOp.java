@@ -1,14 +1,11 @@
-package org.firstinspires.ftc.teamcode.code.opmodes;
+package org.firstinspires.ftc.teamcode.code.helpers;
 
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -16,93 +13,49 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.code.parts.Intake;
 import org.firstinspires.ftc.teamcode.code.parts.Shooter;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
-import java.util.List;
-
 @Config
-@TeleOp(name = "Blue TeleOp Alternate Test", group = "TeleOp")
-public class BlueTeleOpAlternateTest extends OpMode {
-    public static final double g = 386.08858; // in/s^2
-    public static final double rhinoWheelRadius = 1.88976; // in
-    // TODO: Tune this value
-    public static double k_slip = 0.42; // estimated slip factor
-    public static final double motorTicksPerRev = 28d;
-    public static double maxShooterVelocity = 1800;
-    private Limelight3A limelight;
+public abstract class BaseTeleOp extends OpMode {
+    protected Limelight3A limelight;
 
     public static final double yOffset = -168.0; // mm
     public static final double xOffset = -84.0; // mm
-
-    public static final double aprilX = 60;
-    public static final double aprilY = 54;
-    public static final double goalX = 70;
-    public static final double goalY = 70;
-    // TODO: Measure actual vertical distance from launcher to goal entrance
-    public static double goalDZ = 30;
-
-    public static double angleMin = 5;
-    public static double angleMax = 35;
-
-    // Positive angle is to the left, positive x is forward, and positive y is left
-    // This is the center of the bot when the program is initialized
-    public static final Pose2D startPos = new Pose2D(DistanceUnit.INCH, -63, 15, AngleUnit.DEGREES, 0);
 
     public static final Pose2D[] presetPositions = {
             new Pose2D(DistanceUnit.INCH, -54, 0, AngleUnit.DEGREES, 0),
             new Pose2D(DistanceUnit.INCH, 27, 21, AngleUnit.DEGREES, 0),
     };
 
-    public static final int targetID = 20;
-
     public int currentPreset = -1;
 
     public double velocity = 2000;
 
-    private OdometryHolonomicDrivetrain driveTrain;
+    protected OdometryHolonomicDrivetrain driveTrain;
+    protected AutoAligner autoAligner;
 
+    protected boolean autoLock = false;
 
-    private boolean autoLock = false;
+    protected Intake intake;
+    protected boolean intakeOn = false;
+    protected boolean intakeReversed = false;
 
-    private Intake intake;
-    private boolean intakeOn = false;
-    private boolean intakeReversed = false;
+    protected Shooter shooter;
+    protected double shooterVelocity;
+    protected double shooterAngle;
 
-    private Shooter shooter;
-    private double shooterVelocity;
-    private double shooterAngle;
+    /**
+     * Returns the starting position for this alliance
+     */
+    protected abstract Pose2D getStartPosition();
 
-    // TODO: Check angle and velocity calculations
-    // Distances should be passed in as inches due to FTC standard units
-    // theta is the launch angle in degrees, where launching straight up is 0 degrees (hood flat) and straight forward is 90 degrees (hood vertical)
-    // Returns -1 if no valid solution (i.e. not possible given the angle)
-    public double getShooterVelocity(double horizontalDist, double verticalDist, double theta) {
-        // Convert theta to radians
-        theta = Math.toRadians(theta);
-        // Impossible
-        if (verticalDist >= horizontalDist / Math.tan(theta) || theta <= 0 || horizontalDist <= 0) {
-            return -100;
-        }
-        // First calculate the required launch velocity (derived from kinematics assuming no air resistance)
-        double v = Math.sqrt(
-                g * Math.pow(horizontalDist, 2) /
-                        (2 * Math.pow(Math.sin(theta), 2) * (horizontalDist / Math.tan(theta) - verticalDist))
-        );
-
-        // Then calculate RPM from linear velocity
-        double rpm = (v * 60) / (2 * Math.PI * rhinoWheelRadius * k_slip);
-        // Scale to motor ticks per second
-        // TODO: Check ticks/sec calculation
-        double rawTPS = rpm * motorTicksPerRev / 60;
-        if (rawTPS > maxShooterVelocity) {
-            Log.d("Above Max Shooter", "raw vel: " + rawTPS);
-        }
-        return Range.clip(rpm * motorTicksPerRev / 60, 0, maxShooterVelocity);
-    }
+    /**
+     * Returns whether this is the red alliance
+     */
+    protected abstract boolean isRedAlliance();
 
     @Override
     public void init() {
@@ -120,8 +73,11 @@ public class BlueTeleOpAlternateTest extends OpMode {
                 hardwareMap.get(DcMotorEx.class, "frontRight"),
                 new GoBildaPinpointOdometry(pinpointDriver)
         );
-        driveTrain.setPosition(startPos);
+        driveTrain.setPosition(getStartPosition());
         driveTrain.setCountsToSlowDown(500);
+
+        // Initialize AutoAligner
+        autoAligner = new AutoAligner(driveTrain, limelight, isRedAlliance());
 
         intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
         shooter = new Shooter(
@@ -133,36 +89,18 @@ public class BlueTeleOpAlternateTest extends OpMode {
 
     @Override
     public void loop() {
-        LLResult result = limelight.getLatestResult();
-        LLResultTypes.FiducialResult targetApril = null;
-        if (result.isValid()) {
-            List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
-            for (LLResultTypes.FiducialResult tag : aprilTags) {
-                telemetry.addData("April Tag", "ID: %d, Family: %s, X: %.2f, Y: %.2f", tag.getFiducialId(), tag.getFamily(), tag.getTargetXDegrees(), tag.getTargetYDegrees());
-                if (tag.getFiducialId() == targetID) {
-                    targetApril = tag;
-                    break;
-                }
-            }
-        }
-
         driveTrain.updatePosition();
         Pose2D currentPos = driveTrain.getPosition();
 
-        telemetry.addData("Position", "X: %.2f, Y: %.2f, H: %.2f", currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH), currentPos.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("Position", "X: %.2f, Y: %.2f, H: %.2f",
+                currentPos.getX(DistanceUnit.INCH),
+                currentPos.getY(DistanceUnit.INCH),
+                currentPos.getHeading(AngleUnit.DEGREES));
 
-        double wantedHeading;
-        // TODO: Check if distance needs to be increased by a factor so it's to the inside of the goal
-        Pose2D pos = driveTrain.getPosition();
-        double dy = goalY - pos.getY(DistanceUnit.INCH);
-        double dx = goalX - pos.getX(DistanceUnit.INCH);
-        double distance = Math.hypot(dx, dy);
-        if (targetApril != null) {
-            double aprilAngle = driveTrain.getPosition().getHeading(AngleUnit.DEGREES) - targetApril.getTargetXDegrees();
-            wantedHeading = aprilAngle - Math.atan2(goalX - (aprilX - distance * Math.cos(aprilAngle)), goalY - (aprilY - distance * Math.sin(aprilAngle)));
-        } else {
-            wantedHeading = Math.toDegrees(Math.atan2(dy, dx));
-        }
+        // Use AutoAligner to get wanted heading and distance
+        double wantedHeading = autoAligner.getAutoAlignAngle();
+        double distance = autoAligner.getDistanceToGoal();
+
         Log.d("Distance", Double.toString(distance));
 
         // Preset & Auto Lock
@@ -206,9 +144,9 @@ public class BlueTeleOpAlternateTest extends OpMode {
         }
 
         if (autoLock) {
-            shooterAngle = Math.min(angleMin + (distance / 144) * (angleMax - angleMin), angleMax);
-//            shooterAngle = getBestHoodAngleDegrees(distance, goalDZ);
-            shooterVelocity = getShooterVelocity(distance, goalDZ, shooterAngle);
+            // Use AutoAligner methods to calculate shooter angle and velocity
+            shooterAngle = autoAligner.getOptimalHoodAngle();
+            shooterVelocity = autoAligner.getShooterVelocityFromAngle(shooterAngle);
         }
 
         // Shooter and Intake
@@ -260,6 +198,7 @@ public class BlueTeleOpAlternateTest extends OpMode {
 
         telemetry.addData("Shooter Angle", shooterAngle);
         telemetry.addData("Shooter Velocity", shooter.getVelocity());
+        telemetry.addData("Distance to Goal", "%.2f inches", distance);
 
         telemetry.update();
         driveTrain.drive();
