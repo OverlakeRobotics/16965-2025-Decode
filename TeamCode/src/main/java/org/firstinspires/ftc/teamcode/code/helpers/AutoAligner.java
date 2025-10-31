@@ -72,7 +72,7 @@ public class AutoAligner {
     }
 
     public double getAutoAlignAngle() {
-        double distance = getDistanceToGoal();
+        double distanceToGoal = getDistanceToGoal();
         Pose2D pos = driveTrain.getPosition();
         LLResult result = limelight.getLatestResult();
         if (result.isValid()) {
@@ -80,7 +80,8 @@ public class AutoAligner {
             for (LLResultTypes.FiducialResult tag : aprilTags) {
                 if (tag.getFiducialId() == targetAprilID) {
                     double aprilAngle = driveTrain.getPosition().getHeading(AngleUnit.DEGREES) - tag.getTargetXDegrees();
-                    return aprilAngle - Math.atan2(goalX - (aprilX - distance * Math.cos(aprilAngle)), goalY - (aprilY - distance * Math.sin(aprilAngle)));
+                    // Possible issue is that angle wasn't converted to degrees
+                    return aprilAngle - Math.toDegrees(Math.atan2(goalX - (aprilX - distanceToGoal * Math.cos(aprilAngle)), goalY - (aprilY - distanceToGoal * Math.sin(aprilAngle))));
                 }
             }
         }
