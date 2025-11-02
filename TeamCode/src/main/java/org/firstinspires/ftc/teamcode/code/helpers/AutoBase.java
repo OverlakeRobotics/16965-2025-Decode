@@ -57,7 +57,7 @@ public abstract class AutoBase extends OpMode {
     private int autoAlignIndex = -1;
     private double wantedShooterVelocity = 0;
     private boolean isShooting;
-    public static double shooterDelay = 0.75;
+    public static double shooterDelay = 0.6;
     public double shooterTimer = 0;
     public static double shooterTolerance = 60;
 
