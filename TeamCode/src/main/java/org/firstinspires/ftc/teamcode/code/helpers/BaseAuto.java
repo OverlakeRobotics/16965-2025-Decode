@@ -4,11 +4,9 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -30,7 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 @Config
-public abstract class AutoBase extends OpMode {
+public abstract class BaseAuto extends OpMode {
     public double yOffset = -168.0; // mm
     public double xOffset = -84.0; // mm
 
@@ -43,24 +41,25 @@ public abstract class AutoBase extends OpMode {
     private Shooter shooter;
     private AutoAligner autoAligner;
     private Limelight3A limelight;
+    private final ElapsedTime runtime = new ElapsedTime();
 
     protected Pose2D[] positions;
     protected PathServer.Tag[] tags;
 
-    protected Pose2D startPose = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
+    private double wantedShooterVelocity = 0;
+    private boolean isShooting;
+    public static double shooterDelay = 0.6;
+    private double shooterTimer = 0;
+    public static double shooterTolerance = 60;
 
+    protected Pose2D startPose = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
     private int lastTagIndex = 0;
-    private final ElapsedTime runtime = new ElapsedTime();
     private double lastTime = 0;
     private double pauseTimeLeft = 0;
     private int pausedIndex = 0;
     private int autoAlignIndex = -1;
-    private double wantedShooterVelocity = 0;
-    private boolean isShooting;
-    public static double shooterDelay = 0.6;
-    public double shooterTimer = 0;
-    public static double shooterTolerance = 60;
 
+    // Gets the data for a path from a json, as a string.
     public void parseJsonFromString() throws IOException, JSONException {
         BufferedReader br = new BufferedReader(jsonReader);
         StringBuilder sb = new StringBuilder();

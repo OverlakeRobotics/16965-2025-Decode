@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.examples;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 @Config
 @Autonomous(name = "Odometry Auton Example", group = "Autonomous")
+@Disabled
 public class OdometryAutonExample extends OpMode {
     // Change to your actual offsets. See GoBildaPinpointDriver.setOffsets() for details on measuring offsets.
     public double yOffset = -168.0;

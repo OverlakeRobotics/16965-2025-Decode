@@ -25,10 +25,7 @@ public abstract class BaseTeleOp extends OpMode {
     public static final double yOffset = -168.0; // mm
     public static final double xOffset = -84.0; // mm
 
-    public static final Pose2D[] presetPositions = {
-            new Pose2D(DistanceUnit.INCH, -54, 0, AngleUnit.DEGREES, 0),
-            new Pose2D(DistanceUnit.INCH, 27, 21, AngleUnit.DEGREES, 0),
-    };
+    protected Pose2D[] presetPositions;
 
     public int currentPreset = -1;
 
@@ -47,15 +44,8 @@ public abstract class BaseTeleOp extends OpMode {
     protected double shooterVelocity;
     protected double shooterAngle;
 
-    /**
-     * Returns the starting position for this alliance
-     */
-    protected abstract Pose2D getStartPosition();
-
-    /**
-     * Returns whether this is the red alliance
-     */
     protected abstract boolean isRedAlliance();
+    protected abstract Pose2D[] getPresetPositions();
 
     @Override
     public void init() {
@@ -73,7 +63,7 @@ public abstract class BaseTeleOp extends OpMode {
                 hardwareMap.get(DcMotorEx.class, "frontRight"),
                 new GoBildaPinpointOdometry(pinpointDriver)
         );
-//        driveTrain.setPosition(getStartPosition());
+
         driveTrain.setCountsToSlowDown(500);
 
         // Initialize AutoAligner
@@ -85,6 +75,8 @@ public abstract class BaseTeleOp extends OpMode {
                 hardwareMap.get(Servo.class, "hood"),
                 hardwareMap.get(Servo.class, "blocker")
         );
+
+        presetPositions = getPresetPositions();
     }
 
     @Override
@@ -99,16 +91,6 @@ public abstract class BaseTeleOp extends OpMode {
 
         // Use AutoAligner to get wanted heading and distance
         double wantedHeading = autoAligner.getAutoAlignAngle();
-        double distance = autoAligner.getDistanceToGoal();
-
-        Log.d("Distance", Double.toString(distance));
-
-        // Preset & Auto Lock
-        if (gamepad2.a) {
-            currentPreset = 0;
-        } else if (gamepad2.b) {
-            currentPreset = 1;
-        }
 
         if (currentPreset >= 0 && (Math.abs(gamepad1.left_stick_x) > 0.001 || Math.abs(gamepad1.left_stick_y) > 0.001 || Math.abs(gamepad1.right_stick_x) > 0.001)) {
             currentPreset = -1;
@@ -138,9 +120,10 @@ public abstract class BaseTeleOp extends OpMode {
             if (autoLock) {
                 driveTrain.setWantedHeading(wantedHeading);
                 turn = driveTrain.getHeadingCorrectionVelocity();
+                driveTrain.setVelocityDriveFieldCentric(-gamepad1.left_stick_y * velocity, -gamepad1.left_stick_x * velocity, turn, isRedAlliance() ? -90 : 90);
+            } else {
+                driveTrain.setVelocityDrive(-gamepad1.left_stick_y * velocity, -gamepad1.left_stick_x * velocity, turn);
             }
-
-            driveTrain.setVelocityDriveFieldCentric(-gamepad1.left_stick_y * velocity, -gamepad1.left_stick_x * velocity, turn);
         }
 
         if (autoLock) {
@@ -149,31 +132,24 @@ public abstract class BaseTeleOp extends OpMode {
             shooterVelocity = autoAligner.getShooterVelocityFromAngle(shooterAngle);
         }
 
-        // Shooter and Intake
-        if (gamepad1.rightBumperWasPressed()) {
-            shooterVelocity = Math.round(shooterVelocity / 100) * 100;
-            shooterVelocity += 100;
-        }
-        if (gamepad1.leftBumperWasPressed()){
-            shooterVelocity = Math.round(shooterVelocity / 100) * 100;
-            shooterVelocity -= 100;
-        }
-        if (gamepad1.dpadRightWasPressed()) {
-            shooterVelocity = 0;
-        }
-
-        if (gamepad1.dpadUpWasPressed()) {
-            shooterAngle += 2;
-        }
-        if (gamepad1.dpadDownWasPressed()) {
-            shooterAngle -= 2;
-        }
+        // Gamepad 1 controls
+        // Right Bumper: Far preset
+        // Left Bumper: Close preset
+        // A: Shoot artifacts (hold down)
+        // X: Turn on/off intake
+        // B: Reverse intake direction
+        // Y: Auto aim
+        // D-Pad Right: Turn off shooter
 
         if (gamepad1.xWasPressed()) {
             intakeOn = !intakeOn;
         }
         if (gamepad1.bWasPressed()) {
             intakeReversed = !intakeReversed;
+        }
+
+        if (gamepad1.dpadRightWasPressed()) {
+            shooterVelocity = 0;
         }
 
         double intakeVelocity = intakeOn ? (intakeReversed ? -2000 : 2000) : 0;
@@ -189,16 +165,40 @@ public abstract class BaseTeleOp extends OpMode {
             shooter.close();
         }
 
+        // Preset & Auto Lock
+        if (gamepad1.rightBumperWasPressed()) {
+            currentPreset = 0;
+        } else if (gamepad1.leftBumperWasPressed()) {
+            currentPreset = 1;
+        }
+
+        // Gamepad 2 controls
+        // Right Bumper: Turn up shooter velocity by 100
+        // Left Bumper: Turn down shooter velocity by 100
+        // D-Pad Up: Increase hood angle by 2 degrees (More direct, 90 is straight forward)
+        // D-Pad Down: Decrease hood angle by 2 degrees (More parabolic, 0 is straight up)
+        if (gamepad2.rightBumperWasPressed()) {
+            shooterVelocity = Math.round(shooterVelocity / 100) * 100;
+            shooterVelocity += 100;
+        }
+        if (gamepad2.leftBumperWasPressed()){
+            shooterVelocity = Math.round(shooterVelocity / 100) * 100;
+            shooterVelocity -= 100;
+        }
+
+        if (gamepad2.dpadUpWasPressed()) {
+            shooterAngle += 2;
+        }
+        if (gamepad2.dpadDownWasPressed()) {
+            shooterAngle -= 2;
+        }
+
         shooterAngle = Range.clip(shooterAngle, 0, 90);
         shooterVelocity = Range.clip(shooterVelocity, 0, 2000);
 
         intake.setVelocity(intakeVelocity);
         shooter.setVelocity(shooterVelocity);
         shooter.setAngle(shooterAngle);
-
-        telemetry.addData("Shooter Angle", shooterAngle);
-        telemetry.addData("Shooter Velocity", shooter.getVelocity());
-        telemetry.addData("Distance to Goal", "%.2f inches", distance);
 
         telemetry.update();
         driveTrain.drive();

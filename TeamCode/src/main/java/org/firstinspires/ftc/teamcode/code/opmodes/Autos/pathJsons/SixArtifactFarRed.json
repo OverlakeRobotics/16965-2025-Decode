@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "createdAt": "2025-11-02T04:39:25.379Z",
+  "start": {
+    "x": -63,
+    "y": -15,
+    "h": 0
+  },
+  "points": [
+    {
+      "x": -63,
+      "y": -15,
+      "h": 0
+    },
+    {
+      "x": -54,
+      "y": -15,
+      "h": 0
+    },
+    {
+      "x": -37,
+      "y": -24,
+      "h": -90
+    },
+    {
+      "x": -37,
+      "y": -58,
+      "h": -90
+    },
+    {
+      "x": -54,
+      "y": -15,
+      "h": 0
+    },
+    {
+      "x": -27,
+      "y": -15,
+      "h": 0
+    }
+  ],
+  "headingMode": "straight",
+  "endHeading": 0,
+  "velocity": 70,
+  "maxAccel": 40,
+  "tolerance": 5,
+  "snapInches": 3,
+  "robot": {
+    "length": 18,
+    "width": 18
+  },
+  "tags": [
+    {
+      "index": 1,
+      "name": "autoAimRed",
+      "value": 0
+    },
+    {
+      "index": 2,
+      "name": "launchArtifacts",
+      "value": 5
+    },
+    {
+      "index": 3,
+      "name": "intake",
+      "value": 2000
+    },
+    {
+      "index": 4,
+      "name": "intake",
+      "value": 0
+    },
+    {
+      "index": 4,
+      "name": "autoAimRed",
+      "value": 0
+    },
+    {
+      "index": 5,
+      "name": "launchArtifacts",
+      "value": 5
+    },
+    {
+      "index": 3,
+      "name": "velocity",
+      "value": 25
+    },
+    {
+      "index": 4,
+      "name": "velocity",
+      "value": 70
+    }
+  ]
+}

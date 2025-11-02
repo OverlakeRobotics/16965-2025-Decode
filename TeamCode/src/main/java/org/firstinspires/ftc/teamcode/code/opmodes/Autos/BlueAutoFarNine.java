@@ -3,15 +3,13 @@ package org.firstinspires.ftc.teamcode.code.opmodes.Autos;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.code.helpers.AutoBase;
+import org.firstinspires.ftc.teamcode.code.helpers.BaseAuto;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.StringReader;
 
 @Config
-@Autonomous(name = "Blue Autonomous Far", group = "Autonomous")
-public class BlueAutonomousFar extends AutoBase {
+@Autonomous(name = "Blue Auto Far Nine", group = "Autonomous")
+public class BlueAutoFarNine extends BaseAuto {
     public static String data = "{\n" +
             "  \"version\": 1,\n" +
             "  \"createdAt\": \"2025-11-01T23:50:58.653Z\",\n" +

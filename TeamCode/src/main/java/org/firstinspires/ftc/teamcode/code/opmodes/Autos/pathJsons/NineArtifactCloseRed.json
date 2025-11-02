@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "createdAt": "2025-11-02T04:34:04.978Z",
+  "start": {
+    "x": 48,
+    "y": -48,
+    "h": 0
+  },
+  "points": [
+    {
+      "x": 48,
+      "y": -48,
+      "h": 0
+    },
+    {
+      "x": 18,
+      "y": -18,
+      "h": 0
+    },
+    {
+      "x": 9,
+      "y": -27,
+      "h": -90
+    },
+    {
+      "x": 9,
+      "y": -54,
+      "h": -90
+    },
+    {
+      "x": 18,
+      "y": -18,
+      "h": 0
+    },
+    {
+      "x": -15,
+      "y": -24,
+      "h": -90
+    },
+    {
+      "x": -15,
+      "y": -54,
+      "h": -90
+    },
+    {
+      "x": 18,
+      "y": -18,
+      "h": 0
+    },
+    {
+      "x": 54,
+      "y": -18,
+      "h": 0
+    }
+  ],
+  "headingMode": "straight",
+  "endHeading": 0,
+  "velocity": 70,
+  "maxAccel": 40,
+  "tolerance": 5,
+  "snapInches": 3,
+  "robot": {
+    "length": 18,
+    "width": 18
+  },
+  "tags": [
+    {
+      "index": 1,
+      "name": "autoAimRed",
+      "value": 0
+    },
+    {
+      "index": 2,
+      "name": "launchArtifacts",
+      "value": 4
+    },
+    {
+      "index": 3,
+      "name": "intake",
+      "value": 2000
+    },
+    {
+      "index": 3,
+      "name": "velocity",
+      "value": 25
+    },
+    {
+      "index": 4,
+      "name": "velocity",
+      "value": 70
+    },
+    {
+      "index": 4,
+      "name": "intake",
+      "value": 0
+    },
+    {
+      "index": 4,
+      "name": "autoAimRed",
+      "value": 0
+    },
+    {
+      "index": 5,
+      "name": "launchArtifacts",
+      "value": 4
+    },
+    {
+      "index": 6,
+      "name": "velocity",
+      "value": 25
+    },
+    {
+      "index": 6,
+      "name": "intake",
+      "value": 2000
+    },
+    {
+      "index": 7,
+      "name": "intake",
+      "value": 0
+    },
+    {
+      "index": 7,
+      "name": "velocity",
+      "value": 70
+    },
+    {
+      "index": 7,
+      "name": "autoAimRed",
+      "value": 0
+    },
+    {
+      "index": 8,
+      "name": "launchArtifacts",
+      "value": 4
+    }
+  ]
+}

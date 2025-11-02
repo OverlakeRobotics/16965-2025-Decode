@@ -87,8 +87,8 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     //           This means when that the forward value causes the robot to move in the 0 degree
     //           direction, no matter which way the robot is facing. Similarly, the strafe value
     //           will cause the robot to move in the 90 degree direction.
-    public void setVelocityDriveFieldCentric(double forward, double strafe, double turn) {
-        double heading = currentPosition.getHeading(AngleUnit.RADIANS);
+    public void setVelocityDriveFieldCentric(double forward, double strafe, double turn, double angleOffset) {
+        double heading = currentPosition.getHeading(AngleUnit.RADIANS) - Math.toRadians(angleOffset);
         super.setVelocityDrive(
             forward * Math.cos(heading) + strafe * Math.sin(heading),
             strafe * Math.cos(heading) - forward * Math.sin(heading),

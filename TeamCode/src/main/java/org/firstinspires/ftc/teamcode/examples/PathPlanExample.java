@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.examples;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 
 @Config
 @Autonomous(name = "Path Planning Example", group = "Autonomous")
+@Disabled
 public class PathPlanExample extends OpMode {
     public double yOffset = -168.0; // mm
     public double xOffset = -84.0; // mm

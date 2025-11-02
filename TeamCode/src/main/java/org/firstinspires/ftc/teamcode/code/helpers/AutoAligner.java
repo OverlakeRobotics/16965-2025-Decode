@@ -21,11 +21,11 @@ import java.util.List;
 public class AutoAligner {
     public static final double g = 386.08858; // in/s^2
     public static final double rhinoWheelRadius = 1.88976; // in
-    // TODO: Tune this value
-    public static double kSlip = 0.395; // estimated slip factor
+    // TODO: Tune these values
     public static double farKSlip = 0.395;
     public static double closeKSlip = 0.5;
     public static final double motorTicksPerRev = 28d;
+
     public static double maxShooterVelocity = 1800;
     public static double angleMin = 10;
     public static double angleMax = 38;
@@ -88,21 +88,16 @@ public class AutoAligner {
 //                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
 //                        break;
 //                    }
-                    Log.d("April", "Using April");
 //                    return Math.toDegrees(Math.atan2(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37));
                     return pos.getHeading(AngleUnit.DEGREES) - tag.getTargetXDegrees();
                 }
             }
         }
 
-        Log.d("April", "Using GoBilda");
-
-        double angle = Math.toDegrees(Math.atan2(
+        return Math.toDegrees(Math.atan2(
                 goalY - pos.getY(DistanceUnit.INCH),
                 goalX - pos.getX(DistanceUnit.INCH)
         ));
-        Log.d("April Pos", "Wanted gobilda angle: " + angle);
-        return angle;
     }
 
     // TODO: Check angle and velocity calculations
@@ -112,7 +107,7 @@ public class AutoAligner {
     public double getShooterVelocityFromAngle(double theta) {
         double horizontalDist = getDistanceToGoal();
 
-        kSlip = closeKSlip + (farKSlip - closeKSlip) * (horizontalDist / 144);
+        double kSlip = closeKSlip + (farKSlip - closeKSlip) * (horizontalDist / 144);
         // Convert theta to radians
         theta = Math.toRadians(theta);
         // Impossible
