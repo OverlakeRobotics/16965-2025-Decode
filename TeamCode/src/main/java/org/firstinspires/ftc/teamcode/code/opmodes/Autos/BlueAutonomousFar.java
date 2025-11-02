@@ -7,11 +7,149 @@ import org.firstinspires.ftc.teamcode.code.helpers.AutoBase;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 
 @Config
 @Autonomous(name = "Blue Autonomous Far", group = "Autonomous")
 public class BlueAutonomousFar extends AutoBase {
-    public static String jsonPath = "./jsonFiles/BlueAutonomousFar.json";
+    public static String data = "{\n" +
+            "  \"version\": 1,\n" +
+            "  \"createdAt\": \"2025-11-01T23:50:58.653Z\",\n" +
+            "  \"start\": {\n" +
+            "    \"x\": -63,\n" +
+            "    \"y\": 15,\n" +
+            "    \"h\": 0\n" +
+            "  },\n" +
+            "  \"points\": [\n" +
+            "    {\n" +
+            "      \"x\": -63,\n" +
+            "      \"y\": 15,\n" +
+            "      \"h\": 0\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"x\": -54,\n" +
+            "      \"y\": 15,\n" +
+            "      \"h\": 0\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"x\": -37,\n" +
+            "      \"y\": 24,\n" +
+            "      \"h\": 90\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"x\": -37,\n" +
+            "      \"y\": 58,\n" +
+            "      \"h\": 90\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"x\": -54,\n" +
+            "      \"y\": 15,\n" +
+            "      \"h\": 0\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"x\": -15,\n" +
+            "      \"y\": 24,\n" +
+            "      \"h\": 90\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"x\": -15,\n" +
+            "      \"y\": 54,\n" +
+            "      \"h\": 90\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"x\": -54,\n" +
+            "      \"y\": 15,\n" +
+            "      \"h\": 0\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"x\": -39,\n" +
+            "      \"y\": 15,\n" +
+            "      \"h\": 0\n" +
+            "    }\n" +
+            "  ],\n" +
+            "  \"headingMode\": \"straight\",\n" +
+            "  \"endHeading\": 0,\n" +
+            "  \"velocity\": 70,\n" +
+            "  \"maxAccel\": 40,\n" +
+            "  \"tolerance\": 5,\n" +
+            "  \"snapInches\": 1,\n" +
+            "  \"robot\": {\n" +
+            "    \"length\": 18,\n" +
+            "    \"width\": 18\n" +
+            "  },\n" +
+            "  \"tags\": [\n" +
+            "    {\n" +
+            "      \"index\": 1,\n" +
+            "      \"name\": \"autoAimBlue\",\n" +
+            "      \"value\": 0\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 2,\n" +
+            "      \"name\": \"launchArtifacts\",\n" +
+            "      \"value\": 4\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 3,\n" +
+            "      \"name\": \"intake\",\n" +
+            "      \"value\": 2000\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 4,\n" +
+            "      \"name\": \"intake\",\n" +
+            "      \"value\": 0\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 4,\n" +
+            "      \"name\": \"autoAimBlue\",\n" +
+            "      \"value\": 0\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 5,\n" +
+            "      \"name\": \"launchArtifacts\",\n" +
+            "      \"value\": 4\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 6,\n" +
+            "      \"name\": \"intake\",\n" +
+            "      \"value\": 2000\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 7,\n" +
+            "      \"name\": \"intake\",\n" +
+            "      \"value\": 0\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 7,\n" +
+            "      \"name\": \"autoAimBlue\",\n" +
+            "      \"value\": 0\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 8,\n" +
+            "      \"name\": \"launchArtifacts\",\n" +
+            "      \"value\": 4\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 3,\n" +
+            "      \"name\": \"velocity\",\n" +
+            "      \"value\": 25\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 4,\n" +
+            "      \"name\": \"velocity\",\n" +
+            "      \"value\": 70\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 6,\n" +
+            "      \"name\": \"velocity\",\n" +
+            "      \"value\": 25\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"index\": 7,\n" +
+            "      \"name\": \"velocity\",\n" +
+            "      \"value\": 70\n" +
+            "    }\n" +
+            "  ]\n" +
+            "}";
 
     @Override
     public void init() {
@@ -21,11 +159,7 @@ public class BlueAutonomousFar extends AutoBase {
 
     @Override
     public void start() {
-        try {
-            super.jsonReader = new FileReader(jsonPath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        super.jsonReader = new StringReader(data);
         super.start();
     }
 }

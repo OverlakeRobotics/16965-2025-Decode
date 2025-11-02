@@ -38,8 +38,6 @@ public abstract class AutoBase extends OpMode {
     protected double tolerance;
     protected Reader jsonReader;
     protected boolean readJson;
-    protected HardwareMap hardwareMap;
-    protected Telemetry telemetry;
     protected OdometryHolonomicDrivetrain driveTrain;
     private Intake intake;
     private Shooter shooter;
@@ -59,8 +57,11 @@ public abstract class AutoBase extends OpMode {
     private int autoAlignIndex = -1;
     private double wantedShooterVelocity = 0;
     private boolean isShooting;
+    public static double shooterDelay = 0.75;
+    public double shooterTimer = 0;
+    public static double shooterTolerance = 60;
 
-    public void parseJsonFromPathname() throws IOException, JSONException {
+    public void parseJsonFromString() throws IOException, JSONException {
         BufferedReader br = new BufferedReader(jsonReader);
         StringBuilder sb = new StringBuilder();
         String line;
@@ -141,7 +142,7 @@ public abstract class AutoBase extends OpMode {
     public void start() {
         if (readJson) {
             try {
-                parseJsonFromPathname();
+                parseJsonFromString();
             } catch (IOException | JSONException e) {
                 throw new RuntimeException(e);
             }
@@ -222,6 +223,7 @@ public abstract class AutoBase extends OpMode {
                         pauseTimeLeft = currTag.value;
                         pausedIndex = nextPointIndex;
                         driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
+                        shooterTimer = shooterDelay;
                         isShooting = true;
                         break;
                     }
@@ -234,19 +236,20 @@ public abstract class AutoBase extends OpMode {
                 autoAim(pausedIndex - 1);
                 double intakeVelocity = 0;
 
-                if (Math.abs(shooter.getVelocity() - wantedShooterVelocity) <= 40) {
+                if (shooterTimer <= 0 && Math.abs(shooter.getVelocity() - wantedShooterVelocity) <= shooterTolerance) {
                     intakeVelocity = 2000;
                 }
 
                 intake.setVelocity(intakeVelocity);
             }
-
-            pauseTimeLeft -= runtime.seconds() - lastTime;
+            double dt = runtime.seconds() - lastTime;
+            pauseTimeLeft -= dt;
+            shooterTimer -= dt;
 
             if (pauseTimeLeft <= 0) {
                 pauseTimeLeft = 0;
                 // Initial point index is wrong or something.
-                driveTrain.setPositionDrive(positions, velocity, pausedIndex - 1);
+                driveTrain.setPositionDrive(positions, velocity, pausedIndex);
                 if (isShooting) {
                     shooter.close();
                     intake.setVelocity(0);

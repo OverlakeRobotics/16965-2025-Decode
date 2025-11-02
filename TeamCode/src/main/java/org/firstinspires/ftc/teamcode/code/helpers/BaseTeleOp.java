@@ -73,7 +73,7 @@ public abstract class BaseTeleOp extends OpMode {
                 hardwareMap.get(DcMotorEx.class, "frontRight"),
                 new GoBildaPinpointOdometry(pinpointDriver)
         );
-        driveTrain.setPosition(getStartPosition());
+//        driveTrain.setPosition(getStartPosition());
         driveTrain.setCountsToSlowDown(500);
 
         // Initialize AutoAligner

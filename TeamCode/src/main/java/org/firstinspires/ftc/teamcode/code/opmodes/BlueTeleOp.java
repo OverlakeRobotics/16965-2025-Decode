@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.code.helpers.BaseTeleOp;
 
 @Config
-@TeleOp(name = "Blue TeleOp Alternate Test", group = "TeleOp")
+@TeleOp(name = "Blue TeleOp", group = "TeleOp")
 public class BlueTeleOp extends BaseTeleOp {
     // Blue alliance starting position
     // Positive angle is to the left, positive x is forward, and positive y is left

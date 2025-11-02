@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 import java.util.List;
@@ -20,16 +22,18 @@ public class AutoAligner {
     public static final double g = 386.08858; // in/s^2
     public static final double rhinoWheelRadius = 1.88976; // in
     // TODO: Tune this value
-    public static double k_slip = 0.42; // estimated slip factor
+    public static double kSlip = 0.395; // estimated slip factor
+    public static double farKSlip = 0.395;
+    public static double closeKSlip = 0.5;
     public static final double motorTicksPerRev = 28d;
     public static double maxShooterVelocity = 1800;
-    public static double angleMin = 5;
-    public static double angleMax = 35;
-    private double goalX;
-    private double goalY;
-    private double aprilX;
-    private double aprilY;
-    private double goalDZ = 28;
+    public static double angleMin = 10;
+    public static double angleMax = 38;
+    public static double goalX;
+    public static double goalY;
+    public static double aprilX;
+    public static double aprilY;
+    public static double goalDZ = 28;
     private int targetAprilID;
     private OdometryHolonomicDrivetrain driveTrain;
     private Limelight3A limelight;
@@ -38,6 +42,7 @@ public class AutoAligner {
     public AutoAligner(OdometryHolonomicDrivetrain driveTrain, Limelight3A limelight, boolean isRed) {
         this.driveTrain = driveTrain;
         this.limelight = limelight;
+
         if (isRed) {
             setRed();
         } else {
@@ -47,7 +52,7 @@ public class AutoAligner {
 
     public void setBlue() {
         goalX = 70;
-        goalY = 65;
+        goalY = 68;
         aprilX = 60;
         aprilY = 54;
         targetAprilID = 20;
@@ -55,10 +60,10 @@ public class AutoAligner {
 
     public void setRed() {
         goalX = 70;
-        goalY = -65;
+        goalY = -68;
         aprilX = 60;
         aprilY = -54;
-        targetAprilID = 23;
+        targetAprilID = 24;
     }
 
     public double getDistanceToGoal() {
@@ -72,24 +77,32 @@ public class AutoAligner {
     }
 
     public double getAutoAlignAngle() {
-        double distanceToGoal = getDistanceToGoal();
         Pose2D pos = driveTrain.getPosition();
         LLResult result = limelight.getLatestResult();
         if (result.isValid()) {
             List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
             for (LLResultTypes.FiducialResult tag : aprilTags) {
                 if (tag.getFiducialId() == targetAprilID) {
-                    double aprilAngle = driveTrain.getPosition().getHeading(AngleUnit.DEGREES) - tag.getTargetXDegrees();
-                    // Possible issue is that angle wasn't converted to degrees
-                    return aprilAngle - Math.toDegrees(Math.atan2(goalX - (aprilX - distanceToGoal * Math.cos(aprilAngle)), goalY - (aprilY - distanceToGoal * Math.sin(aprilAngle))));
+//                    Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
+//                    driveTrain.setPosition(new Pose2D(DistanceUnit.METER, -robotPose.x, -robotPose.y, AngleUnit.DEGREES, pos.getHeading(AngleUnit.DEGREES)));
+//                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
+//                        break;
+//                    }
+                    Log.d("April", "Using April");
+//                    return Math.toDegrees(Math.atan2(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37));
+                    return pos.getHeading(AngleUnit.DEGREES) - tag.getTargetXDegrees();
                 }
             }
         }
 
-        return Math.toDegrees(Math.atan2(
+        Log.d("April", "Using GoBilda");
+
+        double angle = Math.toDegrees(Math.atan2(
                 goalY - pos.getY(DistanceUnit.INCH),
                 goalX - pos.getX(DistanceUnit.INCH)
         ));
+        Log.d("April Pos", "Wanted gobilda angle: " + angle);
+        return angle;
     }
 
     // TODO: Check angle and velocity calculations
@@ -98,6 +111,8 @@ public class AutoAligner {
     // Returns -1 if no valid solution (i.e. not possible given the angle)
     public double getShooterVelocityFromAngle(double theta) {
         double horizontalDist = getDistanceToGoal();
+
+        kSlip = closeKSlip + (farKSlip - closeKSlip) * (horizontalDist / 144);
         // Convert theta to radians
         theta = Math.toRadians(theta);
         // Impossible
@@ -111,7 +126,7 @@ public class AutoAligner {
         );
 
         // Then calculate RPM from linear velocity
-        double rpm = (v * 60) / (2 * Math.PI * rhinoWheelRadius * k_slip);
+        double rpm = (v * 60) / (2 * Math.PI * rhinoWheelRadius * kSlip);
         // Scale to motor ticks per second
         // TODO: Check ticks/sec calculation
         double rawTPS = rpm * motorTicksPerRev / 60;

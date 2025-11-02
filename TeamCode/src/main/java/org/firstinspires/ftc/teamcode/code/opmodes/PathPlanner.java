@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.code.opmodes;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.code.helpers.AutoBase;
 import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.teamcode.system.PathServer;
 import java.io.IOException;
 
 @Config
+@Autonomous(name = "Path Planner", group = "Autonomous")
 public class PathPlanner extends AutoBase {
     @Override
     public void init() {
