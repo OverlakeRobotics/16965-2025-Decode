@@ -120,10 +120,8 @@ public abstract class BaseTeleOp extends OpMode {
             if (autoLock) {
                 driveTrain.setWantedHeading(wantedHeading);
                 turn = driveTrain.getHeadingCorrectionVelocity();
-                driveTrain.setVelocityDriveFieldCentric(-gamepad1.left_stick_y * velocity, -gamepad1.left_stick_x * velocity, turn, isRedAlliance() ? -90 : 90);
-            } else {
-                driveTrain.setVelocityDrive(-gamepad1.left_stick_y * velocity, -gamepad1.left_stick_x * velocity, turn);
             }
+            driveTrain.setVelocityDriveFieldCentric(-gamepad1.left_stick_y * velocity, -gamepad1.left_stick_x * velocity, turn, isRedAlliance() ? -90 : 90);
         }
 
         if (autoLock) {
@@ -158,7 +156,7 @@ public abstract class BaseTeleOp extends OpMode {
             shooter.open();
             intakeVelocity = 0;
 
-            if (Math.abs(shooter.getVelocity() - shooterVelocity) <= 40) {
+            if (Math.abs(shooter.getVelocity() - shooterVelocity) <= 60) {
                 intakeVelocity = 2000;
             }
         } else {

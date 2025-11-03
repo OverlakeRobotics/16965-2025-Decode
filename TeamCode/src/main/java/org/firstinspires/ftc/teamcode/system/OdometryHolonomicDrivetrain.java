@@ -96,6 +96,19 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
         );
     }
 
+    // Behavior: Sets the velocity of the robot while accounting for a field centric view.
+    //           This means when that the forward value causes the robot to move in the 0 degree
+    //           direction, no matter which way the robot is facing. Similarly, the strafe value
+    //           will cause the robot to move in the 90 degree direction.
+    public void setVelocityDriveFieldCentric(double forward, double strafe, double turn) {
+        double heading = currentPosition.getHeading(AngleUnit.RADIANS);
+        super.setVelocityDrive(
+                forward * Math.cos(heading) + strafe * Math.sin(heading),
+                strafe * Math.cos(heading) - forward * Math.sin(heading),
+                turn
+        );
+    }
+
     // Behavior: Overrides basic setPositionDrive so whenever a position drive is set, the state
     //           of the current position drive is reset.
     @Override
