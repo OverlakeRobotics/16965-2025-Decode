@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.code.helpers.BaseAuto;
 import java.io.StringReader;
 
 @Config
-@Autonomous(name = "RedAutoFarNine", group = "Autonomous")
+@Autonomous(name = "Red Auto Far Nine", group = "Autonomous")
 public class RedAutoFarNine extends BaseAuto {
     public static String data = "{\n" +
             "  \"version\": 1,\n" +
