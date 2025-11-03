@@ -18,6 +18,8 @@ import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Arrays;
 
@@ -36,6 +38,7 @@ public abstract class BaseAuto extends OpMode {
     protected double tolerance;
     protected Reader jsonReader;
     protected boolean readJson;
+    protected String jsonFilename;
     protected OdometryHolonomicDrivetrain driveTrain;
     private Intake intake;
     private Shooter shooter;
@@ -141,6 +144,11 @@ public abstract class BaseAuto extends OpMode {
     public void start() {
         if (readJson) {
             try {
+                // If a filename is specified, read from assets file
+                if (jsonFilename != null && !jsonFilename.isEmpty()) {
+                    InputStream is = hardwareMap.appContext.getAssets().open(jsonFilename);
+                    jsonReader = new InputStreamReader(is);
+                }
                 parseJsonFromString();
             } catch (IOException | JSONException e) {
                 throw new RuntimeException(e);
