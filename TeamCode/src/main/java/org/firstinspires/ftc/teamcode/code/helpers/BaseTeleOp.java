@@ -6,7 +6,9 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -24,6 +26,10 @@ public abstract class BaseTeleOp extends OpMode {
 
     public static final double yOffset = -168.0; // mm
     public static final double xOffset = -84.0; // mm
+    public static double p = 10.0;
+    public static double i = 3.0;
+    public static double d = 0.0;
+    public static double f = 0.0;
 
     protected Pose2D[] presetPositions;
 
@@ -191,6 +197,13 @@ public abstract class BaseTeleOp extends OpMode {
             shooterAngle -= 2;
         }
 
+        if (gamepad2.aWasPressed()) {
+            shooterVelocity = 2000;
+        }
+        if (gamepad2.xWasPressed()) {
+            shooterVelocity = 0;
+        }
+
         shooterAngle = Range.clip(shooterAngle, 0, 90);
         shooterVelocity = Range.clip(shooterVelocity, 0, 2000);
 
@@ -198,7 +211,19 @@ public abstract class BaseTeleOp extends OpMode {
         shooter.setVelocity(shooterVelocity);
         shooter.setAngle(shooterAngle);
 
-        telemetry.update();
+//        telemetry.update();
         driveTrain.drive();
+
+        PIDFCoefficients newPIDF = new PIDFCoefficients(p, i, d, f);
+        shooter.setPIDF(newPIDF);
+        PIDFCoefficients pidf = shooter.getPIDFCoefficients();
+        Log.d("PID", String.format("P: %f, I: %f, D: %f, F: %f", pidf.p, pidf.i, pidf.d, pidf.f));
+        Log.d("PID", pidf.toString());
+        Log.d("PID", "Current Velocity: " + shooter.getVelocity());
+        Log.d("PID", "Wanted Velocity: " + shooterVelocity);
+        telemetry.addData("Current Velocity", shooter.getVelocity());
+        telemetry.addData("Wanted Velocity", shooterVelocity);
+        telemetry.addData("Wanted Power", shooter.getPower());
+        telemetry.update();
     }
 }

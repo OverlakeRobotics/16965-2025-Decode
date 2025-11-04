@@ -1,7 +1,12 @@
 package org.firstinspires.ftc.teamcode.code.parts;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -26,8 +31,20 @@ public class Shooter {
         shooterMotor.setVelocity(Range.clip(velocity, -MAX_VELOCITY, MAX_VELOCITY));
     }
 
+    public PIDFCoefficients getPIDFCoefficients() {
+        return shooterMotor.getPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void setPIDF(PIDFCoefficients pidf) {
+        shooterMotor.setVelocityPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+    }
+
     public double getVelocity() {
         return shooterMotor.getVelocity();
+    }
+
+    public double getPower() {
+        return shooterMotor.getPower();
     }
 
     // TODO: Make this set correct angle
