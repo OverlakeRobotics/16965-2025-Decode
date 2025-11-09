@@ -11,8 +11,6 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 import java.util.List;
@@ -26,7 +24,7 @@ public class AutoAligner {
     public static double closeKSlip = 0.5;
     public static final double motorTicksPerRev = 28d;
 
-    public static double maxShooterVelocity = 1800;
+    public static double maxShooterVelocity = 2000;
     public static double angleMin = 10;
     public static double angleMax = 38;
     public static double goalX;
@@ -71,7 +69,7 @@ public class AutoAligner {
         return Math.hypot(goalX - pos.getX(DistanceUnit.INCH), goalY - pos.getY(DistanceUnit.INCH));
     }
 
-    public double getDistancetoApril() {
+    public double getDistanceToApril() {
         Pose2D pos = driveTrain.getPosition();
         return Math.hypot(aprilX - pos.getX(DistanceUnit.INCH), aprilY - pos.getY(DistanceUnit.INCH));
     }
@@ -83,17 +81,21 @@ public class AutoAligner {
             List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
             for (LLResultTypes.FiducialResult tag : aprilTags) {
                 if (tag.getFiducialId() == targetAprilID) {
+                    // Testing making it aim not directly at apriltag, doesnt completely work
 //                    Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
 //                    driveTrain.setPosition(new Pose2D(DistanceUnit.METER, -robotPose.x, -robotPose.y, AngleUnit.DEGREES, pos.getHeading(AngleUnit.DEGREES)));
 //                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
 //                        break;
 //                    }
 //                    return Math.toDegrees(Math.atan2(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37));
+
+                    // Return limelight angle if it sees the tag
                     return pos.getHeading(AngleUnit.DEGREES) - tag.getTargetXDegrees();
                 }
             }
         }
 
+        // Fallback on using pinpoint
         return Math.toDegrees(Math.atan2(
                 goalY - pos.getY(DistanceUnit.INCH),
                 goalX - pos.getX(DistanceUnit.INCH)
@@ -135,6 +137,8 @@ public class AutoAligner {
         return Math.min(angleMin + (getDistanceToGoal() / 144) * (angleMax - angleMin), angleMax);
     }
 
+
+    // Work in progress
     public double getHoodAngleFromVelocity(double v, boolean useNegSol) {
         // All inputs must be in inches and inches/second
         double x = getDistanceToGoal();
@@ -157,6 +161,7 @@ public class AutoAligner {
         return getHoodAngleFromVelocity(v, false);
     }
 
+    // Work in progress
     public double getOptimalShooterVelocity() {
         return Math.min(900 + (getDistanceToGoal() / 156) * 900, 1800);
     }
