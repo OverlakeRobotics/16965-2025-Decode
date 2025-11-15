@@ -31,7 +31,7 @@ public abstract class BaseTeleOp extends OpMode {
 
     public int currentPreset = -1;
 
-    public double velocity = 2000;
+    public double velocity = 2800;
 
     protected OdometryHolonomicDrivetrain driveTrain;
     protected AutoAligner autoAligner;
