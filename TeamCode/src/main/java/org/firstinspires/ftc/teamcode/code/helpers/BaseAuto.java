@@ -166,7 +166,7 @@ public abstract class BaseAuto extends OpMode {
         positions[pointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH),
                 curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getAutoAlignAngle());
         double hoodAngle = autoAligner.getOptimalHoodAngle();
-        shooter.setAngle(hoodAngle);
+        shooter.setHoodAngle(hoodAngle);
         wantedShooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
         shooter.setVelocity(wantedShooterVelocity);
     }
@@ -222,7 +222,7 @@ public abstract class BaseAuto extends OpMode {
                         break;
                     }
                     case "hoodAngle": {
-                        shooter.setAngle(currTag.value);
+                        shooter.setHoodAngle(currTag.value);
                         break;
                     }
                     case "launchArtifacts": {

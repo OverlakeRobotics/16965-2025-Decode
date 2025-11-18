@@ -1,12 +1,7 @@
 package org.firstinspires.ftc.teamcode.code.parts;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -16,6 +11,7 @@ public class Shooter {
     private final DcMotorEx shooterMotor;
     private final Servo hoodServo;
     private final Servo blocker;
+    private final int minHoodAngle = 15;
     public static double p = 500;
     public static double i = 1.5;
     public static double d = 5;
@@ -28,6 +24,7 @@ public class Shooter {
         this.shooterMotor.setVelocityPIDFCoefficients(p, i, d, f);
 
         this.hoodServo = hoodServo;
+        this.hoodServo.setDirection(Servo.Direction.REVERSE);
         this.blocker = blocker;
         this.blocker.setDirection(Servo.Direction.REVERSE);
     }
@@ -45,8 +42,8 @@ public class Shooter {
     }
 
     // TODO: Make this set correct angle
-    public void setAngle(double angle) {
-        hoodServo.setPosition(Range.clip((90 - angle) / 100, 0, 1));
+    public void setHoodAngle(double angle) {
+        hoodServo.setPosition(Range.clip(((angle - minHoodAngle) * 3) / 300, 0, 1));
     }
 
     public void open() {

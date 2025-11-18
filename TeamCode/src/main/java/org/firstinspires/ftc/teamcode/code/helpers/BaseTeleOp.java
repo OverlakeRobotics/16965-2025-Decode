@@ -1,14 +1,10 @@
 package org.firstinspires.ftc.teamcode.code.helpers;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -16,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.code.parts.Intake;
-import org.firstinspires.ftc.teamcode.code.parts.Shooter;
+import org.firstinspires.ftc.teamcode.code.parts.Turret;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
@@ -42,9 +38,10 @@ public abstract class BaseTeleOp extends OpMode {
     protected boolean intakeOn = false;
     protected boolean intakeReversed = false;
 
-    protected Shooter shooter;
+    protected Turret turret;
     protected double shooterVelocity;
-    protected double shooterAngle;
+    protected double hoodAngle;
+    protected double turretAngle;
 
     protected abstract boolean isRedAlliance();
     protected abstract Pose2D[] getPresetPositions();
@@ -72,8 +69,9 @@ public abstract class BaseTeleOp extends OpMode {
         autoAligner = new AutoAligner(driveTrain, limelight, isRedAlliance());
 
         intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
-        shooter = new Shooter(
+        turret = new Turret(
                 hardwareMap.get(DcMotorEx.class, "shooter"),
+                hardwareMap.get(DcMotorEx.class, "turret"),
                 hardwareMap.get(Servo.class, "hood"),
                 hardwareMap.get(Servo.class, "blocker")
         );
@@ -128,8 +126,8 @@ public abstract class BaseTeleOp extends OpMode {
 
         if (autoLock) {
             // Use AutoAligner methods to calculate shooter angle and velocity
-            shooterAngle = autoAligner.getOptimalHoodAngle();
-            shooterVelocity = autoAligner.getShooterVelocityFromAngle(shooterAngle);
+            hoodAngle = autoAligner.getOptimalHoodAngle();
+            shooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
         }
 
         // Gamepad 1 controls
@@ -155,14 +153,14 @@ public abstract class BaseTeleOp extends OpMode {
         double intakeVelocity = intakeOn ? (intakeReversed ? -2000 : 2000) : 0;
 
         if (gamepad1.a) {
-            shooter.open();
+            turret.open();
             intakeVelocity = 0;
 
-            if (Math.abs(shooter.getVelocity() - shooterVelocity) <= 60) {
+            if (Math.abs(turret.getVelocity() - shooterVelocity) <= 60) {
                 intakeVelocity = 2000;
             }
         } else {
-            shooter.close();
+            turret.close();
         }
 
         // Preset & Auto Lock
@@ -187,10 +185,16 @@ public abstract class BaseTeleOp extends OpMode {
         }
 
         if (gamepad2.dpadUpWasPressed()) {
-            shooterAngle += 2;
+            hoodAngle += 2;
         }
         if (gamepad2.dpadDownWasPressed()) {
-            shooterAngle -= 2;
+            hoodAngle -= 2;
+        }
+        if (gamepad2.dpad_left) {
+            turretAngle += 5;
+        }
+        if (gamepad2.dpad_right) {
+            turretAngle -= 5;
         }
 
         if (gamepad2.aWasPressed()) {
@@ -200,12 +204,14 @@ public abstract class BaseTeleOp extends OpMode {
             shooterVelocity = 0;
         }
 
-        shooterAngle = Range.clip(shooterAngle, 0, 90);
+        hoodAngle = Range.clip(hoodAngle, 0, 50);
+        turretAngle = Range.clip(turretAngle, -90, 90);
         shooterVelocity = Range.clip(shooterVelocity, 0, 2800);
 
         intake.setVelocity(intakeVelocity);
-        shooter.setVelocity(shooterVelocity);
-        shooter.setAngle(shooterAngle);
+        turret.setVelocity(shooterVelocity);
+        turret.setHoodAngle(hoodAngle);
+        turret.setTurretAngle(turretAngle);
 
         driveTrain.drive();
 
@@ -213,6 +219,10 @@ public abstract class BaseTeleOp extends OpMode {
 //        Log.d("PID", "Wanted Velocity: " + shooterVelocity);
 //        telemetry.addData("Current Velocity", shooter.getVelocity());
 //        telemetry.addData("Wanted Velocity", shooterVelocity);
+//        telemetry.update();
+//        telemetry.addData("Turret Given Target Angle", turretAngle);
+//        telemetry.addData("Turret Current Angle", turret.getCurrentAngle());
+//        telemetry.addData("Turret True Target Angle", turret.getTargetAngle());
 //        telemetry.update();
     }
 }
