@@ -20,8 +20,9 @@ import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 public abstract class BaseTeleOp extends OpMode {
     protected Limelight3A limelight;
 
-    public static final double yOffset = -168.0; // mm
-    public static final double xOffset = -84.0; // mm
+    // TODO: Check if these are correct
+    public static final double yOffset = -156.0; // -168.0 // mm
+    public static final double xOffset = -72.0; // -84.0 // mm
 
     protected Pose2D[] presetPositions;
 
