@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode.code.parts;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 public class Turret extends Shooter {
-    private final double TICKS_PER_DEGREE = 537.7 / 360;
-    private final int ANGLE_LIMIT = 90; // degrees
+    public final double TICKS_PER_DEGREE = 537.7 / 360;
+    public final int ANGLE_LIMIT = 90; // degrees
     private final int TURRET_VELOCITY = 2800;
     private final DcMotorEx turretMotor;
     public Turret(DcMotorEx shooterMotor, DcMotorEx turretMotor, Servo hoodServo, Servo blocker) {
@@ -24,11 +23,11 @@ public class Turret extends Shooter {
         turretMotor.setVelocity(TURRET_VELOCITY);
     }
 
-    public double getTargetAngle() {
+    public double getTurretTargetAngle() {
         return turretMotor.getTargetPosition() / (TICKS_PER_DEGREE * 4);
     }
 
-    public double getCurrentAngle() {
+    public double getTurretCurrentAngle() {
         return turretMotor.getCurrentPosition() / (TICKS_PER_DEGREE * 4);
     }
 

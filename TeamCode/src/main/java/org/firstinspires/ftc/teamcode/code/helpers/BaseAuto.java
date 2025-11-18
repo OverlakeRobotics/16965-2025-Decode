@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.code.parts.Intake;
-import org.firstinspires.ftc.teamcode.code.parts.Shooter;
+import org.firstinspires.ftc.teamcode.code.parts.Turret;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
@@ -41,7 +41,7 @@ public abstract class BaseAuto extends OpMode {
     protected String jsonFilename;
     protected OdometryHolonomicDrivetrain driveTrain;
     private Intake intake;
-    private Shooter shooter;
+    private Turret turret;
     private AutoAligner autoAligner;
     private Limelight3A limelight;
     private final ElapsedTime runtime = new ElapsedTime();
@@ -128,11 +128,13 @@ public abstract class BaseAuto extends OpMode {
         );
 
         intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
-        shooter = new Shooter(hardwareMap.get(DcMotorEx.class, "shooter"),
+        turret = new Turret(hardwareMap.get(DcMotorEx.class, "shooter"),
+                hardwareMap.get(DcMotorEx.class, "turret"),
                 hardwareMap.get(Servo.class, "hood"),
                 hardwareMap.get(Servo.class, "blocker"));
+        turret.resetTurretEncoder();
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        autoAligner = new AutoAligner(driveTrain, limelight, false);
+        autoAligner = new AutoAligner(driveTrain, turret, limelight, false);
     }
 
     @Override
@@ -158,29 +160,31 @@ public abstract class BaseAuto extends OpMode {
         driveTrain.setPosition(startPose);
         Arrays.sort(tags);
         driveTrain.setPositionDrive(positions, velocity);
-        shooter.close();
+        turret.close();
     }
 
-    public void autoAim(int pointIndex) {
-        Pose2D curTarget = positions[pointIndex];
-        positions[pointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH),
-                curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getAutoAlignAngle());
+    public void autoAim() {
+//        Pose2D curTarget = positions[pointIndex];
+//        positions[pointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH),
+//                curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
         double hoodAngle = autoAligner.getOptimalHoodAngle();
-        shooter.setHoodAngle(hoodAngle);
+        turret.setHoodAngle(hoodAngle);
         wantedShooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
-        shooter.setVelocity(wantedShooterVelocity);
+        turret.setShooterVelocity(wantedShooterVelocity);
     }
 
     @Override
     public void loop() {
         driveTrain.updatePosition();
+        turret.setTurretAngle(autoAligner.getTurretAutoAlignAngle());
 
         if (pauseTimeLeft <= 0) {
             driveTrain.drive();
             int nextPointIndex = driveTrain.getNextPointIndex();
 
             if (nextPointIndex == autoAlignIndex && nextPointIndex != -1) {
-                autoAim(nextPointIndex);
+//                autoAim(nextPointIndex);
+                autoAim();
             } else {
                 autoAlignIndex = -1;
             }
@@ -207,26 +211,26 @@ public abstract class BaseAuto extends OpMode {
                         autoAlignIndex = nextPointIndex;
                         autoAligner.setRed();
                         Pose2D curTarget2 = positions[nextPointIndex];
-                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget2.getX(DistanceUnit.INCH), curTarget2.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getAutoAlignAngle());
+                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget2.getX(DistanceUnit.INCH), curTarget2.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
                         break;
                     }
                     case "autoAimBlue": {
                         autoAlignIndex = nextPointIndex;
                         autoAligner.setBlue();
                         Pose2D curTarget3 = positions[nextPointIndex];
-                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget3.getX(DistanceUnit.INCH), curTarget3.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getAutoAlignAngle());
+                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget3.getX(DistanceUnit.INCH), curTarget3.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
                         break;
                     }
                     case "shooterVelocity": {
-                        shooter.setVelocity(currTag.value);
+                        turret.setShooterVelocity(currTag.value);
                         break;
                     }
                     case "hoodAngle": {
-                        shooter.setHoodAngle(currTag.value);
+                        turret.setHoodAngle(currTag.value);
                         break;
                     }
                     case "launchArtifacts": {
-                        shooter.open();
+                        turret.open();
                         pauseTimeLeft = currTag.value;
                         pausedIndex = nextPointIndex;
                         driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
@@ -239,11 +243,12 @@ public abstract class BaseAuto extends OpMode {
             }
         } else {
             if (isShooting) {
-                shooter.open();
-                autoAim(pausedIndex - 1);
+                turret.open();
+//                autoAim(pausedIndex - 1);
+                autoAim();
                 double intakeVelocity = 0;
 
-                if (shooterTimer <= 0 && Math.abs(shooter.getVelocity() - wantedShooterVelocity) <= shooterTolerance) {
+                if (shooterTimer <= 0 && Math.abs(turret.getShooterVelocity() - wantedShooterVelocity) <= shooterTolerance) {
                     intakeVelocity = 2000;
                 }
 
@@ -258,7 +263,7 @@ public abstract class BaseAuto extends OpMode {
                 // Initial point index is wrong or something.
                 driveTrain.setPositionDrive(positions, velocity, pausedIndex);
                 if (isShooting) {
-                    shooter.close();
+                    turret.close();
                     intake.setVelocity(0);
                     isShooting = false;
                 }

@@ -7,11 +7,13 @@ import com.qualcomm.robotcore.util.Range;
 
 @Config
 public class Shooter {
-    private static final double MAX_VELOCITY = 2800;
+    public final double MAX_VELOCITY = 2800;
+    public final double MOTOR_TO_WHEEL_VELOCITY_RATIO = 1.5;
+    public final int minHoodAngle = 15;
+    public final int maxHoodAngle = 40;
     private final DcMotorEx shooterMotor;
     private final Servo hoodServo;
     private final Servo blocker;
-    private final int minHoodAngle = 15;
     public static double p = 500;
     public static double i = 1.5;
     public static double d = 5;
@@ -29,21 +31,21 @@ public class Shooter {
         this.blocker.setDirection(Servo.Direction.REVERSE);
     }
 
-    public void setVelocity(double velocity) {
-        shooterMotor.setVelocity(Range.clip(velocity, -MAX_VELOCITY, MAX_VELOCITY));
+    public void setShooterVelocity(double velocity) {
+        shooterMotor.setVelocity(Range.clip(velocity * MOTOR_TO_WHEEL_VELOCITY_RATIO, -MAX_VELOCITY, MAX_VELOCITY));
     }
 
-    public double getVelocity() {
-        return shooterMotor.getVelocity();
+    public double getShooterVelocity() {
+        return shooterMotor.getVelocity() / MOTOR_TO_WHEEL_VELOCITY_RATIO;
     }
 
-    public double getPower() {
-        return shooterMotor.getPower();
+    public double getShooterPower() {
+        return shooterMotor.getPower() / MOTOR_TO_WHEEL_VELOCITY_RATIO;
     }
 
     // TODO: Make this set correct angle
     public void setHoodAngle(double angle) {
-        hoodServo.setPosition(Range.clip(((angle - minHoodAngle) * 3) / 300, 0, 1));
+        hoodServo.setPosition(Range.clip(((Range.clip(angle, minHoodAngle, maxHoodAngle) - minHoodAngle) * 3) / 300, 0, 1));
     }
 
     public void open() {

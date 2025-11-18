@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.code.parts.Turret;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 import java.util.List;
@@ -20,12 +21,13 @@ public class AutoAligner {
     public static final double g = 386.08858; // in/s^2
     public static final double rhinoWheelRadius = 1.88976; // in
     // TODO: Tune these values
+    public static final double motorTicksPerRev = 28d;
     public static double farKSlip = 0.395;
     public static double closeKSlip = 0.5;
-    public static final double motorTicksPerRev = 28d;
+    public static double autoAlignBuffer = 5; // degrees
 
-    public static double maxShooterVelocity = 2000;
-    public static double angleMin = 10;
+    public static double maxShooterVelocity = 2800;
+    public static double angleMin = 15;
     public static double angleMax = 38;
     public static double goalX;
     public static double goalY;
@@ -34,11 +36,13 @@ public class AutoAligner {
     public static double goalDZ = 28;
     private int targetAprilID;
     private OdometryHolonomicDrivetrain driveTrain;
+    private Turret turret;
     private Limelight3A limelight;
 
 
-    public AutoAligner(OdometryHolonomicDrivetrain driveTrain, Limelight3A limelight, boolean isRed) {
+    public AutoAligner(OdometryHolonomicDrivetrain driveTrain, Turret turret, Limelight3A limelight, boolean isRed) {
         this.driveTrain = driveTrain;
+        this.turret = turret;
         this.limelight = limelight;
 
         if (isRed) {
@@ -74,8 +78,9 @@ public class AutoAligner {
         return Math.hypot(aprilX - pos.getX(DistanceUnit.INCH), aprilY - pos.getY(DistanceUnit.INCH));
     }
 
-    public double getAutoAlignAngle() {
+    public double getRawTurretAutoAlignAngle() {
         Pose2D pos = driveTrain.getPosition();
+        double turretAngle = turret.getTurretCurrentAngle();
         LLResult result = limelight.getLatestResult();
         if (result.isValid()) {
             List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
@@ -90,16 +95,35 @@ public class AutoAligner {
 //                    return Math.toDegrees(Math.atan2(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37));
 
                     // Return limelight angle if it sees the tag
-                    return pos.getHeading(AngleUnit.DEGREES) - tag.getTargetXDegrees();
+                    return turretAngle - tag.getTargetXDegrees();
                 }
             }
         }
 
         // Fallback on using pinpoint
-        return Math.toDegrees(Math.atan2(
-                goalY - pos.getY(DistanceUnit.INCH),
-                goalX - pos.getX(DistanceUnit.INCH)
-        ));
+        return normalize(Math.toDegrees(Math.atan2(
+                        goalY - pos.getY(DistanceUnit.INCH),
+                        goalX - pos.getX(DistanceUnit.INCH)
+                )) - pos.getHeading(AngleUnit.DEGREES));
+    }
+
+    public double getTurretAutoAlignAngle() {
+        double rawAngle = getRawTurretAutoAlignAngle();
+        return Range.clip(rawAngle, -turret.ANGLE_LIMIT, turret.ANGLE_LIMIT);
+    }
+
+    public double getDrivetrainAutoAlignAngle() {
+        double rawTurretAngle = getRawTurretAutoAlignAngle();
+        double drivetrainAngle = driveTrain.getPosition().getHeading(AngleUnit.DEGREES);
+        if (rawTurretAngle >= -turret.ANGLE_LIMIT && rawTurretAngle <= turret.ANGLE_LIMIT) {
+            return drivetrainAngle;
+        }
+        double absDiff = Math.abs(rawTurretAngle) - turret.ANGLE_LIMIT + autoAlignBuffer;
+        if (rawTurretAngle > turret.ANGLE_LIMIT) {
+            return normalize(drivetrainAngle + absDiff);
+        } else {
+            return normalize(drivetrainAngle - absDiff);
+        }
     }
 
     // TODO: Check angle and velocity calculations
@@ -164,5 +188,9 @@ public class AutoAligner {
     // Work in progress
     public double getOptimalShooterVelocity() {
         return Math.min(900 + (getDistanceToGoal() / 156) * 900, 1800);
+    }
+
+    private double normalize(double angle) {
+        return (angle + 180) % 360 - 180;
     }
 }
