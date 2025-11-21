@@ -11,7 +11,7 @@ public class BlueAutoFarTwelve extends BaseAuto {
     @Override
     public void init() {
         super.readJson = true;
-        super.jsonFilename = "pathJsons/TwelveArtifactFarBlue.json";
+        super.jsonFilename = "pathJsons/old/TwelveArtifactFarBlue.json";
         super.init();
     }
 }

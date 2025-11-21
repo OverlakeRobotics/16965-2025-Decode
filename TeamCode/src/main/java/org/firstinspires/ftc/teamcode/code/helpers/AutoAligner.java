@@ -22,13 +22,13 @@ public class AutoAligner {
     public static final double rhinoWheelRadius = 1.88976; // in
     // TODO: Tune these values
     public static final double motorTicksPerRev = 28d;
-    public static double farKSlip = 0.395;
-    public static double closeKSlip = 0.5;
+    public static double farKSlip = 0.4;
+    public static double closeKSlip = 0.44;
     public static double autoAlignBuffer = 5; // degrees
 
     public static double maxShooterVelocity = 2800;
     public static double angleMin = 15;
-    public static double angleMax = 38;
+    public static double angleMax = 42;
     public static double goalX;
     public static double goalY;
     public static double aprilX;
@@ -82,6 +82,11 @@ public class AutoAligner {
         Pose2D pos = driveTrain.getPosition();
         double turretAngle = turret.getTurretCurrentAngle();
         LLResult result = limelight.getLatestResult();
+//        double pinpointAngle = normalize(180 + Math.toDegrees(Math.atan2(
+//                goalY - pos.getY(DistanceUnit.INCH),
+//                goalX - pos.getX(DistanceUnit.INCH)
+//        )) - pos.getHeading(AngleUnit.DEGREES));
+//        Log.d("Turret Debug", "Pinpoint wanted: " + pinpointAngle);
         if (result.isValid()) {
             List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
             for (LLResultTypes.FiducialResult tag : aprilTags) {
@@ -95,34 +100,37 @@ public class AutoAligner {
 //                    return Math.toDegrees(Math.atan2(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37));
 
                     // Return limelight angle if it sees the tag
+//                    double limelightAngle = turretAngle - tag.getTargetXDegrees();
+//                    Log.d("Turret Debug", "Limelight wanted: " + limelightAngle);
+//                    return limelightAngle;
                     return turretAngle - tag.getTargetXDegrees();
                 }
             }
         }
 
         // Fallback on using pinpoint
-        return normalize(Math.toDegrees(Math.atan2(
+        return normalize(180 + Math.toDegrees(Math.atan2(
                         goalY - pos.getY(DistanceUnit.INCH),
                         goalX - pos.getX(DistanceUnit.INCH)
                 )) - pos.getHeading(AngleUnit.DEGREES));
+//        return pinpointAngle;
     }
 
     public double getTurretAutoAlignAngle() {
         double rawAngle = getRawTurretAutoAlignAngle();
-        return Range.clip(rawAngle, -turret.ANGLE_LIMIT, turret.ANGLE_LIMIT);
+        return Range.clip(rawAngle, turret.MIN_ANGLE_LIMIT, turret.MAX_ANGLE_LIMIT);
     }
 
     public double getDrivetrainAutoAlignAngle() {
         double rawTurretAngle = getRawTurretAutoAlignAngle();
         double drivetrainAngle = driveTrain.getPosition().getHeading(AngleUnit.DEGREES);
-        if (rawTurretAngle >= -turret.ANGLE_LIMIT && rawTurretAngle <= turret.ANGLE_LIMIT) {
+        if (rawTurretAngle >= turret.MIN_ANGLE_LIMIT && rawTurretAngle <= turret.MAX_ANGLE_LIMIT) {
             return drivetrainAngle;
         }
-        double absDiff = Math.abs(rawTurretAngle) - turret.ANGLE_LIMIT + autoAlignBuffer;
-        if (rawTurretAngle > turret.ANGLE_LIMIT) {
-            return normalize(drivetrainAngle + absDiff);
+        if (rawTurretAngle < turret.MIN_ANGLE_LIMIT) {
+            return normalize(drivetrainAngle + rawTurretAngle - turret.MIN_ANGLE_LIMIT - autoAlignBuffer);
         } else {
-            return normalize(drivetrainAngle - absDiff);
+            return normalize(drivetrainAngle + rawTurretAngle - turret.MAX_ANGLE_LIMIT + autoAlignBuffer);
         }
     }
 

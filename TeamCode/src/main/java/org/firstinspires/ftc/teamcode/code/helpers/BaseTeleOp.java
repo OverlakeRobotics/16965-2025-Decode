@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.code.helpers;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -22,7 +24,7 @@ public abstract class BaseTeleOp extends OpMode {
 
     // TODO: Check if these are correct
     public static final double yOffset = -156.0; // -168.0 // mm
-    public static final double xOffset = -72.0; // -84.0 // mm
+    public static final double xOffset = 72.0; // -84.0 // mm
 
     protected Pose2D[] presetPositions;
 
@@ -67,16 +69,18 @@ public abstract class BaseTeleOp extends OpMode {
 
         driveTrain.setCountsToSlowDown(500);
 
-        // Initialize AutoAligner
-        autoAligner = new AutoAligner(driveTrain, turret, limelight, isRedAlliance());
-
-        intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
         turret = new Turret(
                 hardwareMap.get(DcMotorEx.class, "shooter"),
                 hardwareMap.get(DcMotorEx.class, "turret"),
                 hardwareMap.get(Servo.class, "hood"),
                 hardwareMap.get(Servo.class, "blocker")
         );
+//        turret.resetTurretEncoder();
+        intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
+
+        // Initialize AutoAligner
+        autoAligner = new AutoAligner(driveTrain, turret, limelight, isRedAlliance());
+
 
         presetPositions = getPresetPositions();
     }
@@ -206,6 +210,10 @@ public abstract class BaseTeleOp extends OpMode {
             if (gamepad2.dpad_right) {
                 turretAngle -= 5;
             }
+            if (gamepad2.yWasPressed()) {
+                turret.resetTurretEncoder();
+                turretAngle = 0;
+            }
         }
 
         if (gamepad2.aWasPressed()) {
@@ -216,7 +224,7 @@ public abstract class BaseTeleOp extends OpMode {
         }
 
         hoodAngle = Range.clip(hoodAngle, turret.minHoodAngle, turret.maxHoodAngle);
-        turretAngle = Range.clip(turretAngle, -turret.ANGLE_LIMIT, turret.ANGLE_LIMIT);
+        turretAngle = Range.clip(turretAngle, turret.MIN_ANGLE_LIMIT, turret.MAX_ANGLE_LIMIT);
         shooterVelocity = Range.clip(shooterVelocity, 0, turret.MAX_VELOCITY);
 
         intake.setVelocity(intakeVelocity);
@@ -226,14 +234,13 @@ public abstract class BaseTeleOp extends OpMode {
 
         driveTrain.drive();
 
-//        Log.d("PID", "Current Velocity: " + shooter.getVelocity());
-//        Log.d("PID", "Wanted Velocity: " + shooterVelocity);
-//        telemetry.addData("Current Velocity", shooter.getVelocity());
-//        telemetry.addData("Wanted Velocity", shooterVelocity);
-//        telemetry.update();
-//        telemetry.addData("Turret Given Target Angle", turretAngle);
-//        telemetry.addData("Turret Current Angle", turret.getCurrentAngle());
-//        telemetry.addData("Turret True Target Angle", turret.getTargetAngle());
-//        telemetry.update();
+        Log.d("PID", "Current Velocity: " + turret.getShooterVelocity());
+        Log.d("PID", "Wanted Velocity: " + shooterVelocity);
+        telemetry.addData("Current Velocity", turret.getShooterVelocity());
+        telemetry.addData("Wanted Velocity", shooterVelocity);
+        telemetry.addData("Turret Given Target Angle", turretAngle);
+        telemetry.addData("Turret Current Angle", turret.getTurretCurrentAngle());
+        telemetry.addData("Turret True Target Angle", turret.getTurretTargetAngle());
+        telemetry.update();
     }
 }

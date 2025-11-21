@@ -8,9 +8,9 @@ import com.qualcomm.robotcore.util.Range;
 @Config
 public class Shooter {
     public final double MAX_VELOCITY = 2800;
-    public final double MOTOR_TO_WHEEL_VELOCITY_RATIO = 1.5;
+    public final double MOTOR_TO_WHEEL_VELOCITY_RATIO = 1.0;
     public final int minHoodAngle = 15;
-    public final int maxHoodAngle = 40;
+    public final int maxHoodAngle = 45;
     private final DcMotorEx shooterMotor;
     private final Servo hoodServo;
     private final Servo blocker;
@@ -28,7 +28,6 @@ public class Shooter {
         this.hoodServo = hoodServo;
         this.hoodServo.setDirection(Servo.Direction.REVERSE);
         this.blocker = blocker;
-        this.blocker.setDirection(Servo.Direction.REVERSE);
     }
 
     public void setShooterVelocity(double velocity) {
@@ -49,7 +48,7 @@ public class Shooter {
     }
 
     public void open() {
-        blocker.setPosition(0.18);
+        blocker.setPosition(0.2);
     }
 
     public void close() {

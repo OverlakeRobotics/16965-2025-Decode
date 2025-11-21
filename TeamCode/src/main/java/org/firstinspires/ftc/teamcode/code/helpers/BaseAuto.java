@@ -31,8 +31,8 @@ import org.json.JSONObject;
 
 @Config
 public abstract class BaseAuto extends OpMode {
-    public double yOffset = -168.0; // mm
-    public double xOffset = -84.0; // mm
+    public static final double yOffset = -156.0; // -168.0 // mm
+    public static final double xOffset = 72.0; // -84.0 // mm
 
     protected int velocity;
     protected double tolerance;
@@ -177,6 +177,7 @@ public abstract class BaseAuto extends OpMode {
     public void loop() {
         driveTrain.updatePosition();
         turret.setTurretAngle(autoAligner.getTurretAutoAlignAngle());
+//        turret.setTurretAngle(0);
 
         if (pauseTimeLeft <= 0) {
             driveTrain.drive();

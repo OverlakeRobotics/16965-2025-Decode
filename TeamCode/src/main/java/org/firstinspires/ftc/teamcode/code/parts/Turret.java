@@ -1,25 +1,32 @@
 package org.firstinspires.ftc.teamcode.code.parts;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
+@Config
 public class Turret extends Shooter {
     public final double TICKS_PER_DEGREE = 537.7 / 360;
-    public final int ANGLE_LIMIT = 90; // degrees
-    private final int TURRET_VELOCITY = 2800;
+    public static int MAX_LIMIT_ANGLE = 110; // degrees
+    public static int MIN_LIMIT_ANGLE = -110; // degrees
+    public final int MAX_ANGLE_LIMIT;
+    public final int MIN_ANGLE_LIMIT;
+    public static int TURRET_VELOCITY = 1000;
     private final DcMotorEx turretMotor;
     public Turret(DcMotorEx shooterMotor, DcMotorEx turretMotor, Servo hoodServo, Servo blocker) {
         super(shooterMotor, hoodServo, blocker);
+        this.MAX_ANGLE_LIMIT = MAX_LIMIT_ANGLE;
+        this.MIN_ANGLE_LIMIT = MIN_LIMIT_ANGLE;
         this.turretMotor = turretMotor;
         this.turretMotor.setTargetPosition(0);
         this.turretMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         this.turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
     }
 
-    // Left is positive, right is negative
+    // CCW is positive, CW is negative
     public void setTurretAngle(double angle) {
-        turretMotor.setTargetPosition((int) Math.round(Range.clip(angle, -ANGLE_LIMIT, ANGLE_LIMIT) * 4 * TICKS_PER_DEGREE));
+        turretMotor.setTargetPosition((int) Math.round(Range.clip(angle, MIN_ANGLE_LIMIT, MAX_ANGLE_LIMIT) * 4 * TICKS_PER_DEGREE));
         turretMotor.setVelocity(TURRET_VELOCITY);
     }
 
@@ -32,7 +39,8 @@ public class Turret extends Shooter {
     }
 
     public void resetTurretEncoder() {
-        this.turretMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        this.turretMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        turretMotor.setVelocity(0);
+        turretMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        turretMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
     }
 }
