@@ -26,6 +26,8 @@ public abstract class BaseTeleOp extends OpMode {
     public static final double yOffset = -156.0; // -168.0 // mm
     public static final double xOffset = 72.0; // -84.0 // mm
 
+    public static double ADJUSTMENT_FACTOR = 0.021;
+
     protected Pose2D[] presetPositions;
 
     public int currentPreset = -1;
@@ -103,6 +105,8 @@ public abstract class BaseTeleOp extends OpMode {
             autoLock = true;
         }
 
+        double turretAdjustment = 0;
+
         if (currentPreset >= 0) {
             Pose2D wantedPosition = new Pose2D(
                 DistanceUnit.INCH,
@@ -128,6 +132,8 @@ public abstract class BaseTeleOp extends OpMode {
                 turn = driveTrain.getHeadingCorrectionVelocity();
             }
             driveTrain.setVelocityDriveFieldCentric(-gamepad1.left_stick_y * velocity, -gamepad1.left_stick_x * velocity, turn, isRedAlliance() ? -90 : 90);
+
+            turretAdjustment = -turn * ADJUSTMENT_FACTOR;
         }
 
         if (autoLock) {
@@ -137,7 +143,7 @@ public abstract class BaseTeleOp extends OpMode {
         }
 
         if (autoTurret) {
-            turretAngle = autoAligner.getTurretAutoAlignAngle();
+            turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
         }
 
         // Gamepad 1 controls
