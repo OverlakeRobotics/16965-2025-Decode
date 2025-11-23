@@ -240,13 +240,13 @@ public abstract class BaseTeleOp extends OpMode {
 
         driveTrain.drive();
 
-        Log.d("PID", "Current Velocity: " + turret.getShooterVelocity());
-        Log.d("PID", "Wanted Velocity: " + shooterVelocity);
-        telemetry.addData("Current Velocity", turret.getShooterVelocity());
-        telemetry.addData("Wanted Velocity", shooterVelocity);
-        telemetry.addData("Turret Given Target Angle", turretAngle);
-        telemetry.addData("Turret Current Angle", turret.getTurretCurrentAngle());
-        telemetry.addData("Turret True Target Angle", turret.getTurretTargetAngle());
+//        Log.d("PID", "Current Velocity: " + turret.getShooterVelocity());
+//        Log.d("PID", "Wanted Velocity: " + shooterVelocity);
+//        telemetry.addData("Current Velocity", turret.getShooterVelocity());
+//        telemetry.addData("Wanted Velocity", shooterVelocity);
+//        telemetry.addData("Turret Given Target Angle", turretAngle);
+//        telemetry.addData("Turret Current Angle", turret.getTurretCurrentAngle());
+//        telemetry.addData("Turret True Target Angle", turret.getTurretTargetAngle());
         telemetry.update();
     }
 }

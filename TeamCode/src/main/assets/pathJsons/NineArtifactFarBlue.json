@@ -1,67 +1,67 @@
 {
   "version": 1,
-  "createdAt": "2025-11-01T23:50:58.653Z",
+  "createdAt": "2025-11-22T22:34:47.092Z",
   "start": {
-    "x": -63,
-    "y": 15,
-    "h": 0
+    "x": -64,
+    "y": 32,
+    "h": 90
   },
   "points": [
     {
-      "x": -63,
-      "y": 15,
-      "h": 0
-    },
-    {
-      "x": -54,
-      "y": 15,
-      "h": 0
-    },
-    {
-      "x": -37,
-      "y": 24,
+      "x": -64,
+      "y": 32.5,
       "h": 90
     },
     {
-      "x": -37,
-      "y": 58,
+      "x": -64,
+      "y": 32,
       "h": 90
     },
     {
-      "x": -54,
-      "y": 15,
-      "h": 0
-    },
-    {
-      "x": -15,
-      "y": 24,
+      "x": -65.5,
+      "y": 62.5,
       "h": 90
     },
     {
-      "x": -15,
-      "y": 54,
+      "x": -62,
+      "y": 28,
       "h": 90
     },
     {
-      "x": -54,
-      "y": 15,
-      "h": 0
+      "x": -38,
+      "y": 25,
+      "h": 90
     },
     {
-      "x": -39,
-      "y": 15,
-      "h": 0
+      "x": -38,
+      "y": 55,
+      "h": 90
+    },
+    {
+      "x": -62,
+      "y": 28,
+      "h": 90
+    },
+    {
+      "x": -50,
+      "y": 39,
+      "h": 90
+    },
+    {
+      "x": -49.5,
+      "y": 39.5,
+      "h": 90
     }
   ],
   "headingMode": "straight",
-  "endHeading": 0,
-  "velocity": 70,
+  "endHeading": 90,
+  "velocity": 120,
   "maxAccel": 40,
   "tolerance": 5,
-  "snapInches": 1,
+  "snapInches": 0.5,
   "robot": {
-    "length": 18,
-    "width": 18
+    "length": "17.39",
+    "width": "16.32"
   },
   "tags": [
     {
@@ -72,67 +72,77 @@
     {
       "index": 2,
       "name": "launchArtifacts",
-      "value": 4
+      "value": 2.75
     },
     {
       "index": 3,
-      "name": "intake",
-      "value": 2000
+      "name": "velocity",
+      "value": 120
     },
     {
-      "index": 4,
-      "name": "intake",
-      "value": 0
-    },
-    {
-      "index": 4,
+      "index": 3,
       "name": "autoAimBlue",
       "value": 0
+    },
+    {
+      "index": 4,
+      "name": "launchArtifacts",
+      "value": 2.75
     },
     {
       "index": 5,
-      "name": "launchArtifacts",
-      "value": 4
+      "name": "velocity",
+      "value": 35
     },
     {
-      "index": 6,
+      "index": 5,
       "name": "intake",
       "value": 2000
     },
     {
-      "index": 7,
+      "index": 6,
+      "name": "velocity",
+      "value": 120
+    },
+    {
+      "index": 6,
       "name": "intake",
       "value": 0
     },
     {
-      "index": 7,
+      "index": 6,
       "name": "autoAimBlue",
       "value": 0
     },
     {
-      "index": 8,
+      "index": 7,
       "name": "launchArtifacts",
-      "value": 4
+      "value": 2.75
     },
     {
-      "index": 3,
+      "index": 2,
+      "name": "intake",
+      "value": 2000
+    },
+    {
+      "index": 2,
       "name": "velocity",
-      "value": 25
+      "value": 40
     },
     {
       "index": 4,
-      "name": "velocity",
-      "value": 70
+      "name": "intake",
+      "value": 0
     },
     {
-      "index": 6,
-      "name": "velocity",
-      "value": 25
+      "index": 3,
+      "name": "pause",
+      "value": 0.5
     },
     {
-      "index": 7,
-      "name": "velocity",
-      "value": 70
+      "index": 8,
+      "name": "shooterVelocity",
+      "value": 0
     }
   ]
 }

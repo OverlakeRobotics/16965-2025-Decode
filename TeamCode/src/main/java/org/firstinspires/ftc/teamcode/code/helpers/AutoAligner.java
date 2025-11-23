@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.code.parts.Turret;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
@@ -22,15 +23,20 @@ public class AutoAligner {
     public static final double rhinoWheelRadius = 1.88976; // in
     // TODO: Tune these values
     public static final double motorTicksPerRev = 28d;
-    public static double farKSlip = 0.4;
-    public static double closeKSlip = 0.44;
+    public static double farKSlip = 0.41;
+    public static double closeKSlip = 0.38;
+    public static double kSlipTurretRotationConstant = 0.03;
     public static double autoAlignBuffer = 5; // degrees
 
     public static double maxShooterVelocity = 2800;
-    public static double angleMin = 15;
-    public static double angleMax = 42;
+    public static double angleMin = 20;
+    public static double angleMax = 50;
     public static double goalX;
     public static double goalY;
+    public static double redGoalX = 70;
+    public static double redGoalY = -70;
+    public static double blueGoalX = 70;
+    public static double blueGoalY = 70;
     public static double aprilX;
     public static double aprilY;
     public static double goalDZ = 28;
@@ -53,16 +59,16 @@ public class AutoAligner {
     }
 
     public void setBlue() {
-        goalX = 70;
-        goalY = 68;
+        goalX = blueGoalX;
+        goalY = blueGoalY;
         aprilX = 60;
         aprilY = 54;
         targetAprilID = 20;
     }
 
     public void setRed() {
-        goalX = 70;
-        goalY = -68;
+        goalX = redGoalX;
+        goalY = redGoalY;
         aprilX = 60;
         aprilY = -54;
         targetAprilID = 24;
@@ -92,22 +98,25 @@ public class AutoAligner {
             for (LLResultTypes.FiducialResult tag : aprilTags) {
                 if (tag.getFiducialId() == targetAprilID) {
                     // Testing making it aim not directly at apriltag, doesnt completely work
-//                    Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
+                    Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
+//                    Log.d("Limelight", "See tag");
+//                    Log.d("Limelight", "Pose: " + robotPose);
 //                    driveTrain.setPosition(new Pose2D(DistanceUnit.METER, -robotPose.x, -robotPose.y, AngleUnit.DEGREES, pos.getHeading(AngleUnit.DEGREES)));
-//                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
-//                        break;
-//                    }
-//                    return Math.toDegrees(Math.atan2(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37));
+                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
+//                        Log.d("Limelight", "Pos off");
+                        break;
+                    }
+                    return normalize(180 + Math.toDegrees(Math.atan2(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37)) - pos.getHeading(AngleUnit.DEGREES));
 
                     // Return limelight angle if it sees the tag
 //                    double limelightAngle = turretAngle - tag.getTargetXDegrees();
 //                    Log.d("Turret Debug", "Limelight wanted: " + limelightAngle);
 //                    return limelightAngle;
-                    return turretAngle - tag.getTargetXDegrees();
+//                    return turretAngle - tag.getTargetXDegrees();
                 }
             }
         }
-
+//        Log.d("Limelight", "Pinpoint fallback");
         // Fallback on using pinpoint
         return normalize(180 + Math.toDegrees(Math.atan2(
                         goalY - pos.getY(DistanceUnit.INCH),
@@ -141,7 +150,7 @@ public class AutoAligner {
     public double getShooterVelocityFromAngle(double theta) {
         double horizontalDist = getDistanceToGoal();
 
-        double kSlip = closeKSlip + (farKSlip - closeKSlip) * (horizontalDist / 144);
+        double kSlip = closeKSlip + (farKSlip - closeKSlip) * (horizontalDist / 144) + kSlipTurretRotationConstant * Math.abs(turret.getTurretCurrentAngle()) / 180;
         // Convert theta to radians
         theta = Math.toRadians(theta);
         // Impossible

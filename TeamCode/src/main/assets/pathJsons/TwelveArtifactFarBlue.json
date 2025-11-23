@@ -1,84 +1,79 @@
 {
   "version": 1,
-  "createdAt": "2025-11-21T04:58:34.689Z",
+  "createdAt": "2025-11-22T22:16:39.509Z",
   "start": {
-    "x": -63.5,
-    "y": 15.5,
+    "x": -64,
+    "y": 32,
     "h": 90
   },
   "points": [
     {
-      "x": -63.5,
-      "y": 15.5,
+      "x": -64,
+      "y": 32.5,
       "h": 90
     },
     {
-      "x": -54,
-      "y": 15,
+      "x": -64,
+      "y": 32,
       "h": 90
     },
     {
-      "x": -12,
-      "y": 27,
+      "x": -65.5,
+      "y": 62.5,
       "h": 90
     },
     {
-      "x": -9,
+      "x": -62,
+      "y": 28,
+      "h": 90
+    },
+    {
+      "x": -38,
+      "y": 25,
+      "h": 90
+    },
+    {
+      "x": -38,
+      "y": 55,
+      "h": 90
+    },
+    {
+      "x": -62,
+      "y": 28,
+      "h": 90
+    },
+    {
+      "x": -14.5,
+      "y": 24.5,
+      "h": 90
+    },
+    {
+      "x": -15,
       "y": 56,
       "h": 90
     },
     {
-      "x": -12,
-      "y": 27,
+      "x": -62,
+      "y": 28.5,
       "h": 90
     },
     {
-      "x": -54,
-      "y": 15,
+      "x": -50,
+      "y": 38,
       "h": 90
     },
     {
-      "x": -36,
-      "y": 27,
-      "h": 90
-    },
-    {
-      "x": -36,
-      "y": 60,
-      "h": 90
-    },
-    {
-      "x": -54,
-      "y": 15,
-      "h": 90
-    },
-    {
-      "x": -29,
-      "y": 63,
-      "h": 180
-    },
-    {
-      "x": -63,
-      "y": 63,
-      "h": 180
-    },
-    {
-      "x": -54,
-      "y": 15,
-      "h": 90
-    },
-    {
-      "x": -54,
-      "y": 48,
+      "x": -50,
+      "y": 38,
       "h": 90
     }
   ],
   "headingMode": "straight",
   "endHeading": 90,
-  "velocity": 80,
-  "maxAccel": 100,
+  "velocity": 120,
+  "maxAccel": 40,
   "tolerance": 5,
-  "snapInches": 1,
+  "snapInches": 0.5,
   "robot": {
     "length": "17.39",
     "width": "16.32"
@@ -92,102 +87,107 @@
     {
       "index": 2,
       "name": "launchArtifacts",
-      "value": 2.5
-    },
-    {
-      "index": 3,
-      "name": "intake",
-      "value": 2000
+      "value": 2.75
     },
     {
       "index": 3,
       "name": "velocity",
-      "value": 30
+      "value": 120
     },
     {
-      "index": 4,
-      "name": "intake",
+      "index": 3,
+      "name": "autoAimBlue",
       "value": 0
     },
     {
       "index": 4,
-      "name": "velocity",
-      "value": 80
-    },
-    {
-      "index": 4,
-      "name": "pause",
-      "value": 1
+      "name": "launchArtifacts",
+      "value": 2.75
     },
     {
       "index": 5,
-      "name": "autoAimBlue",
+      "name": "velocity",
+      "value": 35
+    },
+    {
+      "index": 5,
+      "name": "intake",
+      "value": 2000
+    },
+    {
+      "index": 6,
+      "name": "velocity",
+      "value": 120
+    },
+    {
+      "index": 6,
+      "name": "intake",
       "value": 0
     },
     {
       "index": 6,
-      "name": "launchArtifacts",
-      "value": 2.5
+      "name": "autoAimBlue",
+      "value": 0
     },
     {
       "index": 7,
+      "name": "launchArtifacts",
+      "value": 2.75
+    },
+    {
+      "index": 2,
       "name": "intake",
       "value": 2000
     },
     {
-      "index": 7,
+      "index": 2,
       "name": "velocity",
-      "value": 30
+      "value": 40
     },
     {
-      "index": 8,
+      "index": 4,
       "name": "intake",
       "value": 0
     },
     {
-      "index": 8,
-      "name": "velocity",
-      "value": 80
+      "index": 3,
+      "name": "pause",
+      "value": 0.5
     },
     {
       "index": 8,
-      "name": "autoAimBlue",
+      "name": "velocity",
+      "value": 35
+    },
+    {
+      "index": 8,
+      "name": "intake",
+      "value": 2000
+    },
+    {
+      "index": 9,
+      "name": "velocity",
+      "value": 120
+    },
+    {
+      "index": 9,
+      "name": "intake",
       "value": 0
     },
     {
       "index": 9,
-      "name": "launchArtifacts",
-      "value": 2.5
-    },
-    {
-      "index": 10,
-      "name": "intake",
-      "value": 2000
-    },
-    {
-      "index": 10,
-      "name": "velocity",
-      "value": 30
-    },
-    {
-      "index": 11,
-      "name": "intake",
-      "value": 0
-    },
-    {
-      "index": 11,
-      "name": "velocity",
-      "value": 80
-    },
-    {
-      "index": 11,
       "name": "autoAimBlue",
       "value": 0
     },
     {
-      "index": 12,
+      "index": 10,
       "name": "launchArtifacts",
       "value": 2.5
+    },
+    {
+      "index": 11,
+      "name": "shooterVelocity",
+      "value": 0
     }
   ]
 }

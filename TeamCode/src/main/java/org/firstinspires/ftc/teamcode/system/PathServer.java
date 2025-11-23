@@ -34,8 +34,8 @@ public class PathServer extends NanoHTTPD {
     public static class Tag implements Comparable<Tag> {
         public final int index;
         public final String name;
-        public final int value;
-        public Tag(String name, int value, int index) {
+        public final double value;
+        public Tag(String name, double value, int index) {
             this.name = name;
             this.value = value;
             this.index = index;
@@ -234,7 +234,7 @@ public class PathServer extends NanoHTTPD {
                 JSONObject t = tagsArr.getJSONObject(i);
                 out[i] = new Tag(
                         t.optString("name", ""),
-                        t.optInt("value", 0),
+                        t.optDouble("value", 0.0),
                         t.optInt("index", 0)
                 );
             }

@@ -35,14 +35,20 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     private int currentPoint = -1;
 
     public OdometryHolonomicDrivetrain(DcMotorEx backLeft, DcMotorEx backRight, DcMotorEx frontLeft,
-                                       DcMotorEx frontRight, OdometryModule odometry) {
-        super(backLeft, backRight, frontLeft, frontRight);
+                                       DcMotorEx frontRight, OdometryModule odometry,
+                                       double p, double i, double d, double f) {
+        super(backLeft, backRight, frontLeft, frontRight, p, i, d, f);
         this.odometry = odometry;
         this.odometry.updatePosition();
         this.currentPosition = this.odometry.getPosition();
         this.wantedPosition = currentPosition;
 
         lastHeading = this.currentPosition.getHeading(AngleUnit.DEGREES);
+    }
+
+    public OdometryHolonomicDrivetrain(DcMotorEx backLeft, DcMotorEx backRight, DcMotorEx frontLeft,
+                                       DcMotorEx frontRight, OdometryModule odometry) {
+        this(backLeft, backRight, frontLeft, frontRight, odometry, 10, 3, 0, 0);
     }
     
     // Behavior: Overrides super classes drive method to include odometry and heading correction.

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.code.helpers;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -35,6 +37,7 @@ public abstract class BaseAuto extends OpMode {
     public static final double xOffset = 72.0; // -84.0 // mm
 
     protected int velocity;
+    protected int intakeVelocity;
     protected double tolerance;
     protected Reader jsonReader;
     protected boolean readJson;
@@ -49,9 +52,14 @@ public abstract class BaseAuto extends OpMode {
     protected Pose2D[] positions;
     protected PathServer.Tag[] tags;
 
+    public static double p = 30;
+    public static double i = 0;
+    public static double d = 7;
+    public static double f = 0;
+
     private double wantedShooterVelocity = 0;
     private boolean isShooting;
-    public static double shooterDelay = 0.6;
+    public static double shooterDelay = 0.3;
     private double shooterTimer = 0;
     public static double shooterTolerance = 60;
 
@@ -103,7 +111,7 @@ public abstract class BaseAuto extends OpMode {
                 JSONObject t = jtags.getJSONObject(i);
                 PathServer.Tag tag = new PathServer.Tag(
                         t.getString("name"),
-                        t.optInt("value", 0),
+                        t.optDouble("value", 0.0),
                         t.getInt("index")
                 );
                 tags[i] = tag;
@@ -124,7 +132,8 @@ public abstract class BaseAuto extends OpMode {
                 hardwareMap.get(DcMotorEx.class, "backRight"),
                 hardwareMap.get(DcMotorEx.class, "frontLeft"),
                 hardwareMap.get(DcMotorEx.class, "frontRight"),
-                new GoBildaPinpointOdometry(pinpointDriver)
+                new GoBildaPinpointOdometry(pinpointDriver),
+                p, i, d, f
         );
 
         intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
@@ -134,6 +143,8 @@ public abstract class BaseAuto extends OpMode {
                 hardwareMap.get(Servo.class, "blocker"));
         turret.resetTurretEncoder();
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0);
+        limelight.start();
         autoAligner = new AutoAligner(driveTrain, turret, limelight, false);
     }
 
@@ -194,18 +205,23 @@ public abstract class BaseAuto extends OpMode {
                 PathServer.Tag currTag = tags[lastTagIndex];
                 switch (currTag.name) {
                     case "velocity":
-                        driveTrain.setVelocity((int) (currTag.value * BasicHolonomicDrivetrain.FORWARD_COUNTS_PER_INCH));
+                        velocity = (int) (currTag.value * BasicHolonomicDrivetrain.FORWARD_COUNTS_PER_INCH);
+                        driveTrain.setVelocity(velocity);
                         break;
                     case "pause":
-                        pauseTimeLeft += currTag.value;
+                        if (currTag.value <= 0) break;
+                        pauseTimeLeft = currTag.value;
+                        Log.d("Pause", "Seconds: " + currTag.value);
                         pausedIndex = nextPointIndex;
                         driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
                         break;
                     case "intake":
                         if (currTag.value <= 0) {
+                            intakeVelocity = 0;
                             intake.stop();
                         } else {
-                            intake.setVelocity(currTag.value);
+                            intakeVelocity = (int) Math.round(currTag.value);
+                            intake.setVelocity(intakeVelocity);
                         }
                         break;
                     case "autoAimRed": {
@@ -231,6 +247,7 @@ public abstract class BaseAuto extends OpMode {
                         break;
                     }
                     case "launchArtifacts": {
+                        if (currTag.value <= 0) break;
                         turret.open();
                         pauseTimeLeft = currTag.value;
                         pausedIndex = nextPointIndex;
@@ -247,13 +264,13 @@ public abstract class BaseAuto extends OpMode {
                 turret.open();
 //                autoAim(pausedIndex - 1);
                 autoAim();
-                double intakeVelocity = 0;
+                double shootingIntakeVelocity = 0;
 
                 if (shooterTimer <= 0 && Math.abs(turret.getShooterVelocity() - wantedShooterVelocity) <= shooterTolerance) {
-                    intakeVelocity = 2000;
+                    shootingIntakeVelocity = 2000;
                 }
 
-                intake.setVelocity(intakeVelocity);
+                intake.setVelocity(shootingIntakeVelocity);
             }
             double dt = runtime.seconds() - lastTime;
             pauseTimeLeft -= dt;
@@ -265,7 +282,7 @@ public abstract class BaseAuto extends OpMode {
                 driveTrain.setPositionDrive(positions, velocity, pausedIndex);
                 if (isShooting) {
                     turret.close();
-                    intake.setVelocity(0);
+                    intake.setVelocity(intakeVelocity);
                     isShooting = false;
                 }
             } else {

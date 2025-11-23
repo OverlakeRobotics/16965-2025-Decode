@@ -16,8 +16,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class BasicHolonomicDrivetrain {
     public static final double MAX_STOP_VELOCITY = 1e-2;
     public static final int MAX_VELOCITY = 2800;
-    public static final double FORWARD_TO_STRAFE_RATIO = /* 1.0822; */ 1.19148;
-    public static final double FORWARD_COUNTS_PER_INCH = 30;
+    public static final double FORWARD_TO_STRAFE_RATIO = /* 1.0822; */ 1.024;
+    public static final double FORWARD_COUNTS_PER_INCH = 32.49; //30;
     private final DcMotorEx backLeft;
     private final DcMotorEx backRight;
     private final DcMotorEx frontLeft;
@@ -38,7 +38,8 @@ public class BasicHolonomicDrivetrain {
     }
 
     public BasicHolonomicDrivetrain(DcMotorEx backLeft, DcMotorEx backRight,
-                                    DcMotorEx frontLeft, DcMotorEx frontRight) {
+                                    DcMotorEx frontLeft, DcMotorEx frontRight,
+                                    double p, double i, double d, double f) {
         this.backLeft = backLeft;
         this.backRight = backRight;
         this.frontLeft = frontLeft;
@@ -54,9 +55,19 @@ public class BasicHolonomicDrivetrain {
         frontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
+        backLeft.setVelocityPIDFCoefficients(p, i, d, f);
+        backRight.setVelocityPIDFCoefficients(p, i, d, f);
+        frontLeft.setVelocityPIDFCoefficients(p, i, d, f);
+        frontRight.setVelocityPIDFCoefficients(p, i, d, f);
+
         currentDriveState = DriveState.STOPPED;
         countsToSlowDown = 1000;
         minPositionVelocity = 150;
+    }
+
+    public BasicHolonomicDrivetrain(DcMotorEx backLeft, DcMotorEx backRight,
+                                    DcMotorEx frontLeft, DcMotorEx frontRight) {
+        this(backLeft, backRight, frontLeft, frontRight, 10, 3, 0, 0);
     }
 
     // Behavior: Sets the velocity of the drive motors to the given velocities.

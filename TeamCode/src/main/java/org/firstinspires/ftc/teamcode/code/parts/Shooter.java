@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.util.Range;
 public class Shooter {
     public final double MAX_VELOCITY = 2800;
     public final double MOTOR_TO_WHEEL_VELOCITY_RATIO = 1.0;
-    public final int minHoodAngle = 15;
-    public final int maxHoodAngle = 45;
+    public static int minHoodAngle = 15;
+    public static int maxHoodAngle = 50;
     private final DcMotorEx shooterMotor;
     private final Servo hoodServo;
     private final Servo blocker;
