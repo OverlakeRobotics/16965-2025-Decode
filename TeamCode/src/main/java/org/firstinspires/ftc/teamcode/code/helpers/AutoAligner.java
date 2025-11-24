@@ -17,20 +17,20 @@ import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 import java.util.List;
 
+
+
 @Config
 public class AutoAligner {
     public static final double g = 386.08858; // in/s^2
     public static final double rhinoWheelRadius = 1.88976; // in
     // TODO: Tune these values
     public static final double motorTicksPerRev = 28d;
-    public static double farKSlip = 0.41;
-    public static double closeKSlip = 0.38;
+    public double kSlip = 0;
+    public double hoodAngle = 0;
     public static double kSlipTurretRotationConstant = 0.03;
     public static double autoAlignBuffer = 5; // degrees
 
     public static double maxShooterVelocity = 2800;
-    public static double angleMin = 20;
-    public static double angleMax = 50;
     public static double goalX;
     public static double goalY;
     public static double redGoalX = 70;
@@ -41,9 +41,25 @@ public class AutoAligner {
     public static double aprilY;
     public static double goalDZ = 28;
     private int targetAprilID;
-    private OdometryHolonomicDrivetrain driveTrain;
-    private Turret turret;
-    private Limelight3A limelight;
+    private final OdometryHolonomicDrivetrain driveTrain;
+    private final Turret turret;
+    private final Limelight3A limelight;
+
+    // 1. kSlip, 2. hoodAngle, 3.
+    public static class PointValues {
+        public double x, y;
+        public double[] v;
+
+        public PointValues(double x, double y, double[] v) {
+            this.x = x;
+            this.y = y;
+            this.v = v;
+        }
+    }
+
+    private final PointValues[] interpolationPoints = {
+            new PointValues(0, 0, new double[]{0.4, 30})
+    };
 
 
     public AutoAligner(OdometryHolonomicDrivetrain driveTrain, Turret turret, Limelight3A limelight, boolean isRed) {
@@ -143,6 +159,40 @@ public class AutoAligner {
         }
     }
 
+    public void updateInterpolation(double x, double y) {
+        int dims = interpolationPoints[0].v.length;       // number of value components
+        double[] weighted = new double[dims];
+        double totalWeight = 0;
+        double eps = 1e-9;
+
+        for (PointValues p : interpolationPoints) {
+            double dx = x - p.x;
+            double dy = y - p.y;
+            double distSq = dx * dx + dy * dy;
+
+            // Exact match
+            if (distSq < 1e-12) {
+                kSlip = p.v[0];
+                hoodAngle = p.v[1];
+            }
+
+            double w = 1.0 / (distSq + eps); // weight = 1/d^2
+
+            for (int i = 0; i < dims; i++) {
+                weighted[i] += w * p.v[i];
+            }
+            totalWeight += w;
+        }
+
+        // Normalize by weight sum
+        for (int i = 0; i < dims; i++) {
+            weighted[i] /= totalWeight;
+        }
+
+        kSlip = weighted[0];
+        hoodAngle = weighted[1];
+    }
+
     // TODO: Check angle and velocity calculations
     // Distances should be passed in as inches due to FTC standard units
     // theta is the launch angle in degrees, where launching straight up is 0 degrees (hood flat) and straight forward is 90 degrees (hood vertical)
@@ -150,7 +200,7 @@ public class AutoAligner {
     public double getShooterVelocityFromAngle(double theta) {
         double horizontalDist = getDistanceToGoal();
 
-        double kSlip = closeKSlip + (farKSlip - closeKSlip) * (horizontalDist / 144) + kSlipTurretRotationConstant * Math.abs(turret.getTurretCurrentAngle()) / 180;
+        double adjustedKSlip = kSlip + kSlipTurretRotationConstant * Math.abs(turret.getTurretCurrentAngle()) / 180;
         // Convert theta to radians
         theta = Math.toRadians(theta);
         // Impossible
@@ -164,7 +214,7 @@ public class AutoAligner {
         );
 
         // Then calculate RPM from linear velocity
-        double rpm = (v * 60) / (2 * Math.PI * rhinoWheelRadius * kSlip);
+        double rpm = (v * 60) / (2 * Math.PI * rhinoWheelRadius * adjustedKSlip);
         // Scale to motor ticks per second
         // TODO: Check ticks/sec calculation
         double rawTPS = rpm * motorTicksPerRev / 60;
@@ -175,9 +225,8 @@ public class AutoAligner {
     }
 
     public double getOptimalHoodAngle() {
-        return Math.min(angleMin + (getDistanceToGoal() / 144) * (angleMax - angleMin), angleMax);
+        return hoodAngle;
     }
-
 
     // Work in progress
     public double getHoodAngleFromVelocity(double v, boolean useNegSol) {
