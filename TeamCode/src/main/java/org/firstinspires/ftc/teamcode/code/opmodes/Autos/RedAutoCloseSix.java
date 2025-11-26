@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.code.opmodes.Autos;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.code.helpers.BaseAuto;
 
 @Config
 @Autonomous(name = "Red Auto Close Six", group = "Autonomous")
+@Disabled
 public class RedAutoCloseSix extends BaseAuto {
     @Override
     public void init() {

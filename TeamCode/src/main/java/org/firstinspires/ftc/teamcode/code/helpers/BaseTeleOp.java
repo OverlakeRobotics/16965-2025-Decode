@@ -47,7 +47,7 @@ public abstract class BaseTeleOp extends OpMode {
     protected double shooterVelocity;
     protected double hoodAngle;
     protected double turretAngle;
-    protected boolean autoTurret = true;
+//    protected boolean autoTurret = true;
 
     protected abstract boolean isRedAlliance();
     protected abstract Pose2D[] getPresetPositions();
@@ -141,10 +141,11 @@ public abstract class BaseTeleOp extends OpMode {
             hoodAngle = autoAligner.getOptimalHoodAngle();
             shooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
         }
+        turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
 
-        if (autoTurret) {
-            turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
-        }
+//        if (autoTurret) {
+//            turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
+//        }
 
         // Gamepad 1 controls
         // Right Bumper: Far preset
@@ -165,9 +166,9 @@ public abstract class BaseTeleOp extends OpMode {
         if (gamepad1.dpadRightWasPressed()) {
             shooterVelocity = 0;
         }
-        if (gamepad1.dpadLeftWasPressed()) {
-            autoTurret = !autoTurret;
-        }
+//        if (gamepad1.dpadLeftWasPressed()) {
+//            autoTurret = !autoTurret;
+//        }
 
         double intakeVelocity = intakeOn ? (intakeReversed ? -2000 : 2000) : 0;
 
@@ -209,18 +210,18 @@ public abstract class BaseTeleOp extends OpMode {
         if (gamepad2.dpadDownWasPressed()) {
             hoodAngle -= 2;
         }
-        if (!autoTurret) {
-            if (gamepad2.dpad_left) {
-                turretAngle += 5;
-            }
-            if (gamepad2.dpad_right) {
-                turretAngle -= 5;
-            }
-            if (gamepad2.yWasPressed()) {
-                turret.resetTurretEncoder();
-                turretAngle = 0;
-            }
-        }
+//        if (!autoTurret) {
+//            if (gamepad2.dpad_left) {
+//                turretAngle += 5;
+//            }
+//            if (gamepad2.dpad_right) {
+//                turretAngle -= 5;
+//            }
+//            if (gamepad2.yWasPressed()) {
+//                turret.resetTurretEncoder();
+//                turretAngle = 0;
+//            }
+//        }
 
         if (gamepad2.aWasPressed()) {
             shooterVelocity = 2000;

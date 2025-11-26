@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "createdAt": "2025-11-23T19:58:53.861Z",
+  "createdAt": "2025-11-23T22:49:07.270Z",
   "start": {
     "x": 48,
     "y": -48,
@@ -13,38 +13,58 @@
       "h": -90
     },
     {
-      "x": 39,
-      "y": -39,
-      "h": -90
-    },
-    {
-      "x": 12,
+      "x": 24,
       "y": -24,
       "h": -90
     },
     {
-      "x": 12,
-      "y": -54,
+      "x": 15,
+      "y": -24,
       "h": -90
     },
     {
-      "x": 39,
-      "y": -39,
+      "x": 15,
+      "y": -55,
       "h": -90
     },
     {
-      "x": -12,
+      "x": 24,
+      "y": -24,
+      "h": -90
+    },
+    {
+      "x": -9,
       "y": -27,
       "h": -90
     },
     {
-      "x": -12,
-      "y": -51,
+      "x": -9,
+      "y": -56,
       "h": -90
     },
     {
-      "x": 39,
-      "y": -39,
+      "x": 24,
+      "y": -24,
+      "h": -90
+    },
+    {
+      "x": -33,
+      "y": -27,
+      "h": -90
+    },
+    {
+      "x": -33,
+      "y": -57,
+      "h": -90
+    },
+    {
+      "x": 24,
+      "y": -24,
+      "h": -90
+    },
+    {
+      "x": 63,
+      "y": -27,
       "h": -90
     },
     {
@@ -54,11 +74,11 @@
     }
   ],
   "headingMode": "straight",
-  "endHeading": 90,
-  "velocity": 100,
+  "endHeading": -90,
+  "velocity": 150,
   "maxAccel": 40,
   "tolerance": 5,
-  "snapInches": 3,
+  "snapInches": 1,
   "robot": {
     "length": "17.8",
     "width": "16.7"
@@ -72,7 +92,7 @@
     {
       "index": 2,
       "name": "launchArtifacts",
-      "value": 3
+      "value": 2.25
     },
     {
       "index": 3,
@@ -92,7 +112,7 @@
     {
       "index": 4,
       "name": "velocity",
-      "value": 100
+      "value": 150
     },
     {
       "index": 4,
@@ -102,7 +122,7 @@
     {
       "index": 5,
       "name": "launchArtifacts",
-      "value": 3
+      "value": 2.25
     },
     {
       "index": 6,
@@ -117,7 +137,7 @@
     {
       "index": 7,
       "name": "velocity",
-      "value": 100
+      "value": 150
     },
     {
       "index": 7,
@@ -132,7 +152,42 @@
     {
       "index": 8,
       "name": "launchArtifacts",
-      "value": 3
+      "value": 2.25
+    },
+    {
+      "index": 9,
+      "name": "velocity",
+      "value": 35
+    },
+    {
+      "index": 9,
+      "name": "intake",
+      "value": 2000
+    },
+    {
+      "index": 10,
+      "name": "velocity",
+      "value": 150
+    },
+    {
+      "index": 10,
+      "name": "intake",
+      "value": 0
+    },
+    {
+      "index": 10,
+      "name": "autoAimRed",
+      "value": 0
+    },
+    {
+      "index": 11,
+      "name": "launchArtifacts",
+      "value": 2.25
+    },
+    {
+      "index": 12,
+      "name": "shooterVelocity",
+      "value": 0
     }
   ]
 }

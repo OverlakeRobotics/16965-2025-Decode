@@ -22,6 +22,7 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     private static final double MIN_DIST_TO_STOP = 0.5;
     private static final double COUNTS_PER_DEGREE = 10;
     private static final double MIN_ANGLE_DIF_TO_STOP = 1;
+    public static double angleOffsetConstant = 1;
     private double pathTolerance = 4;
     private boolean doPositionHeadingCorrection;
     private boolean positionDriveUsingOdometry;
@@ -128,9 +129,9 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     // Behavior: Method just like setPosition drive but also includes a wantedH for heading correction.
     public void setPositionDriveCorrection(int distance, double direction, double velocity, double wantedH) {
         double dh = normalize(currentPosition.getHeading(AngleUnit.DEGREES) - lastHeading);
-        double angleOffset = dh / 2;
+        double angleOffset = angleOffsetConstant * dh / 2;
         // TODO: Test angle offset by driving in a straight line.
-        super.setPositionDrive(distance, direction - currentPosition.getHeading(AngleUnit.DEGREES) - angleOffset,
+        super.setPositionDrive(distance, normalize(direction - currentPosition.getHeading(AngleUnit.DEGREES) - angleOffset),
                 COUNTS_PER_DEGREE * normalize(wantedH - currentPosition.getHeading(AngleUnit.DEGREES)), velocity);
         positionDriveDirection = direction;
         setWantedHeading(wantedH);
@@ -147,6 +148,13 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
         double dy = (this.wantedPosition.getY(DistanceUnit.INCH) - this.currentPosition.getY(DistanceUnit.INCH));
         // TODO: Make not just FORWARD_COUNTS_PER_INCH but a combination of strafe and forward counts per inch.
         //       The robot may be rotated so dx isn't just forward and dy isnt just strafe.
+        // I think this is fine bc the strafe ratio is multiplied in basic's setPositionDrive
+        // The distance meant to be passed into setPositionDriveCorrection and basic's
+        // setPositionDrive assume distance in forward counts; strafe additional is later calculated w/ ratio in basic.
+//        double theta = this.currentPosition.getHeading(AngleUnit.RADIANS);
+//        double forwardInches = dx * Math.cos(theta) + dy * Math.sin(theta);
+//        double strafeInches = -dx * Math.sin(theta) + dy * Math.cos(theta);
+//        int counts = (int) Math.round(Math.hypot(forwardInches * FORWARD_COUNTS_PER_INCH, strafeInches * FORWARD_COUNTS_PER_INCH * STRAFE_TO_FORWARD_RATIO));
         int counts = (int) Math.round(Math.hypot(dx * FORWARD_COUNTS_PER_INCH, dy * FORWARD_COUNTS_PER_INCH));
         double direction = Math.toDegrees(Math.atan2(dy, dx));
         setPositionDriveCorrection(counts, direction, velocity, wantedPosition.getHeading(AngleUnit.DEGREES));

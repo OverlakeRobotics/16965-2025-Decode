@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "createdAt": "2025-11-22T22:36:23.021Z",
+  "createdAt": "2025-11-23T18:56:54.300Z",
   "start": {
     "x": -64,
     "y": -32,
@@ -19,7 +19,7 @@
     },
     {
       "x": -65.5,
-      "y": -62.5,
+      "y": -63.5,
       "h": -90
     },
     {
@@ -55,7 +55,7 @@
   ],
   "headingMode": "straight",
   "endHeading": 90,
-  "velocity": 120,
+  "velocity": 100,
   "maxAccel": 40,
   "tolerance": 5,
   "snapInches": 0.5,
@@ -77,7 +77,7 @@
     {
       "index": 3,
       "name": "velocity",
-      "value": 120
+      "value": 80
     },
     {
       "index": 3,
@@ -102,7 +102,7 @@
     {
       "index": 6,
       "name": "velocity",
-      "value": 120
+      "value": 100
     },
     {
       "index": 6,
@@ -127,7 +127,7 @@
     {
       "index": 2,
       "name": "velocity",
-      "value": 40
+      "value": 60
     },
     {
       "index": 4,
@@ -143,6 +143,11 @@
       "index": 8,
       "name": "shooterVelocity",
       "value": 0
+    },
+    {
+      "index": 4,
+      "name": "velocity",
+      "value": 100
     }
   ]
 }

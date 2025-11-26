@@ -34,9 +34,9 @@ public class AutoAligner {
     public static double goalX;
     public static double goalY;
     public static double redGoalX = 70;
-    public static double redGoalY = -70;
+    public static double redGoalY = -68;
     public static double blueGoalX = 70;
-    public static double blueGoalY = 70;
+    public static double blueGoalY = 68;
     public static double aprilX;
     public static double aprilY;
     public static double goalDZ = 28;
@@ -75,7 +75,22 @@ public class AutoAligner {
     }
 
     public double getDistanceToGoal() {
+        LLResult result = limelight.getLatestResult();
         Pose2D pos = driveTrain.getPosition();
+        if (result.isValid()) {
+            List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult tag : aprilTags) {
+                if (tag.getFiducialId() == targetAprilID) {
+                    Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
+                    Log.d("Limelight", "using limelight dist");
+                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
+                        break;
+                    }
+                    return Math.hypot(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37);
+                }
+            }
+        }
+        Log.d("Limelight", "Pinpoint dist");
         return Math.hypot(goalX - pos.getX(DistanceUnit.INCH), goalY - pos.getY(DistanceUnit.INCH));
     }
 
@@ -99,8 +114,8 @@ public class AutoAligner {
                 if (tag.getFiducialId() == targetAprilID) {
                     // Testing making it aim not directly at apriltag, doesnt completely work
                     Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
-//                    Log.d("Limelight", "See tag");
-//                    Log.d("Limelight", "Pose: " + robotPose);
+                    Log.d("Limelight", "See tag");
+                    Log.d("Limelight", "Pose: " + robotPose);
 //                    driveTrain.setPosition(new Pose2D(DistanceUnit.METER, -robotPose.x, -robotPose.y, AngleUnit.DEGREES, pos.getHeading(AngleUnit.DEGREES)));
                     if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
 //                        Log.d("Limelight", "Pos off");
@@ -116,7 +131,7 @@ public class AutoAligner {
                 }
             }
         }
-//        Log.d("Limelight", "Pinpoint fallback");
+        Log.d("Limelight", "Pinpoint fallback");
         // Fallback on using pinpoint
         return normalize(180 + Math.toDegrees(Math.atan2(
                         goalY - pos.getY(DistanceUnit.INCH),

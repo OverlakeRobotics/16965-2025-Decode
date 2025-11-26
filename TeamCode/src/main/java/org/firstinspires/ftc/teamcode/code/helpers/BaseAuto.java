@@ -52,9 +52,9 @@ public abstract class BaseAuto extends OpMode {
     protected Pose2D[] positions;
     protected PathServer.Tag[] tags;
 
-    public static double p = 30;
-    public static double i = 0;
-    public static double d = 7;
+    public static double p = 30; // 19; // 30;
+    public static double i = 0; // 0.1; // 0;
+    public static double d = 7; // 0; // 7;
     public static double f = 0;
 
     private double wantedShooterVelocity = 0;
@@ -174,10 +174,10 @@ public abstract class BaseAuto extends OpMode {
         turret.close();
     }
 
-    public void autoAim() {
-//        Pose2D curTarget = positions[pointIndex];
-//        positions[pointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH),
-//                curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
+    public void autoAim(int pointIndex) {
+        Pose2D curTarget = positions[pointIndex];
+        positions[pointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH),
+                curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
         double hoodAngle = autoAligner.getOptimalHoodAngle();
         turret.setHoodAngle(hoodAngle);
         wantedShooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
@@ -195,8 +195,8 @@ public abstract class BaseAuto extends OpMode {
             int nextPointIndex = driveTrain.getNextPointIndex();
 
             if (nextPointIndex == autoAlignIndex && nextPointIndex != -1) {
-//                autoAim(nextPointIndex);
-                autoAim();
+                autoAim(nextPointIndex);
+//                autoAim();
             } else {
                 autoAlignIndex = -1;
             }
@@ -211,7 +211,6 @@ public abstract class BaseAuto extends OpMode {
                     case "pause":
                         if (currTag.value <= 0) break;
                         pauseTimeLeft = currTag.value;
-                        Log.d("Pause", "Seconds: " + currTag.value);
                         pausedIndex = nextPointIndex;
                         driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
                         break;
@@ -262,8 +261,8 @@ public abstract class BaseAuto extends OpMode {
         } else {
             if (isShooting) {
                 turret.open();
-//                autoAim(pausedIndex - 1);
-                autoAim();
+                autoAim(pausedIndex - 1);
+//                autoAim();
                 double shootingIntakeVelocity = 0;
 
                 if (shooterTimer <= 0 && Math.abs(turret.getShooterVelocity() - wantedShooterVelocity) <= shooterTolerance) {
@@ -289,6 +288,7 @@ public abstract class BaseAuto extends OpMode {
                 driveTrain.setPositionDrive(positions[pausedIndex - 1], velocity);
             }
         }
+        Log.d("Loop Time", Double.toString(runtime.seconds() - lastTime));
         lastTime = runtime.seconds();
     }
 

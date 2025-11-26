@@ -4,19 +4,16 @@
 // Positive heading is to the left, negative heading is to the right.
 
 package org.firstinspires.ftc.teamcode.system;
-import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
 public class BasicHolonomicDrivetrain {
     public static final double MAX_STOP_VELOCITY = 1e-2;
     public static final int MAX_VELOCITY = 2800;
-    public static final double FORWARD_TO_STRAFE_RATIO = /* 1.0822; */ 1.024;
+    public static final double STRAFE_TO_FORWARD_RATIO = /* 1.0822; */ 1.024;
     public static final double FORWARD_COUNTS_PER_INCH = 32.49; //30;
     private final DcMotorEx backLeft;
     private final DcMotorEx backRight;
@@ -236,7 +233,7 @@ public class BasicHolonomicDrivetrain {
     //      - double velocity: The velocity to move the robot at.
     public void setPositionDrive(int distance, double direction, double turn, double velocity) {
         double forwardCounts = distance * Math.cos(Math.toRadians(direction));
-        double strafeCounts = distance * Math.sin(Math.toRadians(direction)) * FORWARD_TO_STRAFE_RATIO;
+        double strafeCounts = distance * Math.sin(Math.toRadians(direction)) * STRAFE_TO_FORWARD_RATIO;
         setPositionDrive(forwardCounts, strafeCounts, turn, velocity);
     }
 
@@ -287,13 +284,13 @@ public class BasicHolonomicDrivetrain {
     //           counts.
     // Returns: A double containing the distance to the destination in counts.
     public int getPositionDriveDistanceLeft() {
-        return (int)Math.hypot(getForwardCountsLeft(), getStrafeCountsLeft() / FORWARD_TO_STRAFE_RATIO);
+        return (int)Math.hypot(getForwardCountsLeft(), getStrafeCountsLeft() / STRAFE_TO_FORWARD_RATIO);
     }
 
     // Behavior: Gets the direction of the current position drive.
     // Returns: A double, containing the direction of the current position drive in degrees.
     public double getPositionDriveDirection() {
-        return Math.toDegrees(Math.atan2(getStrafeCountsLeft() / FORWARD_TO_STRAFE_RATIO, getForwardCountsLeft()));
+        return Math.toDegrees(Math.atan2(getStrafeCountsLeft() / STRAFE_TO_FORWARD_RATIO, getForwardCountsLeft()));
     }
 
     // Behavior: Stops the robot by setting the motor velocities to 0.
