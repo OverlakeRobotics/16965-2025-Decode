@@ -23,6 +23,11 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     private static final double COUNTS_PER_DEGREE = 10;
     private static final double MIN_ANGLE_DIF_TO_STOP = 1;
     public static double angleOffsetConstant = 1;
+    // TODO: Tune these values
+    public static double minPathDirectionChangeVelocity = 150;
+    public static double robotMaxAccelerationInches = 50;
+    private double pathDriveNormalVelocity;
+    private Pose2D pathStartPos;
     private double pathTolerance = 4;
     private boolean doPositionHeadingCorrection;
     private boolean positionDriveUsingOdometry;
@@ -69,6 +74,23 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
                             wantedPosition = currentPath[currentPoint];
                         } else {
                             atNextPoint = false;
+                        }
+                    }
+
+                    if (currentPoint != currentPath.length - 1) {
+                        double directionChangeAngle = getDirectionChangeAngle(
+                                currentPoint != 0 ? currentPath[currentPoint - 1] : pathStartPos,
+                                currentPath[currentPoint],
+                                currentPath[currentPoint + 1]
+                        );
+                        double directionChangeNeededVelocity = minPathDirectionChangeVelocity + (pathDriveNormalVelocity - minPathDirectionChangeVelocity) * Math.cos(Math.toRadians(directionChangeAngle / 2));
+                        // kinematics; becomes vi^2 - vf^2 because a is negative
+                        double countsNeededToSlowDown = (Math.pow(pathDriveNormalVelocity, 2) - Math.pow(directionChangeNeededVelocity, 2)) / (2 * robotMaxAccelerationInches * FORWARD_COUNTS_PER_INCH);
+                        double countsLeft = getDistanceToDestination();
+                        if (countsLeft < countsNeededToSlowDown) {
+                            forward = directionChangeNeededVelocity + (pathDriveNormalVelocity - directionChangeNeededVelocity) * (countsLeft / countsNeededToSlowDown);
+                        } else {
+                            forward = pathDriveNormalVelocity;
                         }
                     }
 
@@ -174,6 +196,8 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
         }
 
         pathDistances = distances;
+        pathStartPos = currentPosition;
+        pathDriveNormalVelocity = velocity;
 
         currentPath = path;
         setPositionDrive(currentPath[initialPointIndex], velocity);
@@ -264,15 +288,13 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     //      - Pose2D position: The position to set the robot to.
     public void setPosition(Pose2D position) {
         odometry.setPosition(position);
+        this.updatePosition();
     }
 
     // Behavior: Normalizes an angle to (-180,180]
     // Returns: The normalized angle
     private static double normalize(double degrees) {
-        double normalizedAngle = degrees;
-        while (normalizedAngle > 180) normalizedAngle -= 360;
-        while (normalizedAngle <= -180) normalizedAngle += 360;
-        return normalizedAngle;
+        return (degrees + 180) % 360 - 180;
     }
 
     // Behavior: Gets the distance between two Pose2Ds.
@@ -282,6 +304,26 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
             (p1.getX(DistanceUnit.INCH) - p2.getX(DistanceUnit.INCH)),
             (p1.getY(DistanceUnit.INCH) - p2.getY(DistanceUnit.INCH))
         );
+    }
+
+    // Behavior: Gets the magnitude of the angle between the direction of motion from p1 to p2 and the
+    //           direction of motion from p2 to p3. The larger the angle, the sharper the turn.
+    //           0 degrees means no change in direction, and 180 degrees means opposite direction.
+    // Returns: The angle in degrees.
+    public static double getDirectionChangeAngle(Pose2D p1, Pose2D p2, Pose2D p3) {
+        double initialDirection = Math.toDegrees(
+                Math.atan2(
+                        p2.getY(DistanceUnit.INCH) - p1.getY(DistanceUnit.INCH),
+                        p2.getX(DistanceUnit.INCH) - p1.getX(DistanceUnit.INCH)
+                )
+        );
+        double finalDirection = Math.toDegrees(
+                Math.atan2(
+                        p3.getY(DistanceUnit.INCH) - p2.getY(DistanceUnit.INCH),
+                        p3.getX(DistanceUnit.INCH) - p2.getX(DistanceUnit.INCH)
+                )
+        );
+        return Math.abs(normalize(finalDirection - initialDirection));
     }
 
     // Behavior: Returns the index of the current point if path driving, otherwise -1.
