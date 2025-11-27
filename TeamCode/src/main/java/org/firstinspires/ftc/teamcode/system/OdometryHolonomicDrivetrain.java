@@ -6,11 +6,8 @@
 
 package org.firstinspires.ftc.teamcode.system;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -24,9 +21,8 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     private static final double MIN_ANGLE_DIF_TO_STOP = 1;
     public static double angleOffsetConstant = 1;
     // TODO: Tune these values
-    public static double minPathDirectionChangeVelocity = 150;
-    public static double robotMaxAccelerationInches = 50;
-    private double pathDriveNormalVelocity;
+    public static double minDirectionChangeVelocity = 150;
+//    private double pathDriveNormalVelocity;
     private Pose2D pathStartPos;
     private double pathTolerance = 4;
     private boolean doPositionHeadingCorrection;
@@ -37,7 +33,7 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     private Pose2D wantedPosition;
     private double positionDriveDirection;
     private Pose2D[] currentPath;
-    private double[] pathDistances;
+//    private double[] pathDistances;
     private int currentPoint = -1;
 
     public OdometryHolonomicDrivetrain(DcMotorEx backLeft, DcMotorEx backRight, DcMotorEx frontLeft,
@@ -77,23 +73,6 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
                         }
                     }
 
-                    if (currentPoint != currentPath.length - 1) {
-                        double directionChangeAngle = getDirectionChangeAngle(
-                                currentPoint != 0 ? currentPath[currentPoint - 1] : pathStartPos,
-                                currentPath[currentPoint],
-                                currentPath[currentPoint + 1]
-                        );
-                        double directionChangeNeededVelocity = minPathDirectionChangeVelocity + (pathDriveNormalVelocity - minPathDirectionChangeVelocity) * Math.cos(Math.toRadians(directionChangeAngle / 2));
-                        // kinematics; becomes vi^2 - vf^2 because a is negative
-                        double countsNeededToSlowDown = (Math.pow(pathDriveNormalVelocity, 2) - Math.pow(directionChangeNeededVelocity, 2)) / (2 * robotMaxAccelerationInches * FORWARD_COUNTS_PER_INCH);
-                        double countsLeft = getDistanceToDestination();
-                        if (countsLeft < countsNeededToSlowDown) {
-                            forward = directionChangeNeededVelocity + (pathDriveNormalVelocity - directionChangeNeededVelocity) * (countsLeft / countsNeededToSlowDown);
-                        } else {
-                            forward = pathDriveNormalVelocity;
-                        }
-                    }
-
                     int nextPoint = currentPoint;
                     setPositionDrive(currentPath[nextPoint], forward);
                     currentPoint = nextPoint;
@@ -110,6 +89,29 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
 
         lastHeading = currentPosition.getHeading(AngleUnit.DEGREES);
         super.drive();
+    }
+
+    @Override
+    protected double getCurrentVelocity() {
+        if (currentPoint >= 0 && currentPoint != currentPath.length - 1) {
+            double directionChangeAngle = getDirectionChangeAngle(
+                    currentPoint != 0 ? currentPath[currentPoint - 1] : pathStartPos,
+                    currentPath[currentPoint],
+                    currentPath[currentPoint + 1]
+            );
+            double minVelocity = minDirectionChangeVelocity + (forward - minDirectionChangeVelocity) * Math.cos(Math.toRadians(directionChangeAngle / 2));
+            // kinematics; becomes vi^2 - vf^2 because a is negative
+            double countsToSlowDown = (Math.pow(forward, 2) - Math.pow(minVelocity, 2)) / (2 * robotMaxAccelerationInches * FORWARD_COUNTS_PER_INCH);
+
+            double countsLeft = getPositionDriveDistanceLeft();
+            double velocity = forward;
+            if (countsLeft < countsToSlowDown) {
+                velocity = minVelocity + Math.max((forward - minVelocity) * (countsLeft / countsToSlowDown), 0);
+            }
+            return velocity;
+        }
+
+        return super.getCurrentVelocity();
     }
 
     // Behavior: Sets the velocity of the robot while accounting for a field centric view.
@@ -190,14 +192,14 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     //      - Pose2D[] path: The path for the robot to follow as an array of Pose2Ds.
     //      - double velocity: How fast the robot should follow the path.
     public void setPositionDrive(Pose2D[] path, double velocity, int initialPointIndex) {
-        double[] distances = new double[path.length];
-        for (int i = path.length - 2; i >= 0; i--) {
-            distances[i] = distances[i + 1] + dist(path[i], path[i + 1]);
-        }
+//        double[] distances = new double[path.length];
+//        for (int i = path.length - 2; i >= 0; i--) {
+//            distances[i] = distances[i + 1] + dist(path[i], path[i + 1]);
+//        }
 
-        pathDistances = distances;
+//        pathDistances = distances;
         pathStartPos = currentPosition;
-        pathDriveNormalVelocity = velocity;
+//        pathDriveNormalVelocity = velocity;
 
         currentPath = path;
         setPositionDrive(currentPath[initialPointIndex], velocity);
@@ -228,15 +230,15 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
 
     // Behavior: Overrides getPositionDriveDistanceLeft to make the distance count the entire path's
     //           length when doing a path drive.
-    @Override
-    public int getPositionDriveDistanceLeft() {
-        if (currentPoint >= 0) {
-            double totalDist = pathDistances[currentPoint] + dist(currentPosition, currentPath[currentPoint]);
-            return (int)(totalDist * FORWARD_COUNTS_PER_INCH);
-        }
-
-        return super.getPositionDriveDistanceLeft();
-    }
+//    @Override
+//    public int getPositionDriveDistanceLeft() {
+//        if (currentPoint >= 0) {
+//            double totalDist = pathDistances[currentPoint] + dist(currentPosition, currentPath[currentPoint]);
+//            return (int)(totalDist * FORWARD_COUNTS_PER_INCH);
+//        }
+//
+//        return super.getPositionDriveDistanceLeft();
+//    }
 
     @Override
     public boolean isDriving() {

@@ -15,6 +15,7 @@ public class BasicHolonomicDrivetrain {
     public static final int MAX_VELOCITY = 2800;
     public static final double STRAFE_TO_FORWARD_RATIO = /* 1.0822; */ 1.024;
     public static final double FORWARD_COUNTS_PER_INCH = 32.49; //30;
+    public static double robotMaxAccelerationInches = 50;
     private final DcMotorEx backLeft;
     private final DcMotorEx backRight;
     private final DcMotorEx frontLeft;
@@ -23,8 +24,8 @@ public class BasicHolonomicDrivetrain {
     protected double strafe;
     protected double turn;
     protected int countsAffectedByTurn;
-    protected double countsToSlowDown;
-    protected double minPositionVelocity;
+    protected double minVelocity;
+
 
     protected DriveState currentDriveState;
     public enum DriveState {
@@ -58,8 +59,7 @@ public class BasicHolonomicDrivetrain {
         frontRight.setVelocityPIDFCoefficients(p, i, d, f);
 
         currentDriveState = DriveState.STOPPED;
-        countsToSlowDown = 1000;
-        minPositionVelocity = 150;
+        minVelocity = 150;
     }
 
     public BasicHolonomicDrivetrain(DcMotorEx backLeft, DcMotorEx backRight,
@@ -157,16 +157,22 @@ public class BasicHolonomicDrivetrain {
                 frontLeftDif /= max;
                 frontRightDif /= max;
 
-                double countsLeft = getPositionDriveDistanceLeft();
-                double velocity = forward;
-                if (countsLeft < countsToSlowDown) {
-                    velocity = minPositionVelocity + Math.max((forward - minPositionVelocity) * (countsLeft / countsToSlowDown), 0);
-                }
+                double velocity = getCurrentVelocity();
 
                 setVelocity(velocity * backLeftDif, velocity * backRightDif,
                         velocity * frontLeftDif, velocity * frontRightDif);
                 break;
         }
+    }
+
+    protected double getCurrentVelocity() {
+        double countsToSlowDown = (Math.pow(forward, 2) - Math.pow(minVelocity, 2)) / (2 * robotMaxAccelerationInches * FORWARD_COUNTS_PER_INCH);
+        double countsLeft = getPositionDriveDistanceLeft();
+        double velocity = forward;
+        if (countsLeft < countsToSlowDown) {
+            velocity = minVelocity + Math.max((forward - minVelocity) * (countsLeft / countsToSlowDown), 0);
+        }
+        return velocity;
     }
 
     // Behavior: Sets the forward, strafe, and turn velocities of the robot to the given values.
@@ -397,19 +403,11 @@ public class BasicHolonomicDrivetrain {
         return frontRight.getCurrentPosition();
     }
 
-    public void setCountsToSlowDown(double newCountsToSlowDown) {
-        countsToSlowDown = newCountsToSlowDown;
+    public void setMinVelocity(double newMinPositionVelocity) {
+        minVelocity = newMinPositionVelocity;
     }
 
-    public double getCountsToSlowDown() {
-        return countsToSlowDown;
-    }
-
-    public void setMinPositionVelocity(double newMinPositionVelocity) {
-        minPositionVelocity = newMinPositionVelocity;
-    }
-
-    public double getMinPositionVelocity() {
-        return minPositionVelocity;
+    public double getMinVelocity() {
+        return minVelocity;
     }
 }
