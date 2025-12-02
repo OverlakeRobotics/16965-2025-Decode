@@ -49,8 +49,6 @@ public class TeleOpTest extends OpMode {
                 new GoBildaPinpointOdometry(pinpointDriver)
         );
 
-        driveTrain.setCountsToSlowDown(500);
-
         intake = new Intake(hardwareMap.get(DcMotorEx.class, "intakeMotor"));
 
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter");

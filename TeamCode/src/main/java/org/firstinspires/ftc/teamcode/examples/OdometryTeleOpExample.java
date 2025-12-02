@@ -53,7 +53,6 @@ public class OdometryTeleOpExample extends OpMode {
         );
 
         driveTrain.setPosition(startPos);
-        driveTrain.setCountsToSlowDown(500);
     }
 
     @Override

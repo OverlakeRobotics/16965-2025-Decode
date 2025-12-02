@@ -5,6 +5,8 @@
 
 package org.firstinspires.ftc.teamcode.system;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -15,7 +17,7 @@ public class BasicHolonomicDrivetrain {
     public static final int MAX_VELOCITY = 2800;
     public static final double STRAFE_TO_FORWARD_RATIO = /* 1.0822; */ 1.024;
     public static final double FORWARD_COUNTS_PER_INCH = 32.49; //30;
-    public static double robotMaxAccelerationInches = 50;
+    public static double robotMaxAccelerationInches = 120;
     private final DcMotorEx backLeft;
     private final DcMotorEx backRight;
     private final DcMotorEx frontLeft;
@@ -52,10 +54,10 @@ public class BasicHolonomicDrivetrain {
         frontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        backLeft.setVelocityPIDFCoefficients(p, i, d, f);
-        backRight.setVelocityPIDFCoefficients(p, i, d, f);
-        frontLeft.setVelocityPIDFCoefficients(p, i, d, f);
-        frontRight.setVelocityPIDFCoefficients(p, i, d, f);
+//        backLeft.setVelocityPIDFCoefficients(p, i, d, f);
+//        backRight.setVelocityPIDFCoefficients(p, i, d, f);
+//        frontLeft.setVelocityPIDFCoefficients(p, i, d, f);
+//        frontRight.setVelocityPIDFCoefficients(p, i, d, f);
 
         currentDriveState = DriveState.STOPPED;
         minPositionDriveVelocity = 150;
@@ -166,11 +168,14 @@ public class BasicHolonomicDrivetrain {
 
     protected double getPositionDriveVelocity() {
         double minVelocity = getMinPositionDriveVelocity();
+        Log.d("Direction Change", "Min Velocity: " + minVelocity);
         // kinematics; becomes vi^2 - vf^2 because a is negative
         double countsToSlowDown = (Math.pow(forward, 2) - Math.pow(minVelocity, 2)) / (2 * robotMaxAccelerationInches * FORWARD_COUNTS_PER_INCH);
         double countsLeft = getPositionDriveDistanceLeft();
         if (countsLeft <= countsToSlowDown) {
-            return minVelocity + (forward - minVelocity) * (countsLeft / countsToSlowDown);
+            double temp = minVelocity + (forward - minVelocity) * (countsLeft / countsToSlowDown);
+            Log.d("Direction Change", "Desired Velocity: " + temp);
+            return temp;
         }
         return forward;
     }

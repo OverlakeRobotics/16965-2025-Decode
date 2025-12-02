@@ -25,8 +25,9 @@ public class AutoAligner {
     public static final double rhinoWheelRadius = 1.88976; // in
     // TODO: Tune these values
     public static final double motorTicksPerRev = 28d;
-    public double kSlip = 0;
-    public double hoodAngle = 0;
+    public static double kSlip = 0;
+    public static double hoodAngle = 0;
+    public static double aprilAlignOffset = 0;
     public static double kSlipTurretRotationConstant = 0.03;
     public static double autoAlignBuffer = 5; // degrees
 
@@ -58,7 +59,9 @@ public class AutoAligner {
     }
 
     private final PointValues[] interpolationPoints = {
-            new PointValues(0, 0, new double[]{0.4, 30})
+            new PointValues(-48, 0, new double[]{0.44, 50, 0}),
+            new PointValues(-64, 32, new double[]{0.425, 50, 1}),
+            new PointValues(0, 0, new double[]{0.45, 50, -2})
     };
 
 
@@ -129,21 +132,21 @@ public class AutoAligner {
             for (LLResultTypes.FiducialResult tag : aprilTags) {
                 if (tag.getFiducialId() == targetAprilID) {
                     // Testing making it aim not directly at apriltag, doesnt completely work
-                    Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
-                    Log.d("Limelight", "See tag");
-                    Log.d("Limelight", "Pose: " + robotPose);
-//                    driveTrain.setPosition(new Pose2D(DistanceUnit.METER, -robotPose.x, -robotPose.y, AngleUnit.DEGREES, pos.getHeading(AngleUnit.DEGREES)));
-                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
-//                        Log.d("Limelight", "Pos off");
-                        break;
-                    }
-                    return normalize(180 + Math.toDegrees(Math.atan2(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37)) - pos.getHeading(AngleUnit.DEGREES));
+//                    Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
+//                    Log.d("Limelight", "See tag");
+//                    Log.d("Limelight", "Pose: " + robotPose);
+////                    driveTrain.setPosition(new Pose2D(DistanceUnit.METER, -robotPose.x, -robotPose.y, AngleUnit.DEGREES, pos.getHeading(AngleUnit.DEGREES)));
+//                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
+////                        Log.d("Limelight", "Pos off");
+//                        break;
+//                    }
+//                    return normalize(180 + Math.toDegrees(Math.atan2(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37)) - pos.getHeading(AngleUnit.DEGREES));
 
                     // Return limelight angle if it sees the tag
 //                    double limelightAngle = turretAngle - tag.getTargetXDegrees();
 //                    Log.d("Turret Debug", "Limelight wanted: " + limelightAngle);
 //                    return limelightAngle;
-//                    return turretAngle - tag.getTargetXDegrees();
+                    return turretAngle - tag.getTargetXDegrees() + aprilAlignOffset;
                 }
             }
         }
@@ -206,6 +209,7 @@ public class AutoAligner {
 
         kSlip = weighted[0];
         hoodAngle = weighted[1];
+        aprilAlignOffset = weighted[2];
     }
 
     // TODO: Check angle and velocity calculations

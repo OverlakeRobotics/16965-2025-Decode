@@ -6,6 +6,8 @@
 
 package org.firstinspires.ftc.teamcode.system;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
@@ -21,7 +23,7 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     private static final double MIN_ANGLE_DIF_TO_STOP = 1;
     public static double angleOffsetConstant = 1;
     // TODO: Tune these values
-    public static double minPathDirectionChangeVelocity = 150;
+    public static double minPathDirectionChangeVelocity = 400;
     private Pose2D pathStartPos;
     private double pathTolerance = 4;
     private boolean doPositionHeadingCorrection;
@@ -115,7 +117,8 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
                     currentPath[currentPoint],
                     currentPath[currentPoint + 1]
             );
-            return minPathDirectionChangeVelocity + (forward - minPathDirectionChangeVelocity) * Math.cos(Math.toRadians(directionChangeAngle / 2));
+            Log.d("Direction Change", "" + directionChangeAngle);
+            return minPathDirectionChangeVelocity + (forward - minPathDirectionChangeVelocity) * Math.cos(Math.toRadians(Math.min(directionChangeAngle, 90)));
         }
         return super.getMinPositionDriveVelocity();
     }
@@ -301,7 +304,11 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     // Behavior: Normalizes an angle to (-180,180]
     // Returns: The normalized angle
     private static double normalize(double degrees) {
-        return (degrees + 180) % 360 - 180;
+//        return (degrees + 180) % 360 - 180;
+        double normalizedAngle = degrees;
+        while (normalizedAngle > 180) normalizedAngle -= 360;
+        while (normalizedAngle <= -180) normalizedAngle += 360;
+        return normalizedAngle;
     }
 
     // Behavior: Gets the distance between two Pose2Ds.

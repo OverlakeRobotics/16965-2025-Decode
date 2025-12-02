@@ -69,8 +69,6 @@ public abstract class BaseTeleOp extends OpMode {
                 new GoBildaPinpointOdometry(pinpointDriver)
         );
 
-        driveTrain.setCountsToSlowDown(500);
-
         turret = new Turret(
                 hardwareMap.get(DcMotorEx.class, "shooter"),
                 hardwareMap.get(DcMotorEx.class, "turret"),
@@ -91,7 +89,7 @@ public abstract class BaseTeleOp extends OpMode {
     public void loop() {
         driveTrain.updatePosition();
         Pose2D currentPos = driveTrain.getPosition();
-        autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
+//        autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
 
         telemetry.addData("Position", "X: %.2f, Y: %.2f, H: %.2f",
                 currentPos.getX(DistanceUnit.INCH),
