@@ -28,7 +28,7 @@ public class AutoAligner {
     public static double kSlip = 0;
     public static double hoodAngle = 0;
     public static double aprilAlignOffset = 0;
-    public static double kSlipTurretRotationConstant = 0.03;
+    public static double kSlipTurretRotationConstant = 0.01;
     public static double autoAlignBuffer = 5; // degrees
 
     public static double maxShooterVelocity = 2800;
@@ -59,9 +59,16 @@ public class AutoAligner {
     }
 
     private final PointValues[] interpolationPoints = {
-            new PointValues(-48, 0, new double[]{0.44, 50, 0}),
-            new PointValues(-64, 32, new double[]{0.425, 50, 1}),
-            new PointValues(0, 0, new double[]{0.45, 50, -2})
+            new PointValues(-48, 0, new double[]{0.44 - 0.005, 50, 0}),
+            new PointValues(-64, 32, new double[]{0.425 - 0.005, 50, 1}),
+            new PointValues(-64, -32, new double[]{0.42 - 0.005, 50, 0}),
+            new PointValues(-55, 17, new double[]{0.435 - 0.005, 50, 1}),
+            new PointValues(-55, -17, new double[]{0.425 - 0.005, 50, 1}),
+
+            new PointValues(0, 0, new double[]{0.45, 50, -2}),
+            new PointValues(39, 39, new double[]{0.425, 27, -1}),
+            new PointValues(39, -39, new double[]{0.435, 50, -2}),
+            new PointValues(48, 0, new double[]{0.47, 50, -2}),
     };
 
 
