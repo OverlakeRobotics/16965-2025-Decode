@@ -10,6 +10,7 @@ import android.util.Log;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 @Config
 public class BasicHolonomicDrivetrain {
@@ -17,7 +18,7 @@ public class BasicHolonomicDrivetrain {
     public static final int MAX_VELOCITY = 2800;
     public static final double STRAFE_TO_FORWARD_RATIO = /* 1.0822; */ 1.024;
     public static final double FORWARD_COUNTS_PER_INCH = 32.49; //30;
-    public static double robotMaxAccelerationInches = 120;
+    public static double robotMaxAccelerationInches = 180;
     private final DcMotorEx backLeft;
     private final DcMotorEx backRight;
     private final DcMotorEx frontLeft;
@@ -37,8 +38,7 @@ public class BasicHolonomicDrivetrain {
     }
 
     public BasicHolonomicDrivetrain(DcMotorEx backLeft, DcMotorEx backRight,
-                                    DcMotorEx frontLeft, DcMotorEx frontRight,
-                                    double p, double i, double d, double f) {
+                                    DcMotorEx frontLeft, DcMotorEx frontRight) {
         this.backLeft = backLeft;
         this.backRight = backRight;
         this.frontLeft = frontLeft;
@@ -53,19 +53,25 @@ public class BasicHolonomicDrivetrain {
         backRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         frontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-
-//        backLeft.setVelocityPIDFCoefficients(p, i, d, f);
-//        backRight.setVelocityPIDFCoefficients(p, i, d, f);
-//        frontLeft.setVelocityPIDFCoefficients(p, i, d, f);
-//        frontRight.setVelocityPIDFCoefficients(p, i, d, f);
+        Log.d("Drivetrain PIDF RUN_USING_ENCODER", backLeft.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).toString());
+        Log.d("Drivetrain PIDF RUN_TO_POSITION", backRight.getPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION).toString());
 
         currentDriveState = DriveState.STOPPED;
         minPositionDriveVelocity = 150;
     }
 
     public BasicHolonomicDrivetrain(DcMotorEx backLeft, DcMotorEx backRight,
-                                    DcMotorEx frontLeft, DcMotorEx frontRight) {
-        this(backLeft, backRight, frontLeft, frontRight, 10, 3, 0, 0);
+                                    DcMotorEx frontLeft, DcMotorEx frontRight,
+                                    double p, double i, double d, double f) {
+        this(backLeft, backRight, frontLeft, frontRight);
+        this.setPIDFCoefficients(p, i, d, f);
+    }
+
+    public void setPIDFCoefficients(double p, double i, double d, double f) {
+        backLeft.setVelocityPIDFCoefficients(p, i, d, f);
+        backRight.setVelocityPIDFCoefficients(p, i, d, f);
+        frontLeft.setVelocityPIDFCoefficients(p, i, d, f);
+        frontRight.setVelocityPIDFCoefficients(p, i, d, f);
     }
 
     // Behavior: Sets the velocity of the drive motors to the given velocities.

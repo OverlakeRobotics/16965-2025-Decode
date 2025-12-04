@@ -23,7 +23,7 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     private static final double MIN_ANGLE_DIF_TO_STOP = 1;
     public static double angleOffsetConstant = 1;
     // TODO: Tune these values
-    public static double minPathDirectionChangeVelocity = 400;
+    public static double minPathDirectionChangeVelocity = 500;
     private Pose2D pathStartPos;
     private double pathTolerance = 4;
     private boolean doPositionHeadingCorrection;
@@ -38,9 +38,8 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     private int currentPoint = -1;
 
     public OdometryHolonomicDrivetrain(DcMotorEx backLeft, DcMotorEx backRight, DcMotorEx frontLeft,
-                                       DcMotorEx frontRight, OdometryModule odometry,
-                                       double p, double i, double d, double f) {
-        super(backLeft, backRight, frontLeft, frontRight, p, i, d, f);
+                                       DcMotorEx frontRight, OdometryModule odometry) {
+        super(backLeft, backRight, frontLeft, frontRight);
         this.odometry = odometry;
         this.odometry.updatePosition();
         this.currentPosition = this.odometry.getPosition();
@@ -50,8 +49,10 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     }
 
     public OdometryHolonomicDrivetrain(DcMotorEx backLeft, DcMotorEx backRight, DcMotorEx frontLeft,
-                                       DcMotorEx frontRight, OdometryModule odometry) {
-        this(backLeft, backRight, frontLeft, frontRight, odometry, 10, 3, 0, 0);
+                                       DcMotorEx frontRight, OdometryModule odometry,
+                                       double p, double i, double d, double f) {
+        this(backLeft, backRight, frontLeft, frontRight, odometry);
+        super.setPIDFCoefficients(p, i, d, f);
     }
     
     // Behavior: Overrides super classes drive method to include odometry and heading correction.

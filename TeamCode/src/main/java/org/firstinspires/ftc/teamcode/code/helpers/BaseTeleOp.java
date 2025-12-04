@@ -38,6 +38,7 @@ public abstract class BaseTeleOp extends OpMode {
     protected AutoAligner autoAligner;
 
     protected boolean autoLock = false;
+    protected boolean autoShooter = true;
 
     protected Intake intake;
     protected boolean intakeOn = false;
@@ -118,8 +119,9 @@ public abstract class BaseTeleOp extends OpMode {
         } else {
             double turn = -gamepad1.right_stick_x * velocity;
 
-            if (gamepad1.y) {
+            if (gamepad2.y) {
                 autoLock = true;
+                autoShooter = true;
             }
 
             if (Math.abs(turn) > 2) {
@@ -135,7 +137,7 @@ public abstract class BaseTeleOp extends OpMode {
             turretAdjustment = -turn * ADJUSTMENT_FACTOR;
         }
 
-        if (autoLock) {
+        if (autoShooter) {
             // Use AutoAligner methods to calculate shooter angle and velocity
             hoodAngle = autoAligner.getOptimalHoodAngle();
             shooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
@@ -155,28 +157,29 @@ public abstract class BaseTeleOp extends OpMode {
         // Y: Auto aim
         // D-Pad Right: Turn off shooter
 
-        if (gamepad1.xWasPressed()) {
+        if (gamepad2.xWasPressed()) {
             intakeOn = !intakeOn;
         }
-        if (gamepad1.bWasPressed()) {
+        if (gamepad2.bWasPressed()) {
             intakeReversed = !intakeReversed;
         }
 
-        if (gamepad1.dpadRightWasPressed()) {
+        if (gamepad2.dpadRightWasPressed()) {
+            autoShooter = false;
             shooterVelocity = 0;
         }
 //        if (gamepad1.dpadLeftWasPressed()) {
 //            autoTurret = !autoTurret;
 //        }
 
-        double intakeVelocity = intakeOn ? (intakeReversed ? -2000 : 2000) : 0;
+        double intakeVelocity = intakeOn ? (intakeReversed ? -2800 : 2800) : 0;
 
-        if (gamepad1.a) {
+        if (gamepad2.a) {
             turret.open();
             intakeVelocity = 0;
 
             if (Math.abs(turret.getShooterVelocity() - shooterVelocity) <= 60) {
-                intakeVelocity = 2000;
+                intakeVelocity = 2800;
             }
         } else {
             turret.close();
@@ -198,17 +201,17 @@ public abstract class BaseTeleOp extends OpMode {
             shooterVelocity = Math.round(shooterVelocity / 100) * 100;
             shooterVelocity += 100;
         }
-        if (gamepad2.leftBumperWasPressed()){
+        if (gamepad2.leftBumperWasPressed()) {
             shooterVelocity = Math.round(shooterVelocity / 100) * 100;
             shooterVelocity -= 100;
         }
 
-        if (gamepad2.dpadUpWasPressed()) {
-            hoodAngle += 2;
-        }
-        if (gamepad2.dpadDownWasPressed()) {
-            hoodAngle -= 2;
-        }
+//        if (gamepad2.dpadUpWasPressed()) {
+//            hoodAngle += 2;
+//        }
+//        if (gamepad2.dpadDownWasPressed()) {
+//            hoodAngle -= 2;
+//        }
 //        if (!autoTurret) {
 //            if (gamepad2.dpad_left) {
 //                turretAngle += 5;
@@ -222,12 +225,12 @@ public abstract class BaseTeleOp extends OpMode {
 //            }
 //        }
 
-        if (gamepad2.aWasPressed()) {
-            shooterVelocity = 2000;
-        }
-        if (gamepad2.xWasPressed()) {
-            shooterVelocity = 0;
-        }
+//        if (gamepad2.aWasPressed()) {
+//            shooterVelocity = 2000;
+//        }
+//        if (gamepad2.xWasPressed()) {
+//            shooterVelocity = 0;
+//        }
 
         hoodAngle = Range.clip(hoodAngle, turret.minHoodAngle, turret.maxHoodAngle);
         turretAngle = Range.clip(turretAngle, turret.MIN_ANGLE_LIMIT, turret.MAX_ANGLE_LIMIT);

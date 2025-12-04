@@ -35,13 +35,14 @@ public class AutoAligner {
     public static double goalX;
     public static double goalY;
     public static double redGoalX = 70;
-    public static double redGoalY = -68;
+    public static double redGoalY = -70;
     public static double blueGoalX = 70;
-    public static double blueGoalY = 68;
+    public static double blueGoalY = 70;
     public static double aprilX;
     public static double aprilY;
     public static double goalDZ = 28;
     private int targetAprilID;
+    private int sideFlipMultiplier;
     private final OdometryHolonomicDrivetrain driveTrain;
     private final Turret turret;
     private final Limelight3A limelight;
@@ -59,18 +60,17 @@ public class AutoAligner {
     }
 
     private final PointValues[] interpolationPoints = {
-            new PointValues(-48, 0, new double[]{0.44 - 0.005, 50, 0}),
-            new PointValues(-64, 32, new double[]{0.425 - 0.005, 50, 1}),
-            new PointValues(-64, -32, new double[]{0.42 - 0.005, 50, 0}),
-            new PointValues(-55, 17, new double[]{0.435 - 0.005, 50, 1}),
-            new PointValues(-55, -17, new double[]{0.425 - 0.005, 50, 1}),
+            new PointValues(-48, 0, new double[]{0.44, 50, 0}),
+            new PointValues(-64, 32, new double[]{0.425, 50, 1}),
+            new PointValues(-64, -32, new double[]{0.42, 50, 0}),
+            new PointValues(-55, 17, new double[]{0.435, 50, 1}),
+            new PointValues(-55, -17, new double[]{0.425, 50, 1}),
 
             new PointValues(0, 0, new double[]{0.45, 50, -2}),
             new PointValues(39, 39, new double[]{0.425, 27, -1}),
             new PointValues(39, -39, new double[]{0.435, 50, -2}),
             new PointValues(48, 0, new double[]{0.47, 50, -2}),
     };
-
 
     public AutoAligner(OdometryHolonomicDrivetrain driveTrain, Turret turret, Limelight3A limelight, boolean isRed) {
         this.driveTrain = driveTrain;
@@ -90,6 +90,7 @@ public class AutoAligner {
         aprilX = 60;
         aprilY = 54;
         targetAprilID = 20;
+        sideFlipMultiplier = 1;
     }
 
     public void setRed() {
@@ -98,6 +99,7 @@ public class AutoAligner {
         aprilX = 60;
         aprilY = -54;
         targetAprilID = 24;
+        sideFlipMultiplier = -1;
     }
 
     public double getDistanceToGoal() {
@@ -191,7 +193,7 @@ public class AutoAligner {
         double eps = 1e-9;
 
         for (PointValues p : interpolationPoints) {
-            double dx = x - p.x;
+            double dx = x - p.x * sideFlipMultiplier;
             double dy = y - p.y;
             double distSq = dx * dx + dy * dy;
 
@@ -199,6 +201,7 @@ public class AutoAligner {
             if (distSq < 1e-12) {
                 kSlip = p.v[0];
                 hoodAngle = p.v[1];
+                aprilAlignOffset = p.v[2] * sideFlipMultiplier;
             }
 
             double w = 1.0 / (distSq + eps); // weight = 1/d^2
@@ -216,7 +219,7 @@ public class AutoAligner {
 
         kSlip = weighted[0];
         hoodAngle = weighted[1];
-        aprilAlignOffset = weighted[2];
+        aprilAlignOffset = weighted[2] * sideFlipMultiplier;
     }
 
     // TODO: Check angle and velocity calculations

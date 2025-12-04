@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "createdAt": "2025-11-23T18:53:27.394Z",
+  "createdAt": "2025-12-04T01:00:22.946Z",
   "start": {
     "x": -64,
     "y": -32,
@@ -9,68 +9,73 @@
   "points": [
     {
       "x": -64,
-      "y": -32.5,
-      "h": -90
-    },
-    {
-      "x": -64,
       "y": -32,
       "h": -90
     },
     {
-      "x": -65.5,
+      "x": -64,
+      "y": -32.5,
+      "h": -90
+    },
+    {
+      "x": -64.5,
       "y": -63.5,
       "h": -90
     },
     {
-      "x": -62,
-      "y": -28,
+      "x": -58,
+      "y": -53,
+      "h": -90
+    },
+    {
+      "x": -58.1142578125,
+      "y": -22.6376953125,
+      "h": -90
+    },
+    {
+      "x": -37.5,
+      "y": -26.5,
       "h": -90
     },
     {
       "x": -38,
-      "y": -25,
+      "y": -55.5,
       "h": -90
     },
     {
-      "x": -38,
-      "y": -55,
-      "h": -90
-    },
-    {
-      "x": -62,
-      "y": -28,
+      "x": -58.1142578125,
+      "y": -23.1376953125,
       "h": -90
     },
     {
       "x": -14.5,
-      "y": -24.5,
+      "y": -26.5,
       "h": -90
     },
     {
       "x": -15,
-      "y": -56,
+      "y": -56.5,
       "h": -90
     },
     {
-      "x": -62,
-      "y": -28.5,
+      "x": -58.1142578125,
+      "y": -22.6376953125,
       "h": -90
     },
     {
-      "x": -50,
-      "y": -38,
+      "x": -47.5,
+      "y": -43.5,
       "h": -90
     },
     {
-      "x": -50,
-      "y": -38,
+      "x": -47.5,
+      "y": -43.5,
       "h": -90
     }
   ],
   "headingMode": "straight",
   "endHeading": 90,
-  "velocity": 120,
+  "velocity": 90,
   "maxAccel": 40,
   "tolerance": 5,
   "snapInches": 0.5,
@@ -90,64 +95,29 @@
       "value": 2.75
     },
     {
-      "index": 3,
-      "name": "velocity",
-      "value": 80
-    },
-    {
-      "index": 3,
-      "name": "autoAimRed",
-      "value": 0
-    },
-    {
-      "index": 4,
-      "name": "launchArtifacts",
-      "value": 2.75
-    },
-    {
-      "index": 5,
-      "name": "velocity",
-      "value": 35
-    },
-    {
-      "index": 5,
-      "name": "intake",
-      "value": 2000
-    },
-    {
-      "index": 6,
-      "name": "velocity",
-      "value": 120
-    },
-    {
-      "index": 6,
-      "name": "intake",
-      "value": 0
-    },
-    {
-      "index": 6,
-      "name": "autoAimRed",
-      "value": 0
-    },
-    {
-      "index": 7,
-      "name": "launchArtifacts",
-      "value": 2.75
-    },
-    {
-      "index": 2,
-      "name": "intake",
-      "value": 2000
-    },
-    {
       "index": 2,
       "name": "velocity",
       "value": 60
     },
     {
-      "index": 4,
+      "index": 2,
       "name": "intake",
+      "value": 2800
+    },
+    {
+      "index": 3,
+      "name": "velocity",
+      "value": 50
+    },
+    {
+      "index": 4,
+      "name": "autoAimRed",
       "value": 0
+    },
+    {
+      "index": 5,
+      "name": "launchArtifacts",
+      "value": 2.75
     },
     {
       "index": 3,
@@ -155,44 +125,79 @@
       "value": 0.5
     },
     {
-      "index": 8,
-      "name": "velocity",
-      "value": 35
-    },
-    {
-      "index": 8,
+      "index": 6,
       "name": "intake",
-      "value": 2000
+      "value": 2800
     },
     {
-      "index": 9,
+      "index": 6,
       "name": "velocity",
-      "value": 120
+      "value": 45
     },
     {
-      "index": 9,
+      "index": 7,
+      "name": "velocity",
+      "value": 90
+    },
+    {
+      "index": 7,
       "name": "intake",
       "value": 0
     },
     {
-      "index": 9,
+      "index": 7,
       "name": "autoAimRed",
       "value": 0
     },
     {
+      "index": 8,
+      "name": "launchArtifacts",
+      "value": 2.75
+    },
+    {
+      "index": 9,
+      "name": "intake",
+      "value": 2800
+    },
+    {
+      "index": 9,
+      "name": "velocity",
+      "value": 45
+    },
+    {
       "index": 10,
+      "name": "velocity",
+      "value": 90
+    },
+    {
+      "index": 10,
+      "name": "intake",
+      "value": 0
+    },
+    {
+      "index": 10,
+      "name": "autoAimRed",
+      "value": 0
+    },
+    {
+      "index": 11,
       "name": "launchArtifacts",
       "value": 2.5
     },
     {
-      "index": 11,
+      "index": 12,
       "name": "shooterVelocity",
+      "value": 0
+    },
+    {
+      "index": 5,
+      "name": "intake",
       "value": 0
     },
     {
       "index": 4,
       "name": "velocity",
-      "value": 120
+      "value": 90
     }
   ]
 }
