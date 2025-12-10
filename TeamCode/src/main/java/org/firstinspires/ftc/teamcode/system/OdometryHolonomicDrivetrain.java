@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
 
 @Config
 public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
@@ -345,5 +346,38 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     // Returns: The index of the current point in the path, or -1 if not path driving.
     public int getNextPointIndex() {
         return currentPoint;
+    }
+
+    public double getVelocity() {
+        if (odometry instanceof GoBildaPinpointOdometry) {
+            GoBildaPinpointOdometry pinpoint = (GoBildaPinpointOdometry) odometry;
+            return pinpoint.getVelocity();
+        }
+
+        throw new IllegalArgumentException(
+                "Expected GoBildaPinpointOdometry, got " + odometry.getClass().getSimpleName()
+        );
+    }
+
+    public double getXVelocity() {
+        if (odometry instanceof GoBildaPinpointOdometry) {
+            GoBildaPinpointOdometry pinpoint = (GoBildaPinpointOdometry) odometry;
+            return pinpoint.getXVelocity();
+        }
+
+        throw new IllegalArgumentException(
+                "Expected GoBildaPinpointOdometry, got " + odometry.getClass().getSimpleName()
+        );
+    }
+
+    public double getYVelocity() {
+        if (odometry instanceof GoBildaPinpointOdometry) {
+            GoBildaPinpointOdometry pinpoint = (GoBildaPinpointOdometry) odometry;
+            return pinpoint.getYVelocity();
+        }
+
+        throw new IllegalArgumentException(
+                "Expected GoBildaPinpointOdometry, got " + odometry.getClass().getSimpleName()
+        );
     }
 }

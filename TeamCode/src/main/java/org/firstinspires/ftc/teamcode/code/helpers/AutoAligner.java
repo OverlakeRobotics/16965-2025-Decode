@@ -41,6 +41,7 @@ public class AutoAligner {
     public static double aprilX;
     public static double aprilY;
     public static double goalDZ = 28;
+    public double angleOffset = 0;
     private int targetAprilID;
     private int sideFlipMultiplier;
     private final OdometryHolonomicDrivetrain driveTrain;
@@ -155,7 +156,7 @@ public class AutoAligner {
 //                    double limelightAngle = turretAngle - tag.getTargetXDegrees();
 //                    Log.d("Turret Debug", "Limelight wanted: " + limelightAngle);
 //                    return limelightAngle;
-                    return turretAngle - tag.getTargetXDegrees() + aprilAlignOffset;
+                    return turretAngle - tag.getTargetXDegrees() + aprilAlignOffset + angleOffset;
                 }
             }
         }
@@ -237,10 +238,48 @@ public class AutoAligner {
             return -100;
         }
         // First calculate the required launch velocity (derived from kinematics assuming no air resistance)
-        double v = Math.sqrt(
-                g * Math.pow(horizontalDist, 2) /
-                        (2 * Math.pow(Math.sin(theta), 2) * (horizontalDist / Math.tan(theta) - goalDZ))
-        );
+
+        Pose2D pos = driveTrain.getPosition();
+
+        double dx = goalX - pos.getX(DistanceUnit.INCH);
+        double dy = goalY - pos.getY(DistanceUnit.INCH);
+        double dist = Math.hypot(dx, dy);
+
+        double vx = driveTrain.getXVelocity();
+        double vy = driveTrain.getYVelocity();
+
+        // towards/away from goal
+        double velPar = 0.0;
+
+        // sideways/strafing around goal
+        double velPerp = 0.0;
+
+        if (dist != 0) {
+            double ux = dx / dist;
+            double uy = dy / dist;
+
+            velPar = vx * ux + vy * uy;
+            velPerp = vx * uy - vy * ux;
+        }
+
+        double sin = Math.sin(theta);
+        double cos = Math.cos(theta);
+
+        double a = -goalDZ * sin * sin + cos * sin * horizontalDist;
+        double b = -2 * goalDZ * sin * velPar + cos * velPar * horizontalDist;
+        double c = (-g * horizontalDist * horizontalDist / 2.0) - goalDZ * velPar * velPar;
+
+        double discriminant = b * b - 4 * a * c;
+        double v = (-b + Math.sqrt(discriminant)) / (2 * a);
+
+//        angleOffset = Math.atan2(-velPerp, v * sin + velPar);
+        angleOffset = -Math.toDegrees(Math.asin(-velPerp / (v * sin)));
+
+
+//        double v = Math.sqrt(
+//                g * Math.pow(horizontalDist, 2) /
+//                        (2 * Math.pow(Math.sin(theta), 2) * (horizontalDist / Math.tan(theta) - goalDZ))
+//        );
 
         // Then calculate RPM from linear velocity
         double rpm = (v * 60) / (2 * Math.PI * rhinoWheelRadius * adjustedKSlip);

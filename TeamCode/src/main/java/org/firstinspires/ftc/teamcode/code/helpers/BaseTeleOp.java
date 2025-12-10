@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.code.parts.Intake;
 import org.firstinspires.ftc.teamcode.code.parts.Turret;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
+import org.firstinspires.ftc.teamcode.system.PathServer;
 
 @Config
 public abstract class BaseTeleOp extends OpMode {
@@ -84,12 +85,19 @@ public abstract class BaseTeleOp extends OpMode {
 
 
         presetPositions = getPresetPositions();
+        PathServer.startServer();
+    }
+
+    @Override
+    public void init_loop() {
+        PathServer.setRobotPose(driveTrain.getPosition());
     }
 
     @Override
     public void loop() {
         driveTrain.updatePosition();
         Pose2D currentPos = driveTrain.getPosition();
+        PathServer.setRobotPose(currentPos);
         autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
 
         telemetry.addData("Position", "X: %.2f, Y: %.2f, H: %.2f",
@@ -142,7 +150,7 @@ public abstract class BaseTeleOp extends OpMode {
             hoodAngle = autoAligner.getOptimalHoodAngle();
             shooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
         }
-        turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
+//        turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
 
 //        if (autoTurret) {
 //            turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
@@ -212,18 +220,18 @@ public abstract class BaseTeleOp extends OpMode {
 //        if (gamepad2.dpadDownWasPressed()) {
 //            hoodAngle -= 2;
 //        }
-//        if (!autoTurret) {
-//            if (gamepad2.dpad_left) {
-//                turretAngle += 5;
-//            }
-//            if (gamepad2.dpad_right) {
-//                turretAngle -= 5;
-//            }
-//            if (gamepad2.yWasPressed()) {
-//                turret.resetTurretEncoder();
-//                turretAngle = 0;
-//            }
+
+        if (gamepad2.dpad_left) {
+            turretAngle += 5;
+        }
+        if (gamepad2.dpad_right) {
+            turretAngle -= 5;
+        }
+//        if (gamepad2.yWasPressed()) {
+//            turret.resetTurretEncoder();
+//            turretAngle = 0;
 //        }
+
 
 //        if (gamepad2.aWasPressed()) {
 //            shooterVelocity = 2000;
@@ -241,7 +249,7 @@ public abstract class BaseTeleOp extends OpMode {
         turret.setHoodAngle(hoodAngle);
         turret.setTurretAngle(turretAngle);
 
-        driveTrain.drive();
+//        driveTrain.drive();
 
 //        Log.d("PID", "Current Velocity: " + turret.getShooterVelocity());
 //        Log.d("PID", "Wanted Velocity: " + shooterVelocity);
@@ -251,5 +259,10 @@ public abstract class BaseTeleOp extends OpMode {
 //        telemetry.addData("Turret Current Angle", turret.getTurretCurrentAngle());
 //        telemetry.addData("Turret True Target Angle", turret.getTurretTargetAngle());
         telemetry.update();
+    }
+
+    @Override
+    public void stop() {
+        PathServer.stopServer();
     }
 }
