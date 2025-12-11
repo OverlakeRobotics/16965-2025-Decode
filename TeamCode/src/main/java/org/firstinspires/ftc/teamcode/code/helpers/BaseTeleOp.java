@@ -72,7 +72,8 @@ public abstract class BaseTeleOp extends OpMode {
         );
 
         turret = new Turret(
-                hardwareMap.get(DcMotorEx.class, "shooter"),
+                hardwareMap.get(DcMotorEx.class, "shooterTop"),
+                hardwareMap.get(DcMotorEx.class, "shooterBottom"),
                 hardwareMap.get(DcMotorEx.class, "turret"),
                 hardwareMap.get(Servo.class, "hood"),
                 hardwareMap.get(Servo.class, "blocker")
@@ -150,7 +151,7 @@ public abstract class BaseTeleOp extends OpMode {
             hoodAngle = autoAligner.getOptimalHoodAngle();
             shooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
         }
-//        turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
+        turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
 
 //        if (autoTurret) {
 //            turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
@@ -249,7 +250,7 @@ public abstract class BaseTeleOp extends OpMode {
         turret.setHoodAngle(hoodAngle);
         turret.setTurretAngle(turretAngle);
 
-//        driveTrain.drive();
+        driveTrain.drive();
 
 //        Log.d("PID", "Current Velocity: " + turret.getShooterVelocity());
 //        Log.d("PID", "Wanted Velocity: " + shooterVelocity);

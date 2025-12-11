@@ -11,7 +11,8 @@ public class Shooter {
     public final double MOTOR_TO_WHEEL_VELOCITY_RATIO = 1.0;
     public static int minHoodAngle = 15;
     public static int maxHoodAngle = 50;
-    private final DcMotorEx shooterMotor;
+    private final DcMotorEx shooterMotor1;
+    private final DcMotorEx shooterMotor2;
     private final Servo hoodServo;
     private final Servo blocker;
     public static double p = 500;
@@ -19,11 +20,14 @@ public class Shooter {
     public static double d = 5;
     public static double f = 0;
 
-    public Shooter(DcMotorEx shooterMotor, Servo hoodServo, Servo blocker) {
-        this.shooterMotor = shooterMotor;
+    public Shooter(DcMotorEx shooterMotor1, DcMotorEx shooterMotor2, Servo hoodServo, Servo blocker) {
+        this.shooterMotor1 = shooterMotor1;
+        this.shooterMotor2 = shooterMotor2;
 //        this.shooterMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        this.shooterMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        this.shooterMotor.setVelocityPIDFCoefficients(p, i, d, f);
+        this.shooterMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        this.shooterMotor1.setVelocityPIDFCoefficients(p, i, d, f);
+        this.shooterMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        this.shooterMotor2.setVelocityPIDFCoefficients(p, i, d, f);
 
         this.hoodServo = hoodServo;
         this.hoodServo.setDirection(Servo.Direction.REVERSE);
@@ -31,15 +35,17 @@ public class Shooter {
     }
 
     public void setShooterVelocity(double velocity) {
-        shooterMotor.setVelocity(Range.clip(velocity * MOTOR_TO_WHEEL_VELOCITY_RATIO, -MAX_VELOCITY, MAX_VELOCITY));
+        double clippedVelocity = Range.clip(velocity * MOTOR_TO_WHEEL_VELOCITY_RATIO, -MAX_VELOCITY, MAX_VELOCITY);
+        shooterMotor1.setVelocity(clippedVelocity);
+        shooterMotor2.setVelocity(clippedVelocity);
     }
 
     public double getShooterVelocity() {
-        return shooterMotor.getVelocity() / MOTOR_TO_WHEEL_VELOCITY_RATIO;
+        return shooterMotor1.getVelocity() / MOTOR_TO_WHEEL_VELOCITY_RATIO;
     }
 
     public double getShooterPower() {
-        return shooterMotor.getPower() / MOTOR_TO_WHEEL_VELOCITY_RATIO;
+        return shooterMotor1.getPower() / MOTOR_TO_WHEEL_VELOCITY_RATIO;
     }
 
     // TODO: Make this set correct angle

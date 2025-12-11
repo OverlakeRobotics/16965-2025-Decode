@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.util.Range;
 @Config
 public class Turret extends Shooter {
     public final double TICKS_PER_DEGREE = 537.7 / 360;
-    public static int MAX_LIMIT_ANGLE = 115; // degrees
-    public static int MIN_LIMIT_ANGLE = -115; // degrees
+    public static int MAX_LIMIT_ANGLE = 135; // 115; // degrees
+    public static int MIN_LIMIT_ANGLE = -135; // -115; // degrees
     public static double turretP = 10;
     public static double turretI = 1;
     public static double turretD = 2;
@@ -18,8 +18,8 @@ public class Turret extends Shooter {
     public final int MIN_ANGLE_LIMIT;
     public static int TURRET_VELOCITY = 2000;
     private final DcMotorEx turretMotor;
-    public Turret(DcMotorEx shooterMotor, DcMotorEx turretMotor, Servo hoodServo, Servo blocker) {
-        super(shooterMotor, hoodServo, blocker);
+    public Turret(DcMotorEx shooterMotor1, DcMotorEx shooterMotor2, DcMotorEx turretMotor, Servo hoodServo, Servo blocker) {
+        super(shooterMotor1, shooterMotor2, hoodServo, blocker);
         this.MAX_ANGLE_LIMIT = MAX_LIMIT_ANGLE;
         this.MIN_ANGLE_LIMIT = MIN_LIMIT_ANGLE;
         this.turretMotor = turretMotor;

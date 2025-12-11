@@ -137,10 +137,13 @@ public abstract class BaseAuto extends OpMode {
         );
 
         intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
-        turret = new Turret(hardwareMap.get(DcMotorEx.class, "shooter"),
+        turret = new Turret(
+                hardwareMap.get(DcMotorEx.class, "shooterTop"),
+                hardwareMap.get(DcMotorEx.class, "shooterBottom"),
                 hardwareMap.get(DcMotorEx.class, "turret"),
                 hardwareMap.get(Servo.class, "hood"),
-                hardwareMap.get(Servo.class, "blocker"));
+                hardwareMap.get(Servo.class, "blocker")
+        );
         turret.resetTurretEncoder();
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
