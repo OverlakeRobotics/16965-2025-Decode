@@ -67,11 +67,14 @@ public class AutoAligner {
 //            new PointValues(-64, -32, new double[]{0.42, 50, 0}),
 //            new PointValues(-55, 17, new double[]{0.435, 50, 1}),
 //            new PointValues(-55, -17, new double[]{0.425, 50, 1}),
-              new PointValues(-45, 0, new double[]{0.47, 50, 2.5}),
+              new PointValues(-45, 0, new double[]{0.47, 50, 1.5}),
               new PointValues(-54, 18, new double[]{0.47, 50, 1}),
               new PointValues(-54, -18, new double[]{0.47, 50, 1}),
 
-              new PointValues(24, 24, new double[]{0.49, 40, 0}),
+              new PointValues(25, 25, new double[]{0.5, 44, 0}),
+              new PointValues(14, 14, new double[]{0.52, 50, 0}),
+
+//              new PointValues(24, 24, new double[]{0.49, 40, 0}),
               new PointValues(0, 0, new double[]{0.51, 50, 0}),
               new PointValues(36, 36, new double[]{0.475, 30, 0}),
               new PointValues(24, -24, new double[]{0.49, 50, -0.5}),

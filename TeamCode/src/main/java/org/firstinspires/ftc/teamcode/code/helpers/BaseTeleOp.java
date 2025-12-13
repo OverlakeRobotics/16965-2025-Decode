@@ -26,6 +26,7 @@ public abstract class BaseTeleOp extends OpMode {
     // TODO: Check if these are correct
     public static final double yOffset = -156.0; // -168.0 // mm
     public static final double xOffset = 72.0; // -84.0 // mm
+    public static double shooterTolerance = 80;
 
     public static double ADJUSTMENT_FACTOR = 0.021;
 
@@ -99,7 +100,7 @@ public abstract class BaseTeleOp extends OpMode {
         driveTrain.updatePosition();
         Pose2D currentPos = driveTrain.getPosition();
         PathServer.setRobotPose(currentPos);
-        autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
+//        autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
 
         telemetry.addData("Position", "X: %.2f, Y: %.2f, H: %.2f",
                 currentPos.getX(DistanceUnit.INCH),
@@ -187,7 +188,7 @@ public abstract class BaseTeleOp extends OpMode {
             turret.open();
             intakeVelocity = 0;
 
-            if (Math.abs(turret.getShooterVelocity() - shooterVelocity) <= 60) {
+            if (Math.abs(turret.getShooterVelocity() - shooterVelocity) <= shooterTolerance) {
                 intakeVelocity = 2800;
             }
         } else {

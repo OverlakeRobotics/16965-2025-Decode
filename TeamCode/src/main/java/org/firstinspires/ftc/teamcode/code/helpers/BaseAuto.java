@@ -61,7 +61,7 @@ public abstract class BaseAuto extends OpMode {
     private boolean isShooting;
     public static double shooterDelay = 0.3;
     private double shooterTimer = 0;
-    public static double shooterTolerance = 60;
+    public static double shooterTolerance = 80;
 
     protected Pose2D startPose = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
     private int lastTagIndex = 0;
@@ -271,7 +271,7 @@ public abstract class BaseAuto extends OpMode {
                 double shootingIntakeVelocity = 0;
 
                 if (shooterTimer <= 0 && Math.abs(turret.getShooterVelocity() - wantedShooterVelocity) <= shooterTolerance) {
-                    shootingIntakeVelocity = 2000;
+                    shootingIntakeVelocity = 2800;
                 }
 
                 intake.setVelocity(shootingIntakeVelocity);
