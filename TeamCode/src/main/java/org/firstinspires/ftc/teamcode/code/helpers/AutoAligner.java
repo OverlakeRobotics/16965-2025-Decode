@@ -30,6 +30,7 @@ public class AutoAligner {
     public static double aprilAlignOffset = 0;
     public static double kSlipTurretRotationConstant = 0.01;
     public static double autoAlignBuffer = 5; // degrees
+    public static double angleOffsetMult = 1;
 
     public static double maxShooterVelocity = 2800;
     public static double goalX;
@@ -61,16 +62,26 @@ public class AutoAligner {
     }
 
     private final PointValues[] interpolationPoints = {
-            new PointValues(-48, 0, new double[]{0.44, 50, 0}),
-            new PointValues(-64, 32, new double[]{0.425, 50, 1}),
-            new PointValues(-64, -32, new double[]{0.42, 50, 0}),
-            new PointValues(-55, 17, new double[]{0.435, 50, 1}),
-            new PointValues(-55, -17, new double[]{0.425, 50, 1}),
+//            new PointValues(-48, 0, new double[]{0.44, 50, 0}),
+//            new PointValues(-64, 32, new double[]{0.425, 50, 1}),
+//            new PointValues(-64, -32, new double[]{0.42, 50, 0}),
+//            new PointValues(-55, 17, new double[]{0.435, 50, 1}),
+//            new PointValues(-55, -17, new double[]{0.425, 50, 1}),
+              new PointValues(-45, 0, new double[]{0.47, 50, 2.5}),
+              new PointValues(-54, 18, new double[]{0.47, 50, 1}),
+              new PointValues(-54, -18, new double[]{0.47, 50, 1}),
 
-            new PointValues(0, 0, new double[]{0.45, 50, -2}),
-            new PointValues(39, 39, new double[]{0.425, 27, -1}),
-            new PointValues(39, -39, new double[]{0.435, 50, -2}),
-            new PointValues(48, 0, new double[]{0.47, 50, -2}),
+              new PointValues(24, 24, new double[]{0.49, 40, 0}),
+              new PointValues(0, 0, new double[]{0.51, 50, 0}),
+              new PointValues(36, 36, new double[]{0.475, 30, 0}),
+              new PointValues(24, -24, new double[]{0.49, 50, -0.5}),
+              new PointValues(48, 0, new double[]{0.51, 50, -1.5}),
+              new PointValues(36, -36, new double[]{0.49, 50, -2.5})
+//
+//            new PointValues(0, 0, new double[]{0.45, 50, -2}),
+//            new PointValues(39, 39, new double[]{0.425, 27, -1}),
+//            new PointValues(39, -39, new double[]{0.435, 50, -2}),
+//            new PointValues(48, 0, new double[]{0.47, 50, -2}),
     };
 
     public AutoAligner(OdometryHolonomicDrivetrain driveTrain, Turret turret, Limelight3A limelight, boolean isRed) {
@@ -273,7 +284,7 @@ public class AutoAligner {
         double v = (-b + Math.sqrt(discriminant)) / (2 * a);
 
 //        angleOffset = Math.atan2(-velPerp, v * sin + velPar);
-        angleOffset = -Math.toDegrees(Math.asin(-velPerp / (v * sin)));
+        angleOffset = -angleOffsetMult * Math.toDegrees(Math.asin(-velPerp / (v * sin)));
 
 
 //        double v = Math.sqrt(

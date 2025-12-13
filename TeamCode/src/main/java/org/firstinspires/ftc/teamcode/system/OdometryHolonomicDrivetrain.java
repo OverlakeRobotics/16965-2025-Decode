@@ -113,16 +113,17 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
 
     @Override
     public double getMinPositionDriveVelocity() {
-        if (currentPoint >= 0 && currentPoint != currentPath.length - 1) {
-            double directionChangeAngle = getDirectionChangeAngle(
-                    currentPoint != 0 ? currentPath[currentPoint - 1] : pathStartPos,
-                    currentPath[currentPoint],
-                    currentPath[currentPoint + 1]
-            );
-            Log.d("Direction Change", "" + directionChangeAngle);
-            return minPathDirectionChangeVelocity + (forward - minPathDirectionChangeVelocity) * Math.cos(Math.toRadians(Math.min(directionChangeAngle, 90)));
-        }
-        return super.getMinPositionDriveVelocity();
+        return forward;
+//        if (currentPoint >= 0 && currentPoint != currentPath.length - 1) {
+//            double directionChangeAngle = getDirectionChangeAngle(
+//                    currentPoint != 0 ? currentPath[currentPoint - 1] : pathStartPos,
+//                    currentPath[currentPoint],
+//                    currentPath[currentPoint + 1]
+//            );
+//            Log.d("Direction Change", "" + directionChangeAngle);
+//            return minPathDirectionChangeVelocity + (forward - minPathDirectionChangeVelocity) * Math.cos(Math.toRadians(Math.min(directionChangeAngle, 90)));
+//        }
+//        return super.getMinPositionDriveVelocity();
     }
 
     // Behavior: Sets the velocity of the robot while accounting for a field centric view.

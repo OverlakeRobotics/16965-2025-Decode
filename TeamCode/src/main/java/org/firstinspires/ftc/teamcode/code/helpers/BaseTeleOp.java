@@ -106,7 +106,7 @@ public abstract class BaseTeleOp extends OpMode {
                 currentPos.getY(DistanceUnit.INCH),
                 currentPos.getHeading(AngleUnit.DEGREES));
 
-        // Use AutoAligner to get wanted heading and distance
+        // Use AutoAligner to get wanted heading and distanceb
         double wantedHeading = autoAligner.getDrivetrainAutoAlignAngle();
 
         if (currentPreset >= 0 && (Math.abs(gamepad1.left_stick_x) > 0.001 || Math.abs(gamepad1.left_stick_y) > 0.001 || Math.abs(gamepad1.right_stick_x) > 0.001)) {

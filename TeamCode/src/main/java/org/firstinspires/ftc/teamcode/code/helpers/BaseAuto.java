@@ -53,8 +53,8 @@ public abstract class BaseAuto extends OpMode {
     protected PathServer.Tag[] tags;
 
     public static double p = 30; // 19; // 30;
-    public static double i = 0.04; // 0.1; // 0;
-    public static double d = 2; // 0; // 7;
+    public static double i = 0; // 0.1; // 0;
+    public static double d = 7; // 0; // 7;
     public static double f = 0;
 
     private double wantedShooterVelocity = 0;
