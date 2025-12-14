@@ -70,6 +70,7 @@ public class AutoAligner {
               new PointValues(-45, 0, new double[]{0.47, 50, 1.5}),
               new PointValues(-54, 18, new double[]{0.47, 50, 1}),
               new PointValues(-54, -18, new double[]{0.47, 50, 1}),
+              new PointValues(-63, 33, new double[]{0.47, 50, 3}),
 
               new PointValues(25, 25, new double[]{0.5, 44, 0}),
               new PointValues(14, 14, new double[]{0.52, 50, 0}),
@@ -208,8 +209,8 @@ public class AutoAligner {
         double eps = 1e-9;
 
         for (PointValues p : interpolationPoints) {
-            double dx = x - p.x * sideFlipMultiplier;
-            double dy = y - p.y;
+            double dx = x - p.x;
+            double dy = y - p.y * sideFlipMultiplier;
             double distSq = dx * dx + dy * dy;
 
             // Exact match

@@ -100,7 +100,7 @@ public abstract class BaseTeleOp extends OpMode {
         driveTrain.updatePosition();
         Pose2D currentPos = driveTrain.getPosition();
         PathServer.setRobotPose(currentPos);
-//        autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
+        autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
 
         telemetry.addData("Position", "X: %.2f, Y: %.2f, H: %.2f",
                 currentPos.getX(DistanceUnit.INCH),
@@ -129,7 +129,7 @@ public abstract class BaseTeleOp extends OpMode {
         } else {
             double turn = -gamepad1.right_stick_x * velocity;
 
-            if (gamepad2.y) {
+            if (gamepad1.y) {
                 autoLock = true;
                 autoShooter = true;
             }
@@ -167,10 +167,10 @@ public abstract class BaseTeleOp extends OpMode {
         // Y: Auto aim
         // D-Pad Right: Turn off shooter
 
-        if (gamepad2.xWasPressed()) {
+        if (gamepad1.xWasPressed()) {
             intakeOn = !intakeOn;
         }
-        if (gamepad2.bWasPressed()) {
+        if (gamepad1.bWasPressed()) {
             intakeReversed = !intakeReversed;
         }
 
@@ -184,7 +184,7 @@ public abstract class BaseTeleOp extends OpMode {
 
         double intakeVelocity = intakeOn ? (intakeReversed ? -2800 : 2800) : 0;
 
-        if (gamepad2.a) {
+        if ( gamepad1.a) {
             turret.open();
             intakeVelocity = 0;
 
