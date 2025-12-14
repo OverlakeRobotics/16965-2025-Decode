@@ -6,12 +6,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.code.helpers.BaseAuto;
 
 @Config
-@Autonomous(name = "Blue Auto Close Twelve", group = "Autonomous")
-public class BlueAutoCloseTwelve extends BaseAuto {
+@Autonomous(name = "Red Auto Close Fifteen", group = "Autonomous")
+public class RedAutoCloseFifteen extends BaseAuto {
     @Override
     public void init() {
         super.readJson = true;
-        super.jsonFilename = "pathJsons/TwelveArtifactCloseBlue.json";
+        super.jsonFilename = "pathJsons/FifteenArtifactCloseRed.json";
         super.init();
     }
 }

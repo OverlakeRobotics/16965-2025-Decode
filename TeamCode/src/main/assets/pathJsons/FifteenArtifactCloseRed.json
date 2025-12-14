@@ -1,0 +1,228 @@
+{
+  "version": 1,
+  "createdAt": "2025-12-14T00:58:43.538Z",
+  "start": {
+    "x": 48,
+    "y": -48,
+    "h": 180
+  },
+  "points": [
+    {
+      "x": 48,
+      "y": -48,
+      "h": 180
+    },
+    {
+      "x": 14,
+      "y": -14,
+      "h": 180
+    },
+    {
+      "x": -10,
+      "y": -22,
+      "h": -90
+    },
+    {
+      "x": -14,
+      "y": -59,
+      "h": -90
+    },
+    {
+      "x": 14,
+      "y": -14,
+      "h": -110
+    },
+    {
+      "x": -12,
+      "y": -38,
+      "h": -90
+    },
+    {
+      "x": -12,
+      "y": -60,
+      "h": -58
+    },
+    {
+      "x": -11,
+      "y": -38,
+      "h": -90
+    },
+    {
+      "x": 15,
+      "y": -18,
+      "h": -110
+    },
+    {
+      "x": 13,
+      "y": -30,
+      "h": -90
+    },
+    {
+      "x": 13,
+      "y": -57,
+      "h": -90
+    },
+    {
+      "x": 15,
+      "y": -18,
+      "h": -110
+    },
+    {
+      "x": -34,
+      "y": -28,
+      "h": -90
+    },
+    {
+      "x": -34,
+      "y": -61,
+      "h": -90
+    },
+    {
+      "x": 15,
+      "y": -18,
+      "h": -110
+    },
+    {
+      "x": -1,
+      "y": -48,
+      "h": -90
+    }
+  ],
+  "headingMode": "straight",
+  "endHeading": 90,
+  "velocity": 120,
+  "maxAccel": 40,
+  "tolerance": 5,
+  "snapInches": 1,
+  "robot": {
+    "length": 18,
+    "width": 18
+  },
+  "tags": [
+    {
+      "index": 1,
+      "name": "autoAimRed",
+      "value": 0
+    },
+    {
+      "index": 2,
+      "name": "launchArtifacts",
+      "value": 1.25
+    },
+    {
+      "index": 3,
+      "name": "intake",
+      "value": 2800
+    },
+    {
+      "index": 3,
+      "name": "velocity",
+      "value": 60
+    },
+    {
+      "index": 4,
+      "name": "intake",
+      "value": 0
+    },
+    {
+      "index": 4,
+      "name": "velocity",
+      "value": 120
+    },
+    {
+      "index": 5,
+      "name": "launchArtifacts",
+      "value": 1.25
+    },
+    {
+      "index": 4,
+      "name": "autoAimRed",
+      "value": 0
+    },
+    {
+      "index": 7,
+      "name": "intake",
+      "value": 2000
+    },
+    {
+      "index": 7,
+      "name": "pause",
+      "value": 0.75
+    },
+    {
+      "index": 8,
+      "name": "autoAimRed",
+      "value": 0
+    },
+    {
+      "index": 9,
+      "name": "launchArtifacts",
+      "value": 1.25
+    },
+    {
+      "index": 8,
+      "name": "intake",
+      "value": 0
+    },
+    {
+      "index": 10,
+      "name": "intake",
+      "value": 2800
+    },
+    {
+      "index": 11,
+      "name": "velocity",
+      "value": 120
+    },
+    {
+      "index": 11,
+      "name": "intake",
+      "value": 0
+    },
+    {
+      "index": 11,
+      "name": "autoAimRed",
+      "value": 0
+    },
+    {
+      "index": 12,
+      "name": "launchArtifacts",
+      "value": 1.25
+    },
+    {
+      "index": 10,
+      "name": "velocity",
+      "value": 60
+    },
+    {
+      "index": 13,
+      "name": "intake",
+      "value": 2800
+    },
+    {
+      "index": 13,
+      "name": "velocity",
+      "value": 60
+    },
+    {
+      "index": 14,
+      "name": "intake",
+      "value": 0
+    },
+    {
+      "index": 14,
+      "name": "velocity",
+      "value": 120
+    },
+    {
+      "index": 14,
+      "name": "autoAimRed",
+      "value": 0
+    },
+    {
+      "index": 15,
+      "name": "launchArtifacts",
+      "value": 1.25
+    }
+  ]
+}

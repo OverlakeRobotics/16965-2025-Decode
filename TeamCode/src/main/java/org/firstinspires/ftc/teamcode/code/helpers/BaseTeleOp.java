@@ -223,12 +223,12 @@ public abstract class BaseTeleOp extends OpMode {
 //            hoodAngle -= 2;
 //        }
 
-        if (gamepad2.dpad_left) {
-            turretAngle += 5;
-        }
-        if (gamepad2.dpad_right) {
-            turretAngle -= 5;
-        }
+//        if (gamepad2.dpad_left) {
+//            turretAngle += 5;
+//        }
+//        if (gamepad2.dpad_right) {
+//            turretAngle -= 5;
+//        }
 //        if (gamepad2.yWasPressed()) {
 //            turret.resetTurretEncoder();
 //            turretAngle = 0;

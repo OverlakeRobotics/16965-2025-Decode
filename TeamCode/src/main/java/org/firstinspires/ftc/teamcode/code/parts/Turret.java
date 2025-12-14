@@ -16,7 +16,7 @@ public class Turret extends Shooter {
     public static double turretF = 0;
     public final int MAX_ANGLE_LIMIT;
     public final int MIN_ANGLE_LIMIT;
-    public static int TURRET_VELOCITY = 2000;
+    public static int TURRET_VELOCITY = 2800;
     private final DcMotorEx turretMotor;
     public Turret(DcMotorEx shooterMotor1, DcMotorEx shooterMotor2, DcMotorEx turretMotor, Servo hoodServo, Servo blocker) {
         super(shooterMotor1, shooterMotor2, hoodServo, blocker);
