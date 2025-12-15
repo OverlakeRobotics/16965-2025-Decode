@@ -127,9 +127,9 @@ public class AutoAligner {
                 if (tag.getFiducialId() == targetAprilID) {
                     Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
                     Log.d("Limelight", "using limelight dist");
-                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
-                        break;
-                    }
+//                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
+//                        break;
+//                    }
                     return Math.hypot(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37);
                 }
             }

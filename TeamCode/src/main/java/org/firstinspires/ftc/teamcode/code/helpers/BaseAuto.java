@@ -191,6 +191,7 @@ public abstract class BaseAuto extends OpMode {
     public void loop() {
         driveTrain.updatePosition();
         Pose2D pos = driveTrain.getPosition();
+        Log.d("Pinpoint pos", pos.toString());
         autoAligner.updateInterpolation(pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH));
         turret.setTurretAngle(autoAligner.getTurretAutoAlignAngle());
 //        turret.setTurretAngle(0);

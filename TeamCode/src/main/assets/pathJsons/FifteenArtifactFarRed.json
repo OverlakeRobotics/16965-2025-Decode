@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "createdAt": "2025-12-14T00:58:57.501Z",
+  "createdAt": "2025-12-14T20:03:14.947Z",
   "start": {
     "x": -63,
     "y": -33,
@@ -117,7 +117,7 @@
     {
       "index": 2,
       "name": "launchArtifacts",
-      "value": 2
+      "value": 1.75
     },
     {
       "index": 3,
@@ -157,7 +157,7 @@
     {
       "index": 8,
       "name": "pause",
-      "value": 1
+      "value": 0.75
     },
     {
       "index": 9,
@@ -212,12 +212,12 @@
     {
       "index": 15,
       "name": "pause",
-      "value": 0.5
+      "value": 0.4
     },
     {
       "index": 15,
       "name": "velocity",
-      "value": 80
+      "value": 100
     },
     {
       "index": 16,
