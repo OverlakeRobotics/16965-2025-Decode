@@ -290,6 +290,7 @@ public class AutoAligner {
 //        angleOffset = Math.atan2(-velPerp, v * sin + velPar);
         angleOffset = -angleOffsetMult * Math.toDegrees(Math.asin(-velPerp / (v * sin)));
 
+        v = Math.sqrt(Math.pow(v * sin, 2) + Math.pow(velPerp, 2));
 
 //        double v = Math.sqrt(
 //                g * Math.pow(horizontalDist, 2) /
