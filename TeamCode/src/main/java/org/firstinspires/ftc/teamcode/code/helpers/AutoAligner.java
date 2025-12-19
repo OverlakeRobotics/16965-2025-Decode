@@ -274,7 +274,9 @@ public class AutoAligner {
             double uy = dy / dist;
 
             velPar = vx * ux + vy * uy;
-            velPerp = vx * uy - vy * ux;
+            velPerp = vy * ux - vx * uy;
+            Log.d("Move Launch", "velPar: " + velPar);
+            Log.d("Move Launch", "velPerp: " + velPerp);
         }
 
         double sin = Math.sin(theta);
@@ -288,10 +290,17 @@ public class AutoAligner {
         double v = (-b + Math.sqrt(discriminant)) / (2 * a);
 
 //        angleOffset = Math.atan2(-velPerp, v * sin + velPar);
-        angleOffset = -angleOffsetMult * Math.toDegrees(Math.asin(-velPerp / (v * sin)));
+//        angleOffset = angleOffsetMult * Math.toDegrees(Math.asin(-velPerp / (v * sin)));
+        angleOffset = -angleOffsetMult * Math.toDegrees(Math.atan2(velPerp, (v * sin)));
+        Log.d("Move Launch", "Angle Offset: " + angleOffset);
 
-        v = Math.sqrt(Math.pow(v * sin, 2) + Math.pow(velPerp, 2));
+        // TODO: Test both ways to calculate v
+        // Option 1
+        v = Math.hypot(v * sin, velPerp);
         v /= sin;
+
+        // Option 2
+        // v = Math.hypot(v, velPerp);
 
 //        double v = Math.sqrt(
 //                g * Math.pow(horizontalDist, 2) /
