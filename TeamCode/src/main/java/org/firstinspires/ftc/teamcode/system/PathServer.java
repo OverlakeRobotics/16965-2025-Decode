@@ -30,6 +30,8 @@ public class PathServer extends NanoHTTPD {
     private static volatile double ROBOT_H_DEG = 0.0;
     private static volatile long   ROBOT_TS_MS = 0L;
 
+    public static String ALLIANCE = "unknown";
+
     // ---- Tags ----
     public static class Tag implements Comparable<Tag> {
         public final int index;
@@ -106,6 +108,10 @@ public class PathServer extends NanoHTTPD {
         Tag[] copy = new Tag[TAGS.length];
         System.arraycopy(TAGS, 0, copy, 0, TAGS.length);
         return copy;
+    }
+
+    public static String getAlliance() {
+        return ALLIANCE;
     }
 
     public static void setRobotPose(Pose2D pose) {
@@ -225,6 +231,10 @@ public class PathServer extends NanoHTTPD {
 
         VELOCITY_IN_S = obj.optDouble("velocity", VELOCITY_IN_S);
         TOLERANCE_IN  = obj.optDouble("tolerance", TOLERANCE_IN);
+
+        ALLIANCE = obj.optString("alliance", ALLIANCE);
+        if (ALLIANCE == null) ALLIANCE = "unknown";
+        ALLIANCE = ALLIANCE.trim().toLowerCase();
 
         // tags: [{index, name, value}, ...]
         JSONArray tagsArr = obj.optJSONArray("tags");

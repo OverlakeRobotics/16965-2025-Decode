@@ -62,6 +62,7 @@ public abstract class BaseAuto extends OpMode {
     public static double shooterDelay = 0.3;
     private double shooterTimer = 0;
     public static double shooterTolerance = 80;
+    public String alliance;
 
     protected Pose2D startPose = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
     private int lastTagIndex = 0;
@@ -84,6 +85,9 @@ public abstract class BaseAuto extends OpMode {
 
         // Tolerance (inches)
         tolerance = root.optDouble("tolerance", 1.0);
+
+        alliance = root.optString("alliance", alliance);
+        alliance = alliance.trim().toLowerCase();
 
         // Start pose
         JSONObject s = root.getJSONObject("start");
@@ -229,18 +233,15 @@ public abstract class BaseAuto extends OpMode {
                             intake.setVelocity(intakeVelocity);
                         }
                         break;
-                    case "autoAimRed": {
+                    case "autoAim": {
+                        if (alliance.equals("red")) {
+                            autoAligner.setRed();
+                        } else {
+                            autoAligner.setBlue();
+                        }
                         autoAlignIndex = nextPointIndex;
-                        autoAligner.setRed();
                         Pose2D curTarget2 = positions[nextPointIndex];
                         positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget2.getX(DistanceUnit.INCH), curTarget2.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
-                        break;
-                    }
-                    case "autoAimBlue": {
-                        autoAlignIndex = nextPointIndex;
-                        autoAligner.setBlue();
-                        Pose2D curTarget3 = positions[nextPointIndex];
-                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget3.getX(DistanceUnit.INCH), curTarget3.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
                         break;
                     }
                     case "shooterVelocity": {

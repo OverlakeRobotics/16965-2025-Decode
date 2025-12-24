@@ -30,6 +30,7 @@ public class PathPlanner extends BaseAuto {
         super.startPose = PathServer.getStartPose();
         super.positions = PathServer.getPath();
         super.tags = PathServer.getTags();
+        super.alliance = PathServer.getAlliance();
         super.start();
     }
 
