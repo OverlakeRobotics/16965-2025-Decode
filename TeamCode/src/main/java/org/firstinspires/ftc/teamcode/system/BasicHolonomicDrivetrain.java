@@ -16,9 +16,8 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 public class BasicHolonomicDrivetrain {
     public static final double MAX_STOP_VELOCITY = 1e-2;
     public static final int MAX_VELOCITY = 2800;
-    public static final double STRAFE_TO_FORWARD_RATIO = /* 1.0822; */ 1.024;
-    public static final double FORWARD_COUNTS_PER_INCH = 32.49; //30;
-    public static double robotMaxAccelerationInches = 180;
+    public static final double STRAFE_TO_FORWARD_RATIO = 1.024;
+    public static final double FORWARD_COUNTS_PER_INCH = 32.49;
     private final DcMotorEx backLeft;
     private final DcMotorEx backRight;
     private final DcMotorEx frontLeft;
@@ -27,7 +26,6 @@ public class BasicHolonomicDrivetrain {
     protected double strafe;
     protected double turn;
     protected int countsAffectedByTurn;
-    protected double minPositionDriveVelocity;
 
     protected DriveState currentDriveState;
     public enum DriveState {
@@ -53,20 +51,16 @@ public class BasicHolonomicDrivetrain {
         backRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         frontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        Log.d("Drivetrain PIDF RUN_USING_ENCODER", backLeft.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER).toString());
-        Log.d("Drivetrain PIDF RUN_TO_POSITION", backRight.getPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION).toString());
 
         currentDriveState = DriveState.STOPPED;
-        minPositionDriveVelocity = 150;
     }
 
-    public BasicHolonomicDrivetrain(DcMotorEx backLeft, DcMotorEx backRight,
-                                    DcMotorEx frontLeft, DcMotorEx frontRight,
-                                    double p, double i, double d, double f) {
-        this(backLeft, backRight, frontLeft, frontRight);
-        this.setPIDFCoefficients(p, i, d, f);
-    }
-
+    // Behavior: Sets the PIDF coefficients for the drivetrain motors.
+    // Parameters:
+    //      - double p: The proportional term.
+    //      - double i: The integral term.
+    //      - double d: The derivative term.
+    //      - double f: The feedback term.
     public void setPIDFCoefficients(double p, double i, double d, double f) {
         backLeft.setVelocityPIDFCoefficients(p, i, d, f);
         backRight.setVelocityPIDFCoefficients(p, i, d, f);
@@ -172,22 +166,11 @@ public class BasicHolonomicDrivetrain {
         }
     }
 
+    // Behavior: Gets the wanted velocity of the robot for position driving. Currently just returns
+    //           forward but can be changed/overridden to implement something like a slowdown.
+    // Returns: The wanted velocity of the robot in ticks/s.
     protected double getPositionDriveVelocity() {
-        double minVelocity = getMinPositionDriveVelocity();
-        Log.d("Direction Change", "Min Velocity: " + minVelocity);
-        // kinematics; becomes vi^2 - vf^2 because a is negative
-        double countsToSlowDown = (Math.pow(forward, 2) - Math.pow(minVelocity, 2)) / (2 * robotMaxAccelerationInches * FORWARD_COUNTS_PER_INCH);
-        double countsLeft = getPositionDriveDistanceLeft();
-        if (countsLeft <= countsToSlowDown) {
-            double temp = minVelocity + (forward - minVelocity) * (countsLeft / countsToSlowDown);
-            Log.d("Direction Change", "Desired Velocity: " + temp);
-            return temp;
-        }
         return forward;
-    }
-
-    public double getMinPositionDriveVelocity() {
-        return minPositionDriveVelocity;
     }
 
     // Behavior: Sets the forward, strafe, and turn velocities of the robot to the given values.
@@ -308,12 +291,6 @@ public class BasicHolonomicDrivetrain {
         return (int)Math.hypot(getForwardCountsLeft(), getStrafeCountsLeft() / STRAFE_TO_FORWARD_RATIO);
     }
 
-    // Behavior: Gets the direction of the current position drive.
-    // Returns: A double, containing the direction of the current position drive in degrees.
-    public double getPositionDriveDirection() {
-        return Math.toDegrees(Math.atan2(getStrafeCountsLeft() / STRAFE_TO_FORWARD_RATIO, getForwardCountsLeft()));
-    }
-
     // Behavior: Stops the robot by setting the motor velocities to 0.
     public void stop() {
         forward = 0;
@@ -416,9 +393,5 @@ public class BasicHolonomicDrivetrain {
 
     public int getFrontRightPosition() {
         return frontRight.getCurrentPosition();
-    }
-
-    public void setMinPositionDriveVelocity(double newMinPositionVelocity) {
-        minPositionDriveVelocity = newMinPositionVelocity;
     }
 }
