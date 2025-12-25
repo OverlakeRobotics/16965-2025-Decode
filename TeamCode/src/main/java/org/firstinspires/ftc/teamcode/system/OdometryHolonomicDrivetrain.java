@@ -44,13 +44,6 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
         lastHeading = this.currentPosition.getHeading(AngleUnit.DEGREES);
     }
 
-    public OdometryHolonomicDrivetrain(DcMotorEx backLeft, DcMotorEx backRight, DcMotorEx frontLeft,
-                                       DcMotorEx frontRight, OdometryModule odometry,
-                                       double p, double i, double d, double f) {
-        this(backLeft, backRight, frontLeft, frontRight, odometry);
-        super.setPIDFCoefficients(p, i, d, f);
-    }
-    
     // Behavior: Overrides super classes drive method to include odometry and heading correction.
     @Override
     public void drive() {
@@ -96,9 +89,9 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     public void setVelocityDriveFieldCentric(double forward, double strafe, double turn, double angleOffset) {
         double heading = currentPosition.getHeading(AngleUnit.RADIANS) - Math.toRadians(angleOffset);
         super.setVelocityDrive(
-            forward * Math.cos(heading) + strafe * Math.sin(heading),
-            strafe * Math.cos(heading) - forward * Math.sin(heading),
-            turn
+                forward * Math.cos(heading) + strafe * Math.sin(heading),
+                strafe * Math.cos(heading) - forward * Math.sin(heading),
+                turn
         );
     }
 
@@ -107,12 +100,7 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     //           direction, no matter which way the robot is facing. Similarly, the strafe value
     //           will cause the robot to move in the 90 degree direction.
     public void setVelocityDriveFieldCentric(double forward, double strafe, double turn) {
-        double heading = currentPosition.getHeading(AngleUnit.RADIANS);
-        super.setVelocityDrive(
-                forward * Math.cos(heading) + strafe * Math.sin(heading),
-                strafe * Math.cos(heading) - forward * Math.sin(heading),
-                turn
-        );
+        this.setVelocityDriveFieldCentric(forward, strafe, turn, 0);
     }
 
     // Behavior: Overrides basic setPositionDrive so whenever a position drive is set, the state
@@ -181,7 +169,7 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     // Returns: A double, in inches, containing the distance to the destination.
     public double getDistanceToDestination() {
         return Math.hypot(wantedPosition.getX(DistanceUnit.INCH) - currentPosition.getX(DistanceUnit.INCH),
-                          wantedPosition.getY(DistanceUnit.INCH) - currentPosition.getY(DistanceUnit.INCH));
+                wantedPosition.getY(DistanceUnit.INCH) - currentPosition.getY(DistanceUnit.INCH));
     }
 
     @Override
@@ -206,7 +194,7 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     // Returns: The turn velocity.
     public double getHeadingCorrectionVelocity() {
         return P_GAIN * normalize(normalize(wantedPosition.getHeading(AngleUnit.DEGREES)) -
-                         normalize(currentPosition.getHeading(AngleUnit.DEGREES)));
+                normalize(currentPosition.getHeading(AngleUnit.DEGREES)));
     }
 
     // Behavior: Updates the position of the robot. This needs to be called in the loop for accurate

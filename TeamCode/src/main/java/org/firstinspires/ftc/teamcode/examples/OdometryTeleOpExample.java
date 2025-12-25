@@ -2,31 +2,32 @@ package org.firstinspires.ftc.teamcode.examples;
 
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 
 @Config
 @TeleOp(name = "Odometry TeleOp Example", group = "TeleOp")
-@Disabled
 public class OdometryTeleOpExample extends OpMode {
-    public double yOffset = -168.0; // mm
-    public double xOffset = -84.0; // mm
+    public double yOffset = -168.0;
+    public double xOffset = -84.0;
 
     public double autoLockX = 60;
     public double autoLockY = 54;
 
     // Positive angle is to the left, positive x is forward, and positive y is left
     // This is the center of the bot when the program is initialized
+    // In real TeleOps, you will likely not set the position of the bot, and instead only set
+    // the position at the start of the autonomous period.
     public Pose2D startPos = new Pose2D(DistanceUnit.INCH, -63, 15, AngleUnit.DEGREES, 0);
 
     // List of preset positions the driver can press a button to start driving to
@@ -36,7 +37,7 @@ public class OdometryTeleOpExample extends OpMode {
     };
 
     public int currentPreset = -1;
-    public double velocity = 2000;
+    public double velocity = 2800;
     private OdometryHolonomicDrivetrain driveTrain;
     private boolean autoLock = false;
 

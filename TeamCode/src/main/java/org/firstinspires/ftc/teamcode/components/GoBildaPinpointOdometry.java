@@ -3,12 +3,8 @@
 package org.firstinspires.ftc.teamcode.components;
 
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
-
-import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.system.OdometryModule;
 
 public class GoBildaPinpointOdometry implements OdometryModule {
@@ -21,8 +17,8 @@ public class GoBildaPinpointOdometry implements OdometryModule {
     public GoBildaPinpointOdometry(GoBildaPinpointDriver pinpoint) {
         this.pinpoint = pinpoint;
 
-        positionPriority = 0;
-        headingPriority = 0;
+        positionPriority = 3;
+        headingPriority = 2;
         doPositionReset = true;
         doHeadingReset = false;
     }
@@ -82,17 +78,5 @@ public class GoBildaPinpointOdometry implements OdometryModule {
 
     public void reset() {
         pinpoint.resetPosAndIMU();
-    }
-
-    public double getXVelocity() {
-        return pinpoint.getVelX(DistanceUnit.INCH);
-    }
-
-    public double getYVelocity() {
-        return pinpoint.getVelY(DistanceUnit.INCH);
-    }
-
-    public double getAngularVelocity() {
-        return pinpoint.getHeadingVelocity(UnnormalizedAngleUnit.RADIANS);
     }
 }

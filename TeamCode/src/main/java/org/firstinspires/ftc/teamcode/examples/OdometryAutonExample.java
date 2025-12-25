@@ -1,21 +1,20 @@
 package org.firstinspires.ftc.teamcode.examples;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 @Config
 @Autonomous(name = "Odometry Auton Example", group = "Autonomous")
-@Disabled
 public class OdometryAutonExample extends OpMode {
     // Change to your actual offsets. See GoBildaPinpointDriver.setOffsets() for details on measuring offsets.
     public double yOffset = -168.0;
@@ -48,9 +47,9 @@ public class OdometryAutonExample extends OpMode {
     }
 
     // This OpMode manually sets the target position of the drive train to the next point after
-    // the robot reaches the current target point. This applies slowdown to each point and is mainly
-    // used to demonstrate some more of the driveTrain class's capabilities. Practically, you will normally
-    // use driveTrain.setPositionDrive(Pose2D[] path, velocity, tolerance) in start() and then just
+    // the robot reaches the current target point. This d is mainly used to demonstrate some more
+    // of the driveTrain class's capabilities. Practically, you will normally use
+    // driveTrain.setPositionDrive(Pose2D[] path, velocity, tolerance) in start() and then just
     // call driveTrain.updatePosition() and driveTrain.drive() in loop().
     @Override
     public void loop() {

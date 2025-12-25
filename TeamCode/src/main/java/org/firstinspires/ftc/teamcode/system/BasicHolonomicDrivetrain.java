@@ -135,7 +135,7 @@ public class BasicHolonomicDrivetrain {
 
             case VELOCITY_DRIVE:
                 if (Math.abs(forward) <= MAX_STOP_VELOCITY && Math.abs(strafe) <= MAX_STOP_VELOCITY &&
-                                                           Math.abs(turn) <= MAX_STOP_VELOCITY) {
+                        Math.abs(turn) <= MAX_STOP_VELOCITY) {
                     setDriveState(DriveState.STOPPED);
                 }
                 moveRobot(forward, strafe, turn);
