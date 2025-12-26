@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.code.parts.Turret;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -238,6 +239,113 @@ public class AutoAligner {
         aprilAlignOffset = weighted[2] * sideFlipMultiplier;
     }
 
+    private static double solveTimeForShot(
+            double d, double z,
+            double thetaRad,
+            double velPar, double velPerp,
+            double g,
+            double tMin, double tMax)
+    {
+        final double sinT = Math.sin(thetaRad);
+        final double cosT = Math.cos(thetaRad);
+
+        if (Math.abs(cosT) < 1e-6) return Double.NaN;
+
+        // Define f(t) we need to find roots for
+        java.util.function.DoubleUnaryOperator f = (t) -> {
+            if (t <= 0) return Double.NaN;
+
+            double V = (z + 0.5 * g * t * t) / (t * cosT);
+            double A = V * sinT;
+
+            double term = (d / t) - velPar;
+            return (A * A) - (velPerp * velPerp) - (term * term);
+        };
+
+        // Log-spaced scan to find all sign-change brackets
+        int N = 160; // small + robust
+        double ratio = Math.pow(tMax / tMin, 1.0 / N);
+
+        double tPrev = tMin;
+        double fPrev = f.applyAsDouble(tPrev);
+        List<double[]> brackets = new ArrayList<>();
+
+        for (int i = 1; i <= N; i++) {
+            double tCur = tPrev * ratio;
+            double fCur = f.applyAsDouble(tCur);
+
+            if (Double.isFinite(fPrev) && Double.isFinite(fCur)) {
+                if (fPrev == 0.0) {
+                    brackets.add(new double[]{tPrev, tPrev});
+                } else if (fPrev * fCur < 0.0) {
+                    brackets.add(new double[]{tPrev, tCur});
+                }
+            }
+
+            tPrev = tCur;
+            fPrev = fCur;
+        }
+
+        if (brackets.isEmpty()) return Double.NaN;
+
+        // Bisection refine each bracket
+        // keep the valid root with smallest required V
+        double bestT = Double.NaN;
+        double bestV = Double.POSITIVE_INFINITY;
+
+        for (double[] br : brackets) {
+            double rootT = (br[0] == br[1]) ? br[0] : bisectRoot(f, br[0], br[1], 1e-6, 80);
+            if (!Double.isFinite(rootT) || rootT <= 0) continue;
+
+            double V = (z + 0.5 * g * rootT * rootT) / (rootT * cosT);
+            if (!(V > 0) || !Double.isFinite(V)) continue;
+
+            double A = V * sinT;
+            if (!Double.isFinite(A) || Math.abs(A) < 1e-9) continue;
+
+            // Need abs(velPerp) <= abs(A) so angle offset works
+            if (Math.abs(velPerp) > Math.abs(A) + 1e-6) continue;
+
+            // Choose the root that minimizes required speed V
+            if (V < bestV) {
+                bestV = V;
+                bestT = rootT;
+            }
+        }
+
+        return bestT;
+    }
+
+    private static double bisectRoot(
+            java.util.function.DoubleUnaryOperator f,
+            double lo, double hi,
+            double tol, int maxIter)
+    {
+        double flo = f.applyAsDouble(lo);
+        double fhi = f.applyAsDouble(hi);
+
+        if (!Double.isFinite(flo) || !Double.isFinite(fhi)) return Double.NaN;
+
+        if (flo * fhi > 0) return Double.NaN;
+
+        for (int i = 0; i < maxIter; i++) {
+            double mid = 0.5 * (lo + hi);
+            double fmid = f.applyAsDouble(mid);
+            if (!Double.isFinite(fmid)) return Double.NaN;
+
+            if (Math.abs(fmid) < tol || (hi - lo) < tol) return mid;
+
+            if (flo * fmid <= 0.0) {
+                hi = mid;
+                fhi = fmid;
+            } else {
+                lo = mid;
+                flo = fmid;
+            }
+        }
+        return 0.5 * (lo + hi);
+    }
+
     // TODO: Check angle and velocity calculations
     // Distances should be passed in as inches due to FTC standard units
     // theta is the launch angle in degrees, where launching straight up is 0 degrees (hood flat) and straight forward is 90 degrees (hood vertical)
@@ -248,11 +356,6 @@ public class AutoAligner {
         double adjustedKSlip = kSlip + kSlipTurretRotationConstant * Math.abs(turret.getTurretCurrentAngle()) / 180;
         // Convert theta to radians
         theta = Math.toRadians(theta);
-        // Impossible
-        if (goalDZ >= horizontalDist / Math.tan(theta) || theta <= 0 || horizontalDist <= 0) {
-            return -100;
-        }
-        // First calculate the required launch velocity (derived from kinematics assuming no air resistance)
 
         Pose2D pos = driveTrain.getPosition();
 
@@ -264,10 +367,10 @@ public class AutoAligner {
         double vy = driveTrain.getYVelocity();
 
         // towards/away from goal
-        double velPar = 0.0;
+        double velPar = 0;
 
         // sideways/strafing around goal
-        double velPerp = 0.0;
+        double velPerp = 0;
 
         if (dist != 0) {
             double ux = dx / dist;
@@ -279,41 +382,32 @@ public class AutoAligner {
             Log.d("Move Launch", "velPerp: " + velPerp);
         }
 
-        double sin = Math.sin(theta);
-        double cos = Math.cos(theta);
+        double t = solveTimeForShot(
+                horizontalDist,
+                goalDZ,
+                theta,
+                velPar,
+                velPerp,
+                g,
+                0.02,
+                4.0
+        );
+        Log.d("Move Launch", "Expected Flight Time: " + t);
+        if (!Double.isFinite(t) || t <= 0) return -1;
 
-        double a = -goalDZ * sin * sin + cos * sin * horizontalDist;
-        double b = -2 * goalDZ * sin * velPar + cos * velPar * horizontalDist;
-        double c = (-g * horizontalDist * horizontalDist / 2.0) - goalDZ * velPar * velPar;
+        double v = (goalDZ + (g * t * t) / 2) / (t * Math.cos(theta));
+        Log.d("Move Launch", "Wanted Exit Velocity: " + v);
 
-        double discriminant = b * b - 4 * a * c;
-        double v = (-b + Math.sqrt(discriminant)) / (2 * a);
-
-//        angleOffset = Math.atan2(-velPerp, v * sin + velPar);
-//        angleOffset = angleOffsetMult * Math.toDegrees(Math.asin(-velPerp / (v * sin)));
-        angleOffset = -angleOffsetMult * Math.toDegrees(Math.atan2(velPerp, (v * sin)));
+        angleOffset = Math.atan2(-velPerp, (horizontalDist / t) - velPar);
         Log.d("Move Launch", "Angle Offset: " + angleOffset);
 
-        // TODO: Test both ways to calculate v
-        // Option 1
-        v = Math.hypot(v * sin, velPerp);
-        v /= sin;
-
-        // Option 2
-        // v = Math.hypot(v, velPerp);
-
-//        double v = Math.sqrt(
-//                g * Math.pow(horizontalDist, 2) /
-//                        (2 * Math.pow(Math.sin(theta), 2) * (horizontalDist / Math.tan(theta) - goalDZ))
-//        );
-
-        // Then calculate RPM from linear velocity
+        // Calculate RPM from linear velocity
         double rpm = (v * 60) / (2 * Math.PI * rhinoWheelRadius * adjustedKSlip);
         // Scale to motor ticks per second
         // TODO: Check ticks/sec calculation
         double rawTPS = rpm * motorTicksPerRev / 60;
         if (rawTPS > maxShooterVelocity) {
-            Log.d("Above Max Shooter", "raw vel: " + rawTPS);
+            Log.d("Move Launch", "raw vel: " + rawTPS);
         }
         return Range.clip(rpm * motorTicksPerRev / 60, 0, maxShooterVelocity);
     }
