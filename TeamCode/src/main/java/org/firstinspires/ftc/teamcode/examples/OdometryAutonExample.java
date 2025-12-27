@@ -13,6 +13,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
+
+// This OpMode shows a simple example of driving the bot along a set path of points using the
+// driveTrain.setPositionDrive() method while passing in an array of Pose2Ds.
 @Config
 @Autonomous(name = "Odometry Auton Example", group = "Autonomous")
 public class OdometryAutonExample extends OpMode {
@@ -22,16 +25,18 @@ public class OdometryAutonExample extends OpMode {
 
     public static int velocity = 2000;
 
-    public static double inchesToChangeDirection = 2.0;
+    // How close the drivetrain has to be to a point before starting to drive to the next one.
+    // This is in inches.
+    public static double tolerance = 4;
+
     private OdometryHolonomicDrivetrain driveTrain;
 
     private final Pose2D[] drivePoints = {
-            new Pose2D(DistanceUnit.INCH, 106, 0, AngleUnit.DEGREES, -90),
-            new Pose2D(DistanceUnit.INCH, 106, -96, AngleUnit.DEGREES, 180),
-            new Pose2D(DistanceUnit.INCH, 14, -96, AngleUnit.DEGREES, 90),
-            new Pose2D(DistanceUnit.INCH, 14, 0, AngleUnit.DEGREES, 0),
+            new Pose2D(DistanceUnit.INCH, 96, 0, AngleUnit.DEGREES, -90),
+            new Pose2D(DistanceUnit.INCH, 96, -96, AngleUnit.DEGREES, 180),
+            new Pose2D(DistanceUnit.INCH, 0, -96, AngleUnit.DEGREES, 90),
+            new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0),
     };
-    private int currentPoint = 0;
 
     @Override
     public void init() {
@@ -44,32 +49,20 @@ public class OdometryAutonExample extends OpMode {
                 hardwareMap.get(DcMotorEx.class, "frontRight"),
                 new GoBildaPinpointOdometry(pinpointDriver)
         );
+
+        driveTrain.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
+        driveTrain.setTolerance(tolerance);
+        driveTrain.setVelocity(velocity);
     }
 
-    // This OpMode manually sets the target position of the drive train to the next point after
-    // the robot reaches the current target point. This d is mainly used to demonstrate some more
-    // of the driveTrain class's capabilities. Practically, you will normally use
-    // driveTrain.setPositionDrive(Pose2D[] path, velocity, tolerance) in start() and then just
-    // call driveTrain.updatePosition() and driveTrain.drive() in loop().
     @Override
     public void loop() {
         driveTrain.updatePosition();
         driveTrain.drive();
-
-        Pose2D pos = driveTrain.getPosition();
-        telemetry.addData("Position", "X: " + pos.getX(DistanceUnit.INCH) + ", Y: " + pos.getY(DistanceUnit.INCH) + ", Heading: " + pos.getHeading(AngleUnit.DEGREES));
-
-        if (driveTrain.getDistanceToDestination() < inchesToChangeDirection) {
-            currentPoint++;
-            if (currentPoint < drivePoints.length) {
-                driveTrain.setPositionDrive(drivePoints[currentPoint], velocity);
-            }
-        }
     }
 
     @Override
     public void start() {
-        driveTrain.updatePosition();
-        driveTrain.setPositionDrive(drivePoints[currentPoint], velocity);
+        driveTrain.setPositionDrive(drivePoints);
     }
 }

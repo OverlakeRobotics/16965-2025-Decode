@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
 public class BasicAutonExample extends OpMode {
 
     private BasicHolonomicDrivetrain driveTrain;
-    public static double velocity = 1000;
+    public static int velocity = 1000;
 
     @Override
     public void init() {
@@ -26,6 +26,8 @@ public class BasicAutonExample extends OpMode {
                 hardwareMap.get(DcMotorEx.class, "frontLeft"),
                 hardwareMap.get(DcMotorEx.class, "frontRight")
         );
+
+        driveTrain.setVelocity(velocity);
     }
 
     @Override
@@ -33,12 +35,12 @@ public class BasicAutonExample extends OpMode {
         driveTrain.drive();
 
         if (!driveTrain.isDriving()) {
-            driveTrain.setPositionDrive(2000, 90, velocity);
+            driveTrain.setPositionDrive(2000, 90);
         }
     }
 
     @Override
     public void start() {
-            driveTrain.setPositionDrive(2000, 0, velocity);
+            driveTrain.setPositionDrive(2000, 0);
     }
 }

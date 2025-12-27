@@ -74,7 +74,7 @@ public class BasicHolonomicDrivetrain {
     //      - double backRightVelocity: The velocity for the back right motor.
     //      - double frontLeftVelocity: The velocity for the front left motor.
     //      - double frontRightVelocity: The velocity for the front right motor.
-    protected void setVelocity(double backLeftVelocity, double backRightVelocity,
+    protected void setMotorVelocity(double backLeftVelocity, double backRightVelocity,
                                double frontLeftVelocity, double frontRightVelocity) {
         double max = Math.max(Math.max(Math.abs(frontLeftVelocity), Math.abs(frontRightVelocity)),
                 Math.max(Math.abs(backLeftVelocity), Math.abs(backRightVelocity)));
@@ -118,7 +118,7 @@ public class BasicHolonomicDrivetrain {
         double fl = forward - strafe - turn;
         double fr = forward + strafe + turn;
 
-        setVelocity(bl, br, fl, fr);
+        setMotorVelocity(bl, br, fl, fr);
     }
 
     // TODO: The stopped behavior here is a little weird, because it just sets a position drive, but then
@@ -130,7 +130,7 @@ public class BasicHolonomicDrivetrain {
     public void drive() {
         switch (currentDriveState) {
             case STOPPED:
-                setPositionDrive(getBackLeftPosition(), getBackRightPosition(), getFrontLeftPosition(), getFrontRightPosition(), 1000);
+                setPositionDrive(getBackLeftPosition(), getBackRightPosition(), getFrontLeftPosition(), getFrontRightPosition());
                 break;
 
             case VELOCITY_DRIVE:
@@ -160,7 +160,7 @@ public class BasicHolonomicDrivetrain {
 
                 double velocity = getPositionDriveVelocity();
 
-                setVelocity(velocity * backLeftDif, velocity * backRightDif,
+                setMotorVelocity(velocity * backLeftDif, velocity * backRightDif,
                         velocity * frontLeftDif, velocity * frontRightDif);
                 break;
         }
@@ -196,16 +196,12 @@ public class BasicHolonomicDrivetrain {
     //      - int backRightTarget: The target for the back right motor in counts.
     //      - int frontLeftTarget: The target for the front left motor in counts.
     //      - int frontRightTarget: The target for the front right motor in counts.
-    //      - double velocity: The velocity to move the robot at.
     public void setPositionDrive(int backLeftTarget, int backRightTarget,
-                                 int frontLeftTarget, int frontRightTarget, double velocity) {
+                                 int frontLeftTarget, int frontRightTarget) {
         backLeft.setTargetPosition(backLeftTarget);
         backRight.setTargetPosition(backRightTarget);
         frontLeft.setTargetPosition(frontLeftTarget);
         frontRight.setTargetPosition(frontRightTarget);
-        forward = velocity;
-        strafe = 0;
-        turn = 0;
         setDriveState(DriveState.POSITION_DRIVE);
     }
 
@@ -219,12 +215,11 @@ public class BasicHolonomicDrivetrain {
     //                        truncated before all the calculations are complete.
     //      - double turn: The number of turn counts to move. It is a double so it is not
     //                        truncated before all the calculations are complete.
-    //      - double velocity: The velocity to move the robot at.
-    public void setPositionDrive(double forward, double strafe, double turn, double velocity) {
+    public void setPositionDrive(double forward, double strafe, double turn) {
         setPositionDrive(backLeft.getCurrentPosition() + (int)(forward + strafe - turn),
                 backRight.getCurrentPosition() + (int)(forward - strafe + turn),
                 frontLeft.getCurrentPosition() + (int)(forward - strafe - turn),
-                frontRight.getCurrentPosition() + (int)(forward + strafe + turn), velocity);
+                frontRight.getCurrentPosition() + (int)(forward + strafe + turn));
         countsAffectedByTurn = (int)turn;
     }
 
@@ -234,15 +229,14 @@ public class BasicHolonomicDrivetrain {
     //      - int distance: The distance to drive, in counts.
     //      - double direction: The direction relative to the robot to drive in, in degrees.
     //                          Forward is 0 degrees, left is positive, right is negative.
-    //      - double velocity: The velocity to move the robot at.
-    public void setPositionDrive(int distance, double direction, double turn, double velocity) {
+    public void setPositionDrive(int distance, double direction, double turn) {
         double forwardCounts = distance * Math.cos(Math.toRadians(direction));
         double strafeCounts = distance * Math.sin(Math.toRadians(direction)) * STRAFE_TO_FORWARD_RATIO;
-        setPositionDrive(forwardCounts, strafeCounts, turn, velocity);
+        setPositionDrive(forwardCounts, strafeCounts, turn);
     }
 
-    public void setPositionDrive(int distance, double direction, double velocity) {
-        setPositionDrive(distance, direction, 0, velocity);
+    public void setPositionDrive(int distance, double direction) {
+        setPositionDrive(distance, direction, 0);
     }
 
     // Behavior: Gets the number of counts the robot needs to move forward to finish the current
@@ -316,11 +310,13 @@ public class BasicHolonomicDrivetrain {
         currentDriveState = driveState;
     }
 
-    // Behavior: Sets the velocity of the robot
+    // Behavior: Sets the velocity of the robot for position drive.
     // Parameters:
-    //      - int velocity: The velocity to set the robot to, in counts/second.
+    //      - int velocity: The velocity to set the robot to, in counts per second.
     public void setVelocity(int velocity) {
         forward = velocity;
+        strafe = 0;
+        turn = 0;
     }
 
     // Behavior: Returns whether the robot is currently driving

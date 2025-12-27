@@ -24,8 +24,6 @@ public class PathPlanExample extends OpMode {
     public double yOffset = -168.0;
     public double xOffset = -84.0;
 
-    public static int velocity;
-
     private OdometryHolonomicDrivetrain driveTrain;
     public Pose2D[] positions;
     public PathServer.Tag[] tags;
@@ -58,7 +56,7 @@ public class PathPlanExample extends OpMode {
 
     @Override
     public void start() {
-        velocity = (int) (PathServer.getVelocity() * BasicHolonomicDrivetrain.FORWARD_COUNTS_PER_INCH);
+        driveTrain.setVelocity((int) (PathServer.getVelocity() * BasicHolonomicDrivetrain.FORWARD_COUNTS_PER_INCH));
         positions = PathServer.getPath();
         driveTrain.setPosition(PathServer.getStartPose());
         driveTrain.setTolerance(PathServer.getTolerance());
@@ -66,7 +64,7 @@ public class PathPlanExample extends OpMode {
         tags = PathServer.getTags();
         Arrays.sort(tags);
 
-        driveTrain.setPositionDrive(positions, velocity);
+        driveTrain.setPositionDrive(positions);
     }
 
 
@@ -88,15 +86,15 @@ public class PathPlanExample extends OpMode {
                 PathServer.Tag currTag = tags[lastTagIndex];
                 switch (currTag.name) {
                     case "velocity":
-                        velocity = (int) (currTag.value * BasicHolonomicDrivetrain.FORWARD_COUNTS_PER_INCH);
-                        driveTrain.setVelocity(velocity);
+                        driveTrain.setVelocity((int) (currTag.value * BasicHolonomicDrivetrain.FORWARD_COUNTS_PER_INCH));
                         break;
                     case "pause":
                         if (currTag.value <= 0) break;
                         pauseTimeLeft = currTag.value;
                         pausedIndex = nextPointIndex;
-                        driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
+                        driveTrain.setPositionDrive(positions[nextPointIndex - 1]);
                         break;
+                    // Add more cases here for your own custom tags!
                 }
                 lastTagIndex++;
             }
@@ -105,9 +103,9 @@ public class PathPlanExample extends OpMode {
 
             if (pauseTimeLeft <= 0) {
                 pauseTimeLeft = 0;
-                driveTrain.setPositionDrive(positions, velocity, pausedIndex);
+                driveTrain.setPositionDrive(positions, pausedIndex);
             } else {
-                driveTrain.setPositionDrive(positions[pausedIndex - 1], velocity);
+                driveTrain.setPositionDrive(positions[pausedIndex - 1]);
             }
         }
     }

@@ -15,6 +15,16 @@ import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 
+// This OpMode shows using GobildaPinpoint odometry with the library in order to create a TeleOp
+// that has preset positions, an auto aim feature, and field centric driving.
+// Controls:
+//      - Y: Turn on autolock to aim the robot at the point (autoLockX, autoLockY). Turn the robot
+//           again to turn this off.
+//      - A: Go to the first preset position.
+//      - B: Go to the second preset position.
+//      - Sticks: Normal driving controls, except its field centric. You can add an angle offset
+//                to change the direction the driver looks to drive the robot by passing it in as
+//                an additional parameter to the setVelocityDriveFieldCentric() method.
 @Config
 @TeleOp(name = "Odometry TeleOp Example", group = "TeleOp")
 public class OdometryTeleOpExample extends OpMode {
@@ -37,7 +47,7 @@ public class OdometryTeleOpExample extends OpMode {
     };
 
     public int currentPreset = -1;
-    public double velocity = 2800;
+    public int velocity = 2800;
     private OdometryHolonomicDrivetrain driveTrain;
     private boolean autoLock = false;
 
@@ -89,7 +99,8 @@ public class OdometryTeleOpExample extends OpMode {
                     AngleUnit.DEGREES,
                     wantedHeading
             );
-            driveTrain.setPositionDrive(wantedPosition, velocity);
+            driveTrain.setVelocity(velocity);
+            driveTrain.setPositionDrive(wantedPosition);
         } else {
             // Start auto lock if y is pressed, and turn it off if driver turns
             if (gamepad1.y) {

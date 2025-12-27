@@ -65,15 +65,15 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
                     }
 
                     int nextPoint = currentPoint;
-                    setPositionDrive(currentPath[nextPoint], forward);
+                    setPositionDrive(currentPath[nextPoint]);
                     currentPoint = nextPoint;
                 } else if (positionDriveUsingOdometry) {
-                    setPositionDrive(wantedPosition, forward);
+                    setPositionDrive(wantedPosition);
                 } else if (doPositionHeadingCorrection) {
-                    setPositionDriveCorrection(getPositionDriveDistanceLeft(), positionDriveDirection, forward, wantedPosition.getHeading(AngleUnit.DEGREES));
+                    setPositionDriveCorrection(getPositionDriveDistanceLeft(), positionDriveDirection, wantedPosition.getHeading(AngleUnit.DEGREES));
                 } else {
                     // TODO: Check if this is right, because its using positionDriveDirection, but that is only set if doPositionHeadingCorrection is true.
-                    super.setPositionDrive(getPositionDriveDistanceLeft(), positionDriveDirection - currentPosition.getHeading(AngleUnit.DEGREES), forward);
+                    super.setPositionDrive(getPositionDriveDistanceLeft(), positionDriveDirection - currentPosition.getHeading(AngleUnit.DEGREES));
                 }
                 break;
         }
@@ -106,20 +106,20 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     // Behavior: Overrides basic setPositionDrive so whenever a position drive is set, the state
     //           of the current position drive is reset.
     @Override
-    public void setPositionDrive(int backLeftTarget, int backRightTarget, int frontLeftTarget, int frontRightTarget, double velocity) {
-        super.setPositionDrive(backLeftTarget, backRightTarget, frontLeftTarget, frontRightTarget, velocity);
+    public void setPositionDrive(int backLeftTarget, int backRightTarget, int frontLeftTarget, int frontRightTarget) {
+        super.setPositionDrive(backLeftTarget, backRightTarget, frontLeftTarget, frontRightTarget);
         doPositionHeadingCorrection = false;
         positionDriveUsingOdometry = false;
         currentPoint = -1;
     }
 
     // Behavior: Method just like setPosition drive but also includes a wantedH for heading correction.
-    public void setPositionDriveCorrection(int distance, double direction, double velocity, double wantedH) {
+    public void setPositionDriveCorrection(int distance, double direction, double wantedH) {
         double dh = normalize(currentPosition.getHeading(AngleUnit.DEGREES) - lastHeading);
         double angleOffset = dh / 2;
         // TODO: Test angle offset by driving in a straight line.
         super.setPositionDrive(distance, normalize(direction - currentPosition.getHeading(AngleUnit.DEGREES) - angleOffset),
-                COUNTS_PER_DEGREE * normalize(wantedH - currentPosition.getHeading(AngleUnit.DEGREES)), velocity);
+                COUNTS_PER_DEGREE * normalize(wantedH - currentPosition.getHeading(AngleUnit.DEGREES)));
         positionDriveDirection = direction;
         setWantedHeading(wantedH);
         doPositionHeadingCorrection = true;
@@ -128,14 +128,13 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     // Behavior: Overloads the setPositionDrive function to go to a specified location using odometry.
     // Parameters:
     //      - Pose2D wantedPosition: The wanted position (x, y, heading) of the robot.
-    //      - double velocity: How fast the robot will move to the wanted position, in counts/s
-    public void setPositionDrive(Pose2D wantedPosition, double velocity) {
+    public void setPositionDrive(Pose2D wantedPosition) {
         this.wantedPosition = wantedPosition;
         double dx = (this.wantedPosition.getX(DistanceUnit.INCH) - this.currentPosition.getX(DistanceUnit.INCH));
         double dy = (this.wantedPosition.getY(DistanceUnit.INCH) - this.currentPosition.getY(DistanceUnit.INCH));
         int counts = (int) Math.round(Math.hypot(dx * FORWARD_COUNTS_PER_INCH, dy * FORWARD_COUNTS_PER_INCH));
         double direction = Math.toDegrees(Math.atan2(dy, dx));
-        setPositionDriveCorrection(counts, direction, velocity, wantedPosition.getHeading(AngleUnit.DEGREES));
+        setPositionDriveCorrection(counts, direction, wantedPosition.getHeading(AngleUnit.DEGREES));
         positionDriveUsingOdometry = true;
     }
 
@@ -144,16 +143,15 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     //           will give less jitter, and a lower value will give more accuracy.
     // Parameters:
     //      - Pose2D[] path: The path for the robot to follow as an array of Pose2Ds.
-    //      - double velocity: How fast the robot should follow the path.
-    public void setPositionDrive(Pose2D[] path, double velocity, int initialPointIndex) {
+    public void setPositionDrive(Pose2D[] path, int initialPointIndex) {
         currentPath = path;
-        setPositionDrive(currentPath[initialPointIndex], velocity);
+        setPositionDrive(currentPath[initialPointIndex]);
         currentPoint = initialPointIndex;
     }
 
     // Behavior: Overloads setPositionDrive to default as 0 as the initial point.
-    public void setPositionDrive(Pose2D[] path, double velocity) {
-        setPositionDrive(path, velocity, 0);
+    public void setPositionDrive(Pose2D[] path) {
+        setPositionDrive(path, 0);
     }
 
     // Behavior: Sets the tolerance parameter for driving along a path.
