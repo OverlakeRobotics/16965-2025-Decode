@@ -125,7 +125,8 @@ public abstract class BaseTeleOp extends OpMode {
                 AngleUnit.DEGREES,
                 wantedHeading
             );
-            driveTrain.setPositionDrive(wantedPosition, velocity);
+            driveTrain.setVelocity((int) velocity);
+            driveTrain.setPositionDrive(wantedPosition);
         } else {
             double turn = -gamepad1.right_stick_x * velocity;
 
@@ -184,7 +185,7 @@ public abstract class BaseTeleOp extends OpMode {
 
         double intakeVelocity = intakeOn ? (intakeReversed ? -2800 : 2800) : 0;
 
-        if ( gamepad1.a) {
+        if (gamepad1.a) {
             turret.open();
             intakeVelocity = 0;
 

@@ -177,8 +177,9 @@ public abstract class BaseAuto extends OpMode {
         }
         driveTrain.setTolerance(tolerance);
         driveTrain.setPosition(startPose);
+        driveTrain.setVelocity(velocity);
         Arrays.sort(tags);
-        driveTrain.setPositionDrive(positions, velocity);
+        driveTrain.setPositionDrive(positions);
         turret.close();
     }
 
@@ -226,7 +227,7 @@ public abstract class BaseAuto extends OpMode {
                         if (currTag.value <= 0) break;
                         pauseTimeLeft = currTag.value;
                         pausedIndex = nextPointIndex;
-                        driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
+                        driveTrain.setPositionDrive(positions[nextPointIndex - 1]);
                         break;
                     case "intake":
                         if (currTag.value <= 0) {
@@ -261,7 +262,7 @@ public abstract class BaseAuto extends OpMode {
                         turret.open();
                         pauseTimeLeft = currTag.value;
                         pausedIndex = nextPointIndex;
-                        driveTrain.setPositionDrive(positions[nextPointIndex - 1], velocity);
+                        driveTrain.setPositionDrive(positions[nextPointIndex - 1]);
                         shooterTimer = shooterDelay;
                         isShooting = true;
                         break;
@@ -286,14 +287,14 @@ public abstract class BaseAuto extends OpMode {
 
             if (pauseTimeLeft <= 0) {
                 pauseTimeLeft = 0;
-                driveTrain.setPositionDrive(positions, velocity, pausedIndex);
+                driveTrain.setPositionDrive(positions, pausedIndex);
                 if (isShooting) {
                     turret.close();
                     intake.setVelocity(intakeVelocity);
                     isShooting = false;
                 }
             } else {
-                driveTrain.setPositionDrive(positions[pausedIndex - 1], velocity);
+                driveTrain.setPositionDrive(positions[pausedIndex - 1]);
             }
         }
     }
