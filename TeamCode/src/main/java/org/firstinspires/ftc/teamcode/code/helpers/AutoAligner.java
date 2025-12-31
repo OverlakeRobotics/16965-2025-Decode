@@ -144,6 +144,20 @@ public class AutoAligner {
         return Math.hypot(aprilX - pos.getX(DistanceUnit.INCH), aprilY - pos.getY(DistanceUnit.INCH));
     }
 
+    public void resetPinpointPositionFromLimelight() {
+        Pose2D pos = driveTrain.getPosition();
+        LLResult result = limelight.getLatestResult();
+        if (result.isValid()) {
+            List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult tag : aprilTags) {
+                if (tag.getFiducialId() == targetAprilID) {
+                    Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
+                    driveTrain.setPosition(new Pose2D(DistanceUnit.METER, -robotPose.x, -robotPose.y, AngleUnit.DEGREES, pos.getHeading(AngleUnit.DEGREES)));
+                }
+            }
+        }
+    }
+
     public double getRawTurretAutoAlignAngle() {
         Pose2D pos = driveTrain.getPosition();
         double turretAngle = turret.getTurretCurrentAngle();

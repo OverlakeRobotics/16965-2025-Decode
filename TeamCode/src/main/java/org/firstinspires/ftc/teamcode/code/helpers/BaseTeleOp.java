@@ -50,7 +50,7 @@ public abstract class BaseTeleOp extends OpMode {
     protected double shooterVelocity;
     protected double hoodAngle;
     protected double turretAngle;
-//    protected boolean autoTurret = true;
+    protected boolean autoTurret = true;
 
     protected abstract boolean isRedAlliance();
     protected abstract Pose2D[] getPresetPositions();
@@ -153,11 +153,11 @@ public abstract class BaseTeleOp extends OpMode {
             hoodAngle = autoAligner.getOptimalHoodAngle();
             shooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
         }
-        turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
+//        turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
 
-//        if (autoTurret) {
-//            turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
-//        }
+        if (autoTurret) {
+            turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
+        }
 
         // Gamepad 1 controls
         // Right Bumper: Far preset
@@ -175,7 +175,7 @@ public abstract class BaseTeleOp extends OpMode {
             intakeReversed = !intakeReversed;
         }
 
-        if (gamepad2.dpadRightWasPressed()) {
+        if (gamepad1.dpadRightWasPressed()) {
             autoShooter = false;
             shooterVelocity = 0;
         }
@@ -203,37 +203,80 @@ public abstract class BaseTeleOp extends OpMode {
             currentPreset = 1;
         }
 
-        // Gamepad 2 controls
+        // Gamepad 2 controls (only for backup in case of robot reset/pinpoint issues)
+
+        // LAUNCHER BACKUP
+        // Following four only work when autoShooter is off
         // Right Bumper: Turn up shooter velocity by 100
         // Left Bumper: Turn down shooter velocity by 100
         // D-Pad Up: Increase hood angle by 2 degrees (More direct, 90 is straight forward)
         // D-Pad Down: Decrease hood angle by 2 degrees (More parabolic, 0 is straight up)
-        if (gamepad2.rightBumperWasPressed()) {
-            shooterVelocity = Math.round(shooterVelocity / 100) * 100;
-            shooterVelocity += 100;
-        }
-        if (gamepad2.leftBumperWasPressed()) {
-            shooterVelocity = Math.round(shooterVelocity / 100) * 100;
-            shooterVelocity -= 100;
+
+        // TURRET BACKUP
+        // A: Toggle autoTurret
+        // Following three only work when autoTurret is off
+        // D-Pad Right: Increase turret angle by 5 degrees (CCW)
+        // D-Pad Left: Decrease turret angle by 5 degrees (CW)
+        // Y: Reset turret encoder to 0
+
+        // PINPOINT BACKUP
+        // B: Reset pinpoint position based on limelight
+        // X: Reset pinpoint heading to 0
+
+        if (!autoShooter) {
+            if (gamepad2.rightBumperWasPressed()) {
+                shooterVelocity = Math.round(shooterVelocity / 100) * 100;
+                shooterVelocity += 100;
+            }
+            if (gamepad2.leftBumperWasPressed()) {
+                shooterVelocity = Math.round(shooterVelocity / 100) * 100;
+                shooterVelocity -= 100;
+            }
+            if (gamepad2.dpadUpWasPressed()) {
+                hoodAngle += 2;
+            }
+            if (gamepad2.dpadDownWasPressed()) {
+                hoodAngle -= 2;
+            }
         }
 
-//        if (gamepad2.dpadUpWasPressed()) {
-//            hoodAngle += 2;
-//        }
-//        if (gamepad2.dpadDownWasPressed()) {
-//            hoodAngle -= 2;
-//        }
+        if (gamepad2.aWasPressed()) {
+            autoTurret = !autoTurret;
+        }
 
-//        if (gamepad2.dpad_left) {
-//            turretAngle += 5;
-//        }
-//        if (gamepad2.dpad_right) {
-//            turretAngle -= 5;
-//        }
-//        if (gamepad2.yWasPressed()) {
-//            turret.resetTurretEncoder();
-//            turretAngle = 0;
-//        }
+        if (!autoTurret) {
+            // Will need to check values for speed/precision
+            if (gamepad2.dpad_left) {
+                turretAngle += 5;
+            }
+            if (gamepad2.dpad_right) {
+                turretAngle -= 5;
+            }
+
+            if (gamepad2.yWasPressed()) {
+                turret.resetTurretEncoder();
+                turretAngle = 0;
+            }
+        }
+
+        if (gamepad2.bWasPressed()) {
+            autoAligner.resetPinpointPositionFromLimelight();
+        }
+        if (gamepad2.xWasPressed()) {
+            Pose2D pos = driveTrain.getPosition();
+            double x = pos.getX(DistanceUnit.INCH);
+            double y = pos.getY(DistanceUnit.INCH);
+            driveTrain.setPosition(
+                    new Pose2D(
+                            DistanceUnit.INCH,
+                            x,
+                            y,
+                            AngleUnit.DEGREES,
+                            0
+                    )
+            );
+        }
+
 
 
 //        if (gamepad2.aWasPressed()) {
