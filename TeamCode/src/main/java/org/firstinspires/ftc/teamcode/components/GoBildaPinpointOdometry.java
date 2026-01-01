@@ -1,5 +1,3 @@
-// Implementation of the OdometryModule interface for SparkFunOTOS sensor.
-
 package org.firstinspires.ftc.teamcode.components;
 
 
@@ -7,6 +5,8 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.system.OdometryModule;
 
+
+// Implementation of the OdometryModule interface for SparkFunOTOS sensor.
 public class GoBildaPinpointOdometry implements OdometryModule {
     private final GoBildaPinpointDriver pinpoint;
     private Pose2D position;

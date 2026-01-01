@@ -1,7 +1,5 @@
-// Implementation of the OdometryModule interface for SparkFunOTOS sensor.
-// TODO: Check if x and y are correct.
-
 package org.firstinspires.ftc.teamcode.components;
+
 
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -9,6 +7,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.system.OdometryModule;
 
+
+// Implementation of the OdometryModule interface for SparkFunOTOS sensor.
+// TODO: Check if x and y are correct.
 public class SparkFunOTOSOdometry implements OdometryModule {
     private final SparkFunOTOS sparkFunSensor;
     private SparkFunOTOS.Pose2D position;
@@ -18,8 +19,6 @@ public class SparkFunOTOSOdometry implements OdometryModule {
     private boolean doHeadingReset;
 
     public SparkFunOTOSOdometry(SparkFunOTOS sparkFunSensor) {
-//        sparkFunSensor.setLinearUnit(DistanceUnit.INCH);
-//        sparkFunSensor.setAngularUnit(AngleUnit.DEGREES);
         this.sparkFunSensor = sparkFunSensor;
 
         positionPriority = 5;

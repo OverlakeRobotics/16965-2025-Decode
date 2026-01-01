@@ -1,6 +1,5 @@
-// Implementation of the OdometryModule interface for the IMU.
-
 package org.firstinspires.ftc.teamcode.components;
+
 
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -9,6 +8,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.system.OdometryModule;
 
+
+// Implementation of the OdometryModule interface for the IMU.
 public class IMUOdometry implements OdometryModule {
     private final IMU imu;
     private double heading;

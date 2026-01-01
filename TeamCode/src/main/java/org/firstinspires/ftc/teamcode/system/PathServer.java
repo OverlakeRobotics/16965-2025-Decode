@@ -1,8 +1,7 @@
 package org.firstinspires.ftc.teamcode.system;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import fi.iki.elonen.NanoHTTPD;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -16,20 +15,22 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@Config
+
+// Server that runs on the robot to connect with the Overlake Robotics Path Planner and allow
+// path uploading.
 public class PathServer extends NanoHTTPD {
     private static final int PORT = 8099;
     private static final String JSON = "application/json";
 
     public static volatile double[][] RAW_POINTS = {{0, 0, 0}};
-    public static volatile double     VELOCITY_IN_S = 0.0;
-    public static volatile double     TOLERANCE_IN  = 0.0;
-    public static volatile String     ALLIANCE      = "unknown";
+    public static volatile double VELOCITY_IN_S = 0.0;
+    public static volatile double TOLERANCE_IN  = 0.0;
+    public static volatile String ALLIANCE = "unknown";
 
     private static volatile double ROBOT_X_IN  = 0.0;
     private static volatile double ROBOT_Y_IN  = 0.0;
     private static volatile double ROBOT_H_DEG = 0.0;
-    private static volatile long   ROBOT_TS_MS = 0L;
+    private static volatile long ROBOT_TS_MS = 0L;
 
     public static final class Tag {
         public final int index;
@@ -46,7 +47,7 @@ public class PathServer extends NanoHTTPD {
     private static volatile Tag[] TAGS = new Tag[0];
     private static volatile PathServer instance;
 
-    /** Starts the embedded HTTP server. */
+    // Starts the embedded HTTP server.
     public static void startServer() {
         if (instance != null) return;
         try {
@@ -57,7 +58,7 @@ public class PathServer extends NanoHTTPD {
         }
     }
 
-    /** Stops the embedded HTTP server. */
+    // Stops the embedded HTTP server.
     public static void stopServer() {
         PathServer s = instance;
         if (s == null) return;
@@ -66,7 +67,7 @@ public class PathServer extends NanoHTTPD {
         System.out.println("PathServer stopped.");
     }
 
-    /** Returns the uploaded path points as Pose2D waypoints, excluding the start pose. */
+    // Returns the uploaded path points as Pose2D waypoints, excluding the start pose.
     public static Pose2D[] getPath() {
         double[][] pts = RAW_POINTS;
         if (pts == null || pts.length <= 1) return new Pose2D[0];
@@ -81,7 +82,7 @@ public class PathServer extends NanoHTTPD {
         return poses;
     }
 
-    /** Returns the current start pose (index 0 of RAW_POINTS), or (0,0,0) if missing. */
+    // Returns the current start pose (index 0 of RAW_POINTS), or (0,0,0) if missing.
     public static Pose2D getStartPose() {
         double[][] pts = RAW_POINTS;
         if (pts == null || pts.length == 0) {
@@ -91,17 +92,17 @@ public class PathServer extends NanoHTTPD {
         return new Pose2D(DistanceUnit.INCH, s[0], s[1], AngleUnit.DEGREES, s[2]);
     }
 
-    /** Returns the configured path velocity. */
+    // Returns the configured path velocity.
     public static double getVelocity() {
         return VELOCITY_IN_S;
     }
 
-    /** Returns the configured path tolerance. */
+    // Returns the configured path tolerance.
     public static double getTolerance() {
         return TOLERANCE_IN;
     }
 
-    /** Returns a snapshot of the current tags array. */
+    // Returns a snapshot of the current tags array.
     public static Tag[] getTags() {
         Tag[] src = TAGS;
         Tag[] copy = new Tag[src.length];
@@ -109,12 +110,12 @@ public class PathServer extends NanoHTTPD {
         return copy;
     }
 
-    /** Returns the currently selected alliance string. */
+    // Returns the currently selected alliance string.
     public static String getAlliance() {
         return ALLIANCE;
     }
 
-    /** Updates the robot pose reported by the /pose endpoint. */
+    // Updates the robot pose reported by the /pose endpoint.
     public static void setRobotPose(Pose2D pose) {
         ROBOT_X_IN  = pose.getX(DistanceUnit.INCH);
         ROBOT_Y_IN  = pose.getY(DistanceUnit.INCH);
@@ -122,7 +123,7 @@ public class PathServer extends NanoHTTPD {
         ROBOT_TS_MS = System.currentTimeMillis();
     }
 
-    /** Handles HTTP requests for points upload and telemetry/config reads. */
+    // Handles HTTP requests for points upload and telemetry/config reads.
     @Override
     public Response serve(IHTTPSession session) {
         try {
@@ -187,13 +188,13 @@ public class PathServer extends NanoHTTPD {
         }
     }
 
-    /** Creates and starts the NanoHTTPD server instance. */
+    // Creates and starts the NanoHTTPD server instance.
     private PathServer() throws IOException {
         super(PORT);
         start(SOCKET_READ_TIMEOUT, false);
     }
 
-    /** Parses the request body as JSON and returns the root object. */
+    // Parses the request body as JSON and returns the root object.
     private static JSONObject readJsonBody(IHTTPSession session) throws IOException, ResponseException, JSONException {
         Map<String, String> files = new HashMap<>();
         session.parseBody(files);
@@ -206,7 +207,7 @@ public class PathServer extends NanoHTTPD {
         return new JSONObject(body);
     }
 
-    /** Applies the uploaded JSON payload to RAW_POINTS/config fields. */
+    // Applies the uploaded JSON payload to RAW_POINTS/config fields.
     private static void applyPayload(JSONObject obj) throws JSONException {
         JSONArray start = obj.optJSONArray("start");
         double sx = (start != null) ? start.optDouble(0, 0.0) : 0.0;
@@ -252,7 +253,7 @@ public class PathServer extends NanoHTTPD {
         TAGS = out;
     }
 
-    /** Converts the tag array into a JSON array for the /config endpoint. */
+    // Converts the tag array into a JSON array for the /config endpoint.
     private static JSONArray tagsToJson(Tag[] tags) throws JSONException {
         JSONArray arr = new JSONArray();
         for (Tag t : tags) {
@@ -264,7 +265,7 @@ public class PathServer extends NanoHTTPD {
         return arr;
     }
 
-    /** Builds the CORS response for browser preflight requests. */
+    // Builds the CORS response for browser preflight requests.
     private Response preflightResponse() {
         Response r = newFixedLengthResponse(Response.Status.NO_CONTENT, "text/plain", "");
         r.addHeader("Access-Control-Allow-Origin", "*");
@@ -275,7 +276,7 @@ public class PathServer extends NanoHTTPD {
         return r;
     }
 
-    /** Adds CORS headers to a normal response. */
+    // Adds CORS headers to a normal response.
     private Response withCors(Response r) {
         r.addHeader("Access-Control-Allow-Origin", "*");
         r.addHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");

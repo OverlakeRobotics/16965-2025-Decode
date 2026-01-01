@@ -1,12 +1,5 @@
-// Extension of the BasicHolonomicDrivetrain class adding the ability to use odometry. This adds
-// features like heading correction, turning to a specific angle, field centric driving, moving to
-// specific positions, and driving along a predefined path.
-// Coordinate system used by this class: Positive x is forward, positive y is left, and
-// positive heading is turning to the left.
-
 package org.firstinspires.ftc.teamcode.system;
 
-import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -14,8 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
 
+
+// Extension of the BasicHolonomicDrivetrain class adding the ability to use odometry. This adds
+// features like heading correction, turning to a specific angle, field centric driving, moving to
+// specific positions, and driving along a predefined path.
+// Coordinate system used by this class: Positive x is forward, positive y is left, and
+// positive heading is turning to the left.
 @Config
 public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     private static final double P_GAIN = 50;

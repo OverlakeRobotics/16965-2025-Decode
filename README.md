@@ -15,7 +15,7 @@ planner interface you can use to design your autonomous with zero code.
 ## Quick Start
 1. Fork this repository and clone that fork to your computer.
 2. Upload the code to the robot (Guide to do this with ADB: https://ftc-tech-toolbox.vercel.app/docs/Getting%20Started/wd).
-3. Run some of the example OpModes and look through them.
+3. Run some of the example OpModes and look through them. (Make sure to remove the @Disabled in the code for the ones you want to run)
 4. Optional: Run the tuning programs to get better autonomous movement (Requires an odometry system)
 5. Make your own OpModes using the movement library!
 

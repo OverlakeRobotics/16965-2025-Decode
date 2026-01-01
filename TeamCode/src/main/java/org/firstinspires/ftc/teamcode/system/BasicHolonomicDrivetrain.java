@@ -1,23 +1,22 @@
-// This class contains basic movement for robots with holonomic movement (Mecanum or Omni)
-// It includes functions that set velocity to the motors, set target positions to the motors, and
-// stop the robot.
-// Positive heading is to the left, negative heading is to the right.
-
 package org.firstinspires.ftc.teamcode.system;
 
-import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+
+// This class contains basic movement for robots with holonomic movement (Mecanum or Omni)
+// It includes functions that set velocity to the motors, set target positions to the motors, and
+// stop the robot.
+// Positive heading is to the left, negative heading is to the right.
 @Config
 public class BasicHolonomicDrivetrain {
     public static final double MAX_STOP_VELOCITY = 1e-2;
     public static final int MAX_VELOCITY = 2800;
-    public static final double STRAFE_TO_FORWARD_RATIO = 1.024;
     public static final double FORWARD_COUNTS_PER_INCH = 32.49;
+    public static final double STRAFE_COUNTS_PER_INCH = 33.27;
+    public static final double STRAFE_TO_FORWARD_RATIO = STRAFE_COUNTS_PER_INCH / FORWARD_COUNTS_PER_INCH;
     private final DcMotorEx backLeft;
     private final DcMotorEx backRight;
     private final DcMotorEx frontLeft;

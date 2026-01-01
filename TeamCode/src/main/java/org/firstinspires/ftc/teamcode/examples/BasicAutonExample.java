@@ -5,11 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
 
+
 // Example that drives 2000 counts forward then 2000 counts to the left.
+@Disabled
 @Config
 @Autonomous(name = "Basic Auton Example", group = "Autonomous")
 @Disabled

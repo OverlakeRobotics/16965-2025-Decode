@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode.examples;
+package org.firstinspires.ftc.teamcode.examples.tuners;
 
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
@@ -15,14 +16,15 @@ import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
 import org.firstinspires.ftc.teamcode.system.OdometryModule;
 
 
-// This class uses a GobildaPinpoint odometry as a baseline to tune the FORWARD_COUNTS_PER_INCH
-// constant automatically. It's not required to tune these, but it will make driving better.
-// FORWARD_COUNTS_PER_INCH is located in the BasicHolonomicDrivetrain class and can be set there
-// after running this opmode and getting the value. Before running this tuner class, make sure you
+// This class uses a GobildaPinpoint odometry as a baseline to tune the STRAFE_COUNTS_PER_INCH
+// constant automatically. It's not required to tune this, but it will make driving better.
+// STRAFE_COUNTS_PER_INCH is located in the BasicHolonomicDrivetrain class and can be set there
+// after running this OpMode and getting the value. Before running this tuner class, make sure you
 // have the correct offsets for your x and y offsets for the pinpoint.
+@Disabled
 @Config
-@Autonomous(name = "Forward Counts Tuner", group = "Autonomous")
-public class ForwardCountsTuner extends OpMode {
+@Autonomous(name = "Strafe Counts Tuner", group = "Autonomous")
+public class StrafeCountsTuner extends OpMode {
     // Change to your actual offsets. See GoBildaPinpointDriver.setOffsets() for details on measuring offsets.
     public double yOffset = -168.0;
     public double xOffset = -84.0;
@@ -32,7 +34,7 @@ public class ForwardCountsTuner extends OpMode {
     private BasicHolonomicDrivetrain driveTrain;
     private OdometryModule odometry;
 
-    public double forwardCountsPerInch;
+    public double strafeCountsPerInch;
 
     public static int driveDist = 2500;
 
@@ -59,15 +61,15 @@ public class ForwardCountsTuner extends OpMode {
         driveTrain.drive();
         odometry.updatePosition();
 
-        if (!driveTrain.isDriving() && forwardCountsPerInch == 0) {
+        if (!driveTrain.isDriving() && strafeCountsPerInch == 0) {
             Pose2D robotPos = odometry.getPosition();
             double distDrivenInches = Math.hypot(robotPos.getX(DistanceUnit.INCH), robotPos.getY(DistanceUnit.INCH));
-            forwardCountsPerInch = driveDist / distDrivenInches;
+            strafeCountsPerInch = driveDist / distDrivenInches;
         }
 
-        if (forwardCountsPerInch != 0) {
-            telemetry.addData("Forward Counts Per Inch", forwardCountsPerInch);
-            Log.d("Forward Counts Per Inch", "Forward Counts Per Inch: " + forwardCountsPerInch);
+        if (strafeCountsPerInch != 0) {
+            telemetry.addData("Strafe Counts Per Inch", strafeCountsPerInch);
+            Log.d("Strafe Counts Per Inch", "Strafe Counts Per Inch: " + strafeCountsPerInch);
         }
 
         telemetry.update();
@@ -75,6 +77,6 @@ public class ForwardCountsTuner extends OpMode {
 
     @Override
     public void start() {
-        driveTrain.setPositionDrive(driveDist, 0);
+        driveTrain.setPositionDrive(driveDist, 90);
     }
 }

@@ -1,8 +1,5 @@
-// Implementation of the OdometryModule interface for April Tags.
-
 package org.firstinspires.ftc.teamcode.components;
 
-import android.util.Log;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -12,6 +9,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
+
+// Implementation of the OdometryModule interface for April Tags.
 public class AprilTagOdometry implements OdometryModule {
     private static final double MAX_ACCURATE_DISTANCE = 40;
     private final AprilTagProcessor aprilTagProcessor;

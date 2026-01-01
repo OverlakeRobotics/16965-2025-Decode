@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.examples;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 // This OpMode shows a simple example of driving the bot along a set path of points using the
 // driveTrain.setPositionDrive() method while passing in an array of Pose2Ds.
+@Disabled
 @Config
 @Autonomous(name = "Odometry Auton Example", group = "Autonomous")
 public class OdometryAutonExample extends OpMode {
