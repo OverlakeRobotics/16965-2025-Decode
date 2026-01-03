@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.system;
 
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+
 import fi.iki.elonen.NanoHTTPD;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -18,6 +20,7 @@ import java.util.Map;
 
 // Server that runs on the robot to connect with the Overlake Robotics Path Planner and allow
 // path uploading.
+@Config
 public class PathServer extends NanoHTTPD {
     private static final int PORT = 8099;
     private static final String JSON = "application/json";
@@ -32,7 +35,7 @@ public class PathServer extends NanoHTTPD {
     private static volatile double ROBOT_H_DEG = 0.0;
     private static volatile long ROBOT_TS_MS = 0L;
 
-    public static final class Tag {
+    public static final class Tag implements Comparable<Tag> {
         public final int index;
         public final String name;
         public final double value;
@@ -42,6 +45,8 @@ public class PathServer extends NanoHTTPD {
             this.value = value;
             this.index = index;
         }
+
+        @Override public int compareTo(Tag other) { return this.index - other.index; }
     }
 
     private static volatile Tag[] TAGS = new Tag[0];
