@@ -27,11 +27,11 @@ public class PathServer extends NanoHTTPD {
 
     public static volatile double[][] RAW_POINTS = {{0, 0, 0}};
     public static volatile double VELOCITY_IN_S = 0.0;
-    public static volatile double TOLERANCE_IN  = 0.0;
+    public static volatile double TOLERANCE_IN = 0.0;
     public static volatile String ALLIANCE = "unknown";
 
-    private static volatile double ROBOT_X_IN  = 0.0;
-    private static volatile double ROBOT_Y_IN  = 0.0;
+    private static volatile double ROBOT_X_IN = 0.0;
+    private static volatile double ROBOT_Y_IN = 0.0;
     private static volatile double ROBOT_H_DEG = 0.0;
     private static volatile long ROBOT_TS_MS = 0L;
 

@@ -193,6 +193,18 @@ public abstract class BaseAuto extends OpMode {
         turret.setShooterVelocity(wantedShooterVelocity);
     }
 
+    public void shoot(int pointIndex) {
+        turret.open();
+        autoAim(pointIndex);
+        double shootingIntakeVelocity = 0;
+
+        if (shooterTimer <= 0 && Math.abs(turret.getShooterVelocity() - wantedShooterVelocity) <= shooterTolerance) {
+            shootingIntakeVelocity = 2800;
+        }
+
+        intake.setVelocity(shootingIntakeVelocity);
+    }
+
     @Override
     public void loop() {
         driveTrain.updatePosition();
@@ -214,6 +226,10 @@ public abstract class BaseAuto extends OpMode {
                 autoAim(nextPointIndex);
             } else {
                 autoAlignIndex = -1;
+            }
+
+            if (isShooting) {
+                shoot(nextPointIndex);
             }
 
             while (lastTagIndex < tags.length && tags[lastTagIndex].index <= nextPointIndex) {
@@ -267,20 +283,23 @@ public abstract class BaseAuto extends OpMode {
                         isShooting = true;
                         break;
                     }
+                    case "startLaunch": {
+                        turret.open();
+                        isShooting = true;
+                        break;
+                    }
+                    case "endLaunch": {
+                        turret.close();
+                        intake.setVelocity(intakeVelocity);
+                        isShooting = false;
+                        break;
+                    }
                 }
                 lastTagIndex++;
             }
         } else {
             if (isShooting) {
-                turret.open();
-                autoAim(pausedIndex - 1);
-                double shootingIntakeVelocity = 0;
-
-                if (shooterTimer <= 0 && Math.abs(turret.getShooterVelocity() - wantedShooterVelocity) <= shooterTolerance) {
-                    shootingIntakeVelocity = 2800;
-                }
-
-                intake.setVelocity(shootingIntakeVelocity);
+                shoot(pausedIndex - 1);
             }
             pauseTimeLeft -= dt;
             shooterTimer -= dt;
