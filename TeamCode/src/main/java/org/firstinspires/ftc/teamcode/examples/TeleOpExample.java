@@ -14,7 +14,6 @@ import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
 @Disabled
 @Config
 @TeleOp(name = "TeleOp Example", group = "TeleOp")
-@Disabled
 public class TeleOpExample extends OpMode {
     public static double velocity = 2800;
     private BasicHolonomicDrivetrain driveTrain;

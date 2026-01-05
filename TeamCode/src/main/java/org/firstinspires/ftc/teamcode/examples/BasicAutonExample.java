@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
 @Disabled
 @Config
 @Autonomous(name = "Basic Auton Example", group = "Autonomous")
-@Disabled
 public class BasicAutonExample extends OpMode {
 
     private BasicHolonomicDrivetrain driveTrain;
