@@ -1,12 +1,13 @@
+// Implementation of the OdometryModule interface for SparkFunOTOS sensor.
+
 package org.firstinspires.ftc.teamcode.components;
 
 
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.system.OdometryModule;
 
-
-// Implementation of the OdometryModule interface for SparkFunOTOS sensor.
 public class GoBildaPinpointOdometry implements OdometryModule {
     private final GoBildaPinpointDriver pinpoint;
     private Pose2D position;
@@ -17,8 +18,8 @@ public class GoBildaPinpointOdometry implements OdometryModule {
     public GoBildaPinpointOdometry(GoBildaPinpointDriver pinpoint) {
         this.pinpoint = pinpoint;
 
-        positionPriority = 3;
-        headingPriority = 2;
+        positionPriority = 0;
+        headingPriority = 0;
         doPositionReset = true;
         doHeadingReset = false;
     }
@@ -78,5 +79,17 @@ public class GoBildaPinpointOdometry implements OdometryModule {
 
     public void reset() {
         pinpoint.resetPosAndIMU();
+    }
+
+    public double getVelocity() {
+        return Math.hypot(pinpoint.getVelX(DistanceUnit.INCH), pinpoint.getVelY(DistanceUnit.INCH));
+    }
+
+    public double getXVelocity() {
+        return pinpoint.getVelX(DistanceUnit.INCH);
+    }
+
+    public double getYVelocity() {
+        return pinpoint.getVelY(DistanceUnit.INCH);
     }
 }
