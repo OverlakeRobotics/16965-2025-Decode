@@ -30,9 +30,26 @@ public abstract class BaseTeleOp extends OpMode {
 
     public static double ADJUSTMENT_FACTOR = 0.021;
 
-    protected Pose2D[] presetPositions;
+    protected static final class Preset {
+        public final Pose2D[] poses;
+        public final boolean useAutoAlignHeading;
+
+        public Preset(Pose2D pose, boolean useAutoAlignHeading) {
+            this(new Pose2D[]{pose}, useAutoAlignHeading);
+        }
+
+        public Preset(Pose2D[] poses, boolean useAutoAlignHeading) {
+            this.poses = poses;
+            this.useAutoAlignHeading = useAutoAlignHeading;
+        }
+    }
+
+    protected Preset[] presetPositions;
 
     public int currentPreset = -1;
+    private int activePreset = -1;
+    private int presetStepIndex = 0;
+    private boolean presetJustSelected = false;
 
     public double velocity = 2800;
 
@@ -53,7 +70,13 @@ public abstract class BaseTeleOp extends OpMode {
     protected boolean autoTurret = true;
 
     protected abstract boolean isRedAlliance();
-    protected abstract Pose2D[] getPresetPositions();
+    protected Preset[] getPresetPositions() {
+        double ySign = isRedAlliance() ? -1.0 : 1.0;
+        return new Preset[]{
+                new Preset(new Pose2D(DistanceUnit.INCH, -54, 15 * ySign, AngleUnit.DEGREES, 0), true),
+                new Preset(new Pose2D(DistanceUnit.INCH, 15, 15 * ySign, AngleUnit.DEGREES, 0), false),
+        };
+    }
 
     @Override
     public void init() {
@@ -118,16 +141,33 @@ public abstract class BaseTeleOp extends OpMode {
         double turretAdjustment = 0;
 
         if (currentPreset >= 0) {
+            if (currentPreset != activePreset) {
+                activePreset = currentPreset;
+                presetStepIndex = 0;
+                presetJustSelected = true;
+            }
+
+            Preset preset = presetPositions[currentPreset];
+            if (!presetJustSelected && presetStepIndex < preset.poses.length - 1 && !driveTrain.isDriving()) {
+                presetStepIndex++;
+            }
+            presetJustSelected = false;
+
+            Pose2D presetPose = preset.poses[presetStepIndex];
+            double targetHeading = preset.useAutoAlignHeading ? wantedHeading : presetPose.getHeading(AngleUnit.DEGREES);
             Pose2D wantedPosition = new Pose2D(
                 DistanceUnit.INCH,
-                presetPositions[currentPreset].getX(DistanceUnit.INCH),
-                presetPositions[currentPreset].getY(DistanceUnit.INCH),
+                presetPose.getX(DistanceUnit.INCH),
+                presetPose.getY(DistanceUnit.INCH),
                 AngleUnit.DEGREES,
-                wantedHeading
+                targetHeading
             );
             driveTrain.setVelocity((int) velocity);
             driveTrain.setPositionDrive(wantedPosition);
         } else {
+            activePreset = -1;
+            presetStepIndex = 0;
+            presetJustSelected = false;
             double turn = -gamepad1.right_stick_x * velocity;
 
             if (gamepad1.y) {
