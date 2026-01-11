@@ -90,21 +90,43 @@ public abstract class BaseAuto extends OpMode {
         alliance = root.optString("alliance", alliance);
         alliance = alliance.trim().toLowerCase();
 
-        // Start pose
-        JSONObject s = root.getJSONObject("start");
-        double sx = s.getDouble("x");
-        double sy = s.getDouble("y");
-        double sh = s.optDouble("h", 0);
+        // Start pose (support object or array formats)
+        double sx = 0;
+        double sy = 0;
+        double sh = 0;
+        Object startObj = root.opt("start");
+        if (startObj instanceof JSONArray) {
+            JSONArray s = (JSONArray) startObj;
+            sx = s.optDouble(0, 0);
+            sy = s.optDouble(1, 0);
+            sh = s.optDouble(2, 0);
+        } else if (startObj instanceof JSONObject) {
+            JSONObject s = (JSONObject) startObj;
+            sx = s.optDouble("x", 0);
+            sy = s.optDouble("y", 0);
+            sh = s.optDouble("h", 0);
+        }
         startPose = new Pose2D(DistanceUnit.INCH, sx, sy, AngleUnit.DEGREES, sh);
 
         // Waypoints -> positions array
         JSONArray pts = root.getJSONArray("points");
         positions = new Pose2D[pts.length()];
         for (int i = 0; i < pts.length(); i++) {
-            JSONObject p = pts.getJSONObject(i);
-            double x = p.getDouble("x");
-            double y = p.getDouble("y");
-            double h = p.optDouble("h", 0);
+            Object pObj = pts.get(i);
+            double x = 0;
+            double y = 0;
+            double h = 0;
+            if (pObj instanceof JSONArray) {
+                JSONArray p = (JSONArray) pObj;
+                x = p.optDouble(0, 0);
+                y = p.optDouble(1, 0);
+                h = p.optDouble(2, 0);
+            } else if (pObj instanceof JSONObject) {
+                JSONObject p = (JSONObject) pObj;
+                x = p.optDouble("x", 0);
+                y = p.optDouble("y", 0);
+                h = p.optDouble("h", 0);
+            }
             positions[i] = new Pose2D(DistanceUnit.INCH, x, y, AngleUnit.DEGREES, h);
         }
 
