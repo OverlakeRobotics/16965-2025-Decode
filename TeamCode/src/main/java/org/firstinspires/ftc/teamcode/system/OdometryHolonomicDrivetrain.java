@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     private static final double P_GAIN = 50;
     private static final double MIN_DIST_TO_STOP = 0.5;
-    private static final double COUNTS_PER_DEGREE = 10;
+    private static final double COUNTS_PER_DEGREE = 7.39179;
     private static final double MIN_ANGLE_DIF_TO_STOP = 1;
     private double pathTolerance = 4;
     private boolean doPositionHeadingCorrection;

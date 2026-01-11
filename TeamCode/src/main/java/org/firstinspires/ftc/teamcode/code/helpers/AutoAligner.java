@@ -31,24 +31,30 @@ public class AutoAligner {
     public static double aprilAlignOffset = 0;
     public static double kSlipTurretRotationConstant = 0.01;
     public static double autoAlignBuffer = 5; // degrees
-    public static double angleOffsetMult = 1;
+    public static double randomMultiplier = 1;
+    public static double randomMultiplierPerp = 1;
 
     public static double maxShooterVelocity = 2800;
     public static double goalX;
     public static double goalY;
-    public static double redGoalX = 70;
-    public static double redGoalY = -70;
-    public static double blueGoalX = 70;
-    public static double blueGoalY = 70;
+    public static double redGoalX = 72;
+    public static double redGoalY = -72;
+    public static double blueGoalX = 72;
+    public static double blueGoalY = 72;
     public static double aprilX;
     public static double aprilY;
-    public static double goalDZ = 28;
+    public static double goalDZ = 28 + 3;
+
+    public static double launchDelay = 0;
     public double angleOffset = 0;
     private int targetAprilID;
     private int sideFlipMultiplier;
     private final OdometryHolonomicDrivetrain driveTrain;
     private final Turret turret;
     private final Limelight3A limelight;
+
+    public double lastVelPar;
+    public double lastVelPerp;
 
     // 1. kSlip, 2. hoodAngle, 3.
     public static class PointValues {
@@ -269,11 +275,12 @@ public class AutoAligner {
         java.util.function.DoubleUnaryOperator f = (t) -> {
             if (t <= 0) return Double.NaN;
 
-            double V = (z + 0.5 * g * t * t) / (t * cosT);
-            double A = V * sinT;
-
-            double term = (d / t) - velPar;
-            return (A * A) - (velPerp * velPerp) - (term * term);
+//            double V = (z + 0.5 * g * t * t) / (t * cosT);
+//            double A = V * sinT;
+//
+//            double term = (d / t) - velPar;
+//            return (A * A) - (velPerp * velPerp) - (term * term);
+            return t * (Math.cos(thetaRad) / Math.sin(thetaRad)) * Math.hypot(velPerp, (d / t) - velPar) - (g * t * t / 2) - z;
         };
 
         // Log-spaced scan to find all sign-change brackets
@@ -304,8 +311,8 @@ public class AutoAligner {
 
         // Bisection refine each bracket
         // keep the valid root with smallest required V
-        double bestT = Double.NaN;
-        double bestV = Double.POSITIVE_INFINITY;
+        double bestT = Double.POSITIVE_INFINITY;
+//        double bestV = Double.POSITIVE_INFINITY;
 
         for (double[] br : brackets) {
             double rootT = (br[0] == br[1]) ? br[0] : bisectRoot(f, br[0], br[1], 1e-6, 80);
@@ -321,8 +328,8 @@ public class AutoAligner {
             if (Math.abs(velPerp) > Math.abs(A) + 1e-6) continue;
 
             // Choose the root that minimizes required speed V
-            if (V < bestV) {
-                bestV = V;
+            if (rootT < bestT) {
+//                bestV = V;
                 bestT = rootT;
             }
         }
@@ -373,12 +380,12 @@ public class AutoAligner {
 
         Pose2D pos = driveTrain.getPosition();
 
-        double dx = goalX - pos.getX(DistanceUnit.INCH);
-        double dy = goalY - pos.getY(DistanceUnit.INCH);
-        double dist = Math.hypot(dx, dy);
-
         double vx = driveTrain.getXVelocity();
         double vy = driveTrain.getYVelocity();
+
+        double dx = goalX - pos.getX(DistanceUnit.INCH) + vx * launchDelay;
+        double dy = goalY - pos.getY(DistanceUnit.INCH) + vy * launchDelay;
+        double dist = Math.hypot(dx, dy);
 
         // towards/away from goal
         double velPar = 0;
@@ -396,12 +403,15 @@ public class AutoAligner {
             Log.d("Move Launch", "velPerp: " + velPerp);
         }
 
+        lastVelPar = velPar;
+        lastVelPerp = velPerp;
+
         double t = solveTimeForShot(
                 horizontalDist,
                 goalDZ,
                 theta,
-                velPar,
-                velPerp,
+                velPar * randomMultiplier,
+                velPerp * randomMultiplierPerp,
                 g,
                 0.02,
                 4.0
@@ -412,7 +422,20 @@ public class AutoAligner {
         double v = (goalDZ + (g * t * t) / 2) / (t * Math.cos(theta));
         Log.d("Move Launch", "Wanted Exit Velocity: " + v);
 
-        angleOffset = Math.atan2(-velPerp, (horizontalDist / t) - velPar);
+        double t_test = solveTimeForShot(
+                horizontalDist,
+                goalDZ,
+                theta,
+                0,
+                0,
+                g,
+                0.02,
+                4.0
+        );
+        double v_test = (goalDZ + (g * t_test * t_test) / 2) / (t_test * Math.cos(theta));
+        double tps_test = (v_test * 60) / (2 * Math.PI * rhinoWheelRadius * adjustedKSlip) * motorTicksPerRev / 60;
+
+        angleOffset = Math.toDegrees(Math.atan2(-velPerp, (horizontalDist / t) - velPar));
         Log.d("Move Launch", "Angle Offset: " + angleOffset);
 
         // Calculate RPM from linear velocity
@@ -421,8 +444,9 @@ public class AutoAligner {
         // TODO: Check ticks/sec calculation
         double rawTPS = rpm * motorTicksPerRev / 60;
         if (rawTPS > maxShooterVelocity) {
-            Log.d("Move Launch", "raw vel: " + rawTPS);
+            Log.d("Shooter Velocity", "raw vel: " + rawTPS);
         }
+        Log.d("Shooter Velocity", "Wanted: " + Math.round(rawTPS) + "WantedStationary: " + Math.round(tps_test) + "Actual: " + turret.getShooterVelocity() + "Diff: " + Math.round(rawTPS - tps_test) + "AccDiff: " + Math.round(rawTPS - turret.getShooterVelocity()) + "Power: " + turret.getShooterPower());
         return Range.clip(rpm * motorTicksPerRev / 60, 0, maxShooterVelocity);
     }
 

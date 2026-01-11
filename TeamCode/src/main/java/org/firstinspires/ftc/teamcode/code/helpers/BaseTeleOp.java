@@ -27,8 +27,11 @@ public abstract class BaseTeleOp extends OpMode {
     public static final double yOffset = -156.0; // -168.0 // mm
     public static final double xOffset = 72.0; // -84.0 // mm
     public static double shooterTolerance = 80;
+    public static double turretTolerance = 5;
 
-    public static double ADJUSTMENT_FACTOR = 0.021;
+    public static double hoodAngleVelScale = 0.5;
+
+    public static double ADJUSTMENT_FACTOR = 0.021; //0.021;
 
     protected static final class Preset {
         public final Pose2D[] poses;
@@ -125,12 +128,14 @@ public abstract class BaseTeleOp extends OpMode {
         PathServer.setRobotPose(currentPos);
         autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
 
+        Log.d("Turret Error", "Turret Error: " + (turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()));
+
         telemetry.addData("Position", "X: %.2f, Y: %.2f, H: %.2f",
                 currentPos.getX(DistanceUnit.INCH),
                 currentPos.getY(DistanceUnit.INCH),
                 currentPos.getHeading(AngleUnit.DEGREES));
 
-        // Use AutoAligner to get wanted heading and distanceb
+        // Use AutoAligner to get wanted heading and distance
         double wantedHeading = autoAligner.getDrivetrainAutoAlignAngle();
 
         if (currentPreset >= 0 && (Math.abs(gamepad1.left_stick_x) > 0.001 || Math.abs(gamepad1.left_stick_y) > 0.001 || Math.abs(gamepad1.right_stick_x) > 0.001)) {
@@ -190,7 +195,8 @@ public abstract class BaseTeleOp extends OpMode {
 
         if (autoShooter) {
             // Use AutoAligner methods to calculate shooter angle and velocity
-            hoodAngle = autoAligner.getOptimalHoodAngle();
+            hoodAngle = autoAligner.getOptimalHoodAngle() - autoAligner.lastVelPar * hoodAngleVelScale;
+            hoodAngle = Range.clip(hoodAngle, turret.minHoodAngle, turret.maxHoodAngle);
             shooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
         }
 //        turretAngle = autoAligner.getTurretAutoAlignAngle() + turretAdjustment;
@@ -226,10 +232,11 @@ public abstract class BaseTeleOp extends OpMode {
         double intakeVelocity = intakeOn ? (intakeReversed ? -2800 : 2800) : 0;
 
         if (gamepad1.a) {
+            autoAligner.resetPinpointPositionFromLimelight();
             turret.open();
             intakeVelocity = 0;
 
-            if (Math.abs(turret.getShooterVelocity() - shooterVelocity) <= shooterTolerance) {
+            if (Math.abs(turret.getShooterVelocity() - shooterVelocity) <= shooterTolerance && (Math.abs(turret.getTurretTargetAngle() - turret.getTurretCurrentAngle())) <= turretTolerance) {
                 intakeVelocity = 2800;
             }
         } else {

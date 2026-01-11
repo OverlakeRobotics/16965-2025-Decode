@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.system;
 
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 
 // This class contains basic movement for robots with holonomic movement (Mecanum or Omni)
@@ -14,8 +17,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class BasicHolonomicDrivetrain {
     public static final double MAX_STOP_VELOCITY = 1e-2;
     public static final int MAX_VELOCITY = 2800;
-    public static final double FORWARD_COUNTS_PER_INCH = 32.49;
-    public static final double STRAFE_COUNTS_PER_INCH = 33.27;
+    public static final double FORWARD_COUNTS_PER_INCH = 29.77497; // 32.49;
+    public static final double STRAFE_COUNTS_PER_INCH = 33.153818; // 33.27;
     public static final double STRAFE_TO_FORWARD_RATIO = STRAFE_COUNTS_PER_INCH / FORWARD_COUNTS_PER_INCH;
     private final DcMotorEx backLeft;
     private final DcMotorEx backRight;
@@ -54,17 +57,32 @@ public class BasicHolonomicDrivetrain {
         currentDriveState = DriveState.STOPPED;
     }
 
-    // Behavior: Sets the PIDF coefficients for the drivetrain motors.
+    // Behavior: Sets the velocity PIDF coefficients for the drivetrain motors.
     // Parameters:
     //      - double p: The proportional term.
     //      - double i: The integral term.
     //      - double d: The derivative term.
-    //      - double f: The feedback term.
-    public void setPIDFCoefficients(double p, double i, double d, double f) {
+    //      - double f: The feedforward term.
+    public void setVelocityPIDFCoefficients(double p, double i, double d, double f) {
         backLeft.setVelocityPIDFCoefficients(p, i, d, f);
         backRight.setVelocityPIDFCoefficients(p, i, d, f);
         frontLeft.setVelocityPIDFCoefficients(p, i, d, f);
         frontRight.setVelocityPIDFCoefficients(p, i, d, f);
+    }
+
+    // Behavior: Sets the positional PIDF coefficients for the drivetrain motors, which is only used
+    //           for autonomous movements.
+    // Parameters:
+    //      - double p: The proportional term.
+    //      - double i: The integral term.
+    //      - double d: The derivative term.
+    //      - double f: The feedforward term.
+    public void setPIDFCoefficients(double p, double i, double d, double f) {
+        PIDFCoefficients coefficients = new PIDFCoefficients(p, i, d, f);
+        backLeft.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, coefficients);
+        backRight.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, coefficients);
+        frontLeft.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, coefficients);
+        frontRight.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, coefficients);
     }
 
     // Behavior: Sets the velocity of the drive motors to the given velocities.

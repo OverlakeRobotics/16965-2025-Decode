@@ -23,7 +23,7 @@ public class Shooter {
     public Shooter(DcMotorEx shooterMotor1, DcMotorEx shooterMotor2, Servo hoodServo, Servo blocker) {
         this.shooterMotor1 = shooterMotor1;
         this.shooterMotor2 = shooterMotor2;
-//        this.shooterMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+
         this.shooterMotor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         this.shooterMotor1.setVelocityPIDFCoefficients(p, i, d, f);
         this.shooterMotor2.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);

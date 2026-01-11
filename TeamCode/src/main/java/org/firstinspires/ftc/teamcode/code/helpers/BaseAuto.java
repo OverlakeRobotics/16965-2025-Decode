@@ -62,6 +62,7 @@ public abstract class BaseAuto extends OpMode {
     public static double shooterDelay = 0.3;
     private double shooterTimer = 0;
     public static double shooterTolerance = 80;
+    public static double turretTolerance = 5;
     public String alliance;
 
     protected Pose2D startPose = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
@@ -139,7 +140,7 @@ public abstract class BaseAuto extends OpMode {
                 new GoBildaPinpointOdometry(pinpointDriver)
         );
 
-        driveTrain.setPIDFCoefficients(p, i, d, f);
+        driveTrain.setVelocityPIDFCoefficients(p, i, d, f);
 
         intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
         turret = new Turret(
@@ -198,7 +199,7 @@ public abstract class BaseAuto extends OpMode {
         autoAim(pointIndex);
         double shootingIntakeVelocity = 0;
 
-        if (shooterTimer <= 0 && Math.abs(turret.getShooterVelocity() - wantedShooterVelocity) <= shooterTolerance) {
+        if (shooterTimer <= 0 && Math.abs(turret.getShooterVelocity() - wantedShooterVelocity) <= shooterTolerance && Math.abs(turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()) <= turretTolerance) {
             shootingIntakeVelocity = 2800;
         }
 
@@ -210,6 +211,7 @@ public abstract class BaseAuto extends OpMode {
         driveTrain.updatePosition();
         Pose2D pos = driveTrain.getPosition();
         Log.d("Pinpoint pos", pos.toString());
+        Log.d("Shooter Velocity", "Turret Error: " + (turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()));
 
         autoAligner.updateInterpolation(pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH));
         turret.setTurretAngle(autoAligner.getTurretAutoAlignAngle());
@@ -242,6 +244,7 @@ public abstract class BaseAuto extends OpMode {
                     case "pause":
                         if (currTag.value <= 0) break;
                         pauseTimeLeft = currTag.value;
+                        Log.d("Pause Time Left", "Pause Time Left: " + pauseTimeLeft);
                         pausedIndex = nextPointIndex;
                         driveTrain.setPositionDrive(positions[nextPointIndex - 1]);
                         break;
@@ -277,6 +280,7 @@ public abstract class BaseAuto extends OpMode {
                         if (currTag.value <= 0) break;
                         turret.open();
                         pauseTimeLeft = currTag.value;
+                        Log.d("Pause Time Left", "Pause Time Left: " + pauseTimeLeft);
                         pausedIndex = nextPointIndex;
                         driveTrain.setPositionDrive(positions[nextPointIndex - 1]);
                         shooterTimer = shooterDelay;
@@ -303,6 +307,8 @@ public abstract class BaseAuto extends OpMode {
             }
             pauseTimeLeft -= dt;
             shooterTimer -= dt;
+
+            Log.d("Pause Time Left", "Pause Time Left: " + pauseTimeLeft);
 
             if (pauseTimeLeft <= 0) {
                 pauseTimeLeft = 0;

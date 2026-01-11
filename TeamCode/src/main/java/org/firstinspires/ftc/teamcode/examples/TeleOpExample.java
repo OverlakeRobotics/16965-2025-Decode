@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.system.BasicHolonomicDrivetrain;
 
 
 // An example of a simple robot-centric TeleOp.
-@Disabled
+//@Disabled
 @Config
 @TeleOp(name = "TeleOp Example", group = "TeleOp")
 public class TeleOpExample extends OpMode {
