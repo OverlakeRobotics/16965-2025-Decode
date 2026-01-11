@@ -37,13 +37,13 @@ public class AutoAligner {
     public static double maxShooterVelocity = 2800;
     public static double goalX;
     public static double goalY;
-    public static double redGoalX = 72;
-    public static double redGoalY = -72;
-    public static double blueGoalX = 72;
-    public static double blueGoalY = 72;
+    public static double redGoalX = 70;
+    public static double redGoalY = -70;
+    public static double blueGoalX = 70;
+    public static double blueGoalY = 70;
     public static double aprilX;
     public static double aprilY;
-    public static double goalDZ = 28 + 3;
+    public static double goalDZ = 28;// + 3;
 
     public static double launchDelay = 0;
     public double angleOffset = 0;

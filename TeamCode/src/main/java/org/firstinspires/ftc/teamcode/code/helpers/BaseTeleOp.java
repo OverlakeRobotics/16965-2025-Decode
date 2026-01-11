@@ -50,9 +50,6 @@ public abstract class BaseTeleOp extends OpMode {
     protected Preset[] presetPositions;
 
     public int currentPreset = -1;
-    private int activePreset = -1;
-    private int presetStepIndex = 0;
-    private boolean presetJustSelected = false;
 
     public double velocity = 2800;
 
@@ -77,7 +74,10 @@ public abstract class BaseTeleOp extends OpMode {
         double ySign = isRedAlliance() ? -1.0 : 1.0;
         return new Preset[]{
                 new Preset(new Pose2D(DistanceUnit.INCH, -54, 15 * ySign, AngleUnit.DEGREES, 0), true),
-                new Preset(new Pose2D(DistanceUnit.INCH, 15, 15 * ySign, AngleUnit.DEGREES, 0), false),
+                new Preset(new Pose2D(DistanceUnit.INCH, 15, 15 * ySign, AngleUnit.DEGREES, 0), true),
+                new Preset(new Pose2D[]{new Pose2D(DistanceUnit.INCH, -12, 38 * ySign, AngleUnit.DEGREES, 90 * ySign),
+                                        new Pose2D(DistanceUnit.INCH, -12, 60 * ySign, AngleUnit.DEGREES, 60 * ySign)},
+                        false),
         };
     }
 
@@ -146,33 +146,16 @@ public abstract class BaseTeleOp extends OpMode {
         double turretAdjustment = 0;
 
         if (currentPreset >= 0) {
-            if (currentPreset != activePreset) {
-                activePreset = currentPreset;
-                presetStepIndex = 0;
-                presetJustSelected = true;
-            }
-
             Preset preset = presetPositions[currentPreset];
-            if (!presetJustSelected && presetStepIndex < preset.poses.length - 1 && !driveTrain.isDriving()) {
-                presetStepIndex++;
-            }
-            presetJustSelected = false;
-
-            Pose2D presetPose = preset.poses[presetStepIndex];
-            double targetHeading = preset.useAutoAlignHeading ? wantedHeading : presetPose.getHeading(AngleUnit.DEGREES);
-            Pose2D wantedPosition = new Pose2D(
-                DistanceUnit.INCH,
-                presetPose.getX(DistanceUnit.INCH),
-                presetPose.getY(DistanceUnit.INCH),
-                AngleUnit.DEGREES,
-                targetHeading
-            );
             driveTrain.setVelocity((int) velocity);
-            driveTrain.setPositionDrive(wantedPosition);
+            driveTrain.setPositionDrive(preset.poses, driveTrain.getNextPointIndex());
+            if (preset.useAutoAlignHeading) {
+                Pose2D nextPoint = preset.poses[driveTrain.getNextPointIndex()];
+                preset.poses[driveTrain.getNextPointIndex()] = new Pose2D(DistanceUnit.INCH,
+                        nextPoint.getX(DistanceUnit.INCH), nextPoint.getY(DistanceUnit.INCH),
+                        AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
+            }
         } else {
-            activePreset = -1;
-            presetStepIndex = 0;
-            presetJustSelected = false;
             double turn = -gamepad1.right_stick_x * velocity;
 
             if (gamepad1.y) {
@@ -232,7 +215,6 @@ public abstract class BaseTeleOp extends OpMode {
         double intakeVelocity = intakeOn ? (intakeReversed ? -2800 : 2800) : 0;
 
         if (gamepad1.a) {
-            autoAligner.resetPinpointPositionFromLimelight();
             turret.open();
             intakeVelocity = 0;
 
@@ -243,11 +225,9 @@ public abstract class BaseTeleOp extends OpMode {
             turret.close();
         }
 
-        // Preset & Auto Lock
+        // Preset for gate pickup
         if (gamepad1.rightBumperWasPressed()) {
-            currentPreset = 0;
-        } else if (gamepad1.leftBumperWasPressed()) {
-            currentPreset = 1;
+            currentPreset = 2;
         }
 
         // Gamepad 2 controls (only for backup in case of robot reset/pinpoint issues)
