@@ -198,10 +198,14 @@ public abstract class BaseTeleOp extends OpMode {
         // D-Pad Right: Turn off shooter
 
         if (gamepad1.xWasPressed()) {
-            intakeOn = !intakeOn;
+            if (!intakeReversed) {
+                intakeOn = !intakeOn;
+            }
+            intakeReversed = false;
         }
         if (gamepad1.bWasPressed()) {
-            intakeReversed = !intakeReversed;
+            intakeReversed = true;
+            intakeOn = true;
         }
 
         if (gamepad1.dpadRightWasPressed()) {
@@ -287,7 +291,10 @@ public abstract class BaseTeleOp extends OpMode {
         }
 
         if (gamepad2.bWasPressed()) {
-            autoAligner.resetPinpointPositionFromLimelight();
+//            autoAligner.resetPinpointPositionFromLimelight();
+            double ySign = isRedAlliance() ? 1.0 : -1.0;
+            Pose2D currPos = driveTrain.getPosition();
+            driveTrain.setPosition(new Pose2D(DistanceUnit.INCH, -63, 63 * ySign, AngleUnit.DEGREES, currPos.getHeading(AngleUnit.DEGREES)));
         }
         if (gamepad2.xWasPressed()) {
             Pose2D pos = driveTrain.getPosition();
