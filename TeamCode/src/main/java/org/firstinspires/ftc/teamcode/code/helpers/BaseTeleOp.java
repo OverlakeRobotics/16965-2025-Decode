@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -103,14 +104,15 @@ public abstract class BaseTeleOp extends OpMode {
                 hardwareMap.get(DcMotorEx.class, "shooterBottom"),
                 hardwareMap.get(DcMotorEx.class, "turret"),
                 hardwareMap.get(Servo.class, "hood"),
-                hardwareMap.get(Servo.class, "blocker")
+                hardwareMap.get(Servo.class, "blocker"),
+                hardwareMap.get(AnalogInput.class, "potentiometer")
         );
 //        turret.resetTurretEncoder();
+//        turret.setEncoderOffset();
         intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
 
         // Initialize AutoAligner
         autoAligner = new AutoAligner(driveTrain, turret, limelight, isRedAlliance());
-
 
         presetPositions = getPresetPositions();
         PathServer.startServer();

@@ -77,12 +77,14 @@ public class BasicHolonomicDrivetrain {
     //      - double i: The integral term.
     //      - double d: The derivative term.
     //      - double f: The feedforward term.
-    public void setPIDFCoefficients(double p, double i, double d, double f) {
-        PIDFCoefficients coefficients = new PIDFCoefficients(p, i, d, f);
-        backLeft.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, coefficients);
-        backRight.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, coefficients);
-        frontLeft.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, coefficients);
-        frontRight.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, coefficients);
+    public void setPositionP(double p) {
+        Log.d("PIDF", "Coefficients Before: " + backLeft.getPIDFCoefficients(DcMotorEx.RunMode.RUN_TO_POSITION));
+        backLeft.setPositionPIDFCoefficients(p);
+        backRight.setPositionPIDFCoefficients(p);
+        frontLeft.setPositionPIDFCoefficients(p);
+        frontRight.setPositionPIDFCoefficients(p);
+        Log.d("PIDF", "Coefficients After: " + backLeft.getPIDFCoefficients(DcMotorEx.RunMode.RUN_TO_POSITION));
+
     }
 
     // Behavior: Sets the velocity of the drive motors to the given velocities.

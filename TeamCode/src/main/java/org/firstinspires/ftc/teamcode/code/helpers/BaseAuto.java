@@ -5,6 +5,7 @@ import android.util.Log;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -56,6 +57,7 @@ public abstract class BaseAuto extends OpMode {
     public static double i = 0; // 0.1; // 0;
     public static double d = 7; // 0; // 7;
     public static double f = 0;
+    public static double positionP = 3;
 
     private double wantedShooterVelocity = 0;
     private boolean isShooting;
@@ -162,7 +164,8 @@ public abstract class BaseAuto extends OpMode {
                 new GoBildaPinpointOdometry(pinpointDriver)
         );
 
-        driveTrain.setVelocityPIDFCoefficients(p, i, d, f);
+//        driveTrain.setVelocityPIDFCoefficients(p, i, d, f);
+        driveTrain.setPositionP(positionP);
 
         intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
         turret = new Turret(
@@ -170,8 +173,10 @@ public abstract class BaseAuto extends OpMode {
                 hardwareMap.get(DcMotorEx.class, "shooterBottom"),
                 hardwareMap.get(DcMotorEx.class, "turret"),
                 hardwareMap.get(Servo.class, "hood"),
-                hardwareMap.get(Servo.class, "blocker")
+                hardwareMap.get(Servo.class, "blocker"),
+                hardwareMap.get(AnalogInput.class, "potentiometer")
         );
+//        turret.setEncoderOffset();
         turret.resetTurretEncoder();
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
@@ -237,6 +242,7 @@ public abstract class BaseAuto extends OpMode {
 
         autoAligner.updateInterpolation(pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH));
         turret.setTurretAngle(autoAligner.getTurretAutoAlignAngle());
+//        turret.setTurretAngle(0);
 
         double curTime = runtime.seconds();
         double dt = curTime - lastTime;

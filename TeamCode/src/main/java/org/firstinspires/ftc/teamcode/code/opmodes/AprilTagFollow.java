@@ -9,6 +9,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -37,7 +38,8 @@ public class AprilTagFollow extends OpMode {
                 hardwareMap.get(DcMotorEx.class, "shooterBottom"),
                 hardwareMap.get(DcMotorEx.class, "turret"),
                 hardwareMap.get(Servo.class, "hood"),
-                hardwareMap.get(Servo.class, "blocker")
+                hardwareMap.get(Servo.class, "blocker"),
+                hardwareMap.get(AnalogInput.class, "potentiometer")
         );
         turret.resetTurretEncoder();
 
