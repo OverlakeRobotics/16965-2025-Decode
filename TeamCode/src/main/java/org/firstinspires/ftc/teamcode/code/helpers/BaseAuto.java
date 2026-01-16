@@ -63,7 +63,7 @@ public abstract class BaseAuto extends OpMode {
     private boolean isShooting;
     public static double shooterDelay = 0.3;
     private double shooterTimer = 0;
-    public static double shooterTolerance = 80;
+    public static double shooterTolerance = 120; // 80;
     public static double turretTolerance = 5;
     public String alliance;
 

@@ -27,7 +27,7 @@ public abstract class BaseTeleOp extends OpMode {
     // TODO: Check if these are correct
     public static final double yOffset = -156.0; // -168.0 // mm
     public static final double xOffset = 72.0; // -84.0 // mm
-    public static double shooterTolerance = 80;
+    public static double shooterTolerance = 120; // 80;
     public static double turretTolerance = 5;
 
     public static double hoodAngleVelScale = 0.5;
@@ -128,7 +128,7 @@ public abstract class BaseTeleOp extends OpMode {
         driveTrain.updatePosition();
         Pose2D currentPos = driveTrain.getPosition();
         PathServer.setRobotPose(currentPos);
-        autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
+//        autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
 
         Log.d("Turret Error", "Turret Error: " + (turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()));
 

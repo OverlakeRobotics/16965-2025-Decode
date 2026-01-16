@@ -43,7 +43,7 @@ public class AutoAligner {
     public static double blueGoalY = 70;
     public static double aprilX;
     public static double aprilY;
-    public static double goalDZ = 28;// + 3;
+    public static double goalDZ = 28 + 2;
 
     public static double launchDelay = 0;
     public double angleOffset = 0;
@@ -79,15 +79,24 @@ public class AutoAligner {
               new PointValues(-54, -18, new double[]{0.47, 50, 1}),
               new PointValues(-63, 33, new double[]{0.47, 50, 3}),
 
-              new PointValues(25, 25, new double[]{0.5, 44, 0}),
-              new PointValues(14, 14, new double[]{0.52, 50, 0}),
+//              new PointValues(25, 25, new double[]{0.5, 44, 0}),
+//              new PointValues(14, 14, new double[]{0.52, 50, 0}),
 
 //              new PointValues(24, 24, new double[]{0.49, 40, 0}),
-              new PointValues(0, 0, new double[]{0.51, 50, 0}),
-              new PointValues(36, 36, new double[]{0.475, 30, 0}),
-              new PointValues(24, -24, new double[]{0.49, 50, -0.5}),
-              new PointValues(48, 0, new double[]{0.51, 50, -1.5}),
-              new PointValues(36, -36, new double[]{0.49, 50, -2.5})
+//              new PointValues(0, 0, new double[]{0.51, 50, 0}),
+              new PointValues(0, 0, new double[]{0.47, 45, 0}),
+              new PointValues(39, 39, new double[]{0.47, 25, 0}),
+              new PointValues(24, 24, new double[]{0.47, 35, 0}),
+              new PointValues(48, 0, new double[]{0.46, 37, -2}),
+              new PointValues(24, 0, new double[]{0.47, 40, 1}),
+              new PointValues(48, 24, new double[]{0.465, 28, -1}),
+              new PointValues(30, 42, new double[]{0.475, 27, 1}),
+              new PointValues(6, 18, new double[]{0.48, 42, 1}),
+              new PointValues(24, -24, new double[]{0.46, 45, -2}),
+//              new PointValues(36, 36, new double[]{0.475, 30, 0}),
+//              new PointValues(24, -24, new double[]{0.49, 50, -0.5}),
+//              new PointValues(48, 0, new double[]{0.51, 50, -1.5}),
+//              new PointValues(36, -36, new double[]{0.49, 50, -2.5})
 //
 //            new PointValues(0, 0, new double[]{0.45, 50, -2}),
 //            new PointValues(39, 39, new double[]{0.425, 27, -1}),
