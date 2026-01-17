@@ -84,6 +84,7 @@ public class AutoAligner {
 
 //              new PointValues(24, 24, new double[]{0.49, 40, 0}),
 //              new PointValues(0, 0, new double[]{0.51, 50, 0}),
+              // Close points
               new PointValues(0, 0, new double[]{0.47, 45, 0}),
               new PointValues(39, 39, new double[]{0.47, 25, 0}),
               new PointValues(24, 24, new double[]{0.47, 35, 0}),
@@ -93,6 +94,17 @@ public class AutoAligner {
               new PointValues(30, 42, new double[]{0.475, 27, 1}),
               new PointValues(6, 18, new double[]{0.48, 42, 1}),
               new PointValues(24, -24, new double[]{0.46, 45, -2}),
+              new PointValues(39, -39, new double[]{0.46, 45, -1}),
+              new PointValues(48, -24, new double[]{0.47, 45, -1}),
+
+              // Far points
+              new PointValues(-54, 18, new double[]{0.455, 45, 3.5}),
+              new PointValues(-63, 33, new double[]{0.45, 45, 3}),
+              new PointValues(-48, 0, new double[]{0.46, 45, 1.5}),
+              new PointValues(-54, -18, new double[]{0.455, 45, 1}),
+              new PointValues(-63, -33, new double[]{0.445, 45, 1}),
+              new PointValues(-63, 0, new double[]{0.45, 45, 2})
+
 //              new PointValues(36, 36, new double[]{0.475, 30, 0}),
 //              new PointValues(24, -24, new double[]{0.49, 50, -0.5}),
 //              new PointValues(48, 0, new double[]{0.51, 50, -1.5}),

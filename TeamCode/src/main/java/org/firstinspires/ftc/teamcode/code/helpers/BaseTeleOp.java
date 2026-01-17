@@ -128,7 +128,7 @@ public abstract class BaseTeleOp extends OpMode {
         driveTrain.updatePosition();
         Pose2D currentPos = driveTrain.getPosition();
         PathServer.setRobotPose(currentPos);
-//        autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
+        autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
 
         Log.d("Turret Error", "Turret Error: " + (turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()));
 
