@@ -176,8 +176,8 @@ public abstract class BaseAuto extends OpMode {
                 hardwareMap.get(Servo.class, "blocker"),
                 hardwareMap.get(AnalogInput.class, "potentiometer")
         );
-//        turret.setEncoderOffset();
-        turret.resetTurretEncoder();
+        turret.setEncoderOffset();
+//        turret.resetTurretEncoder();
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();

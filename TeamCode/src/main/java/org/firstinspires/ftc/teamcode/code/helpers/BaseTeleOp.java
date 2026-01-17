@@ -108,7 +108,7 @@ public abstract class BaseTeleOp extends OpMode {
                 hardwareMap.get(AnalogInput.class, "potentiometer")
         );
 //        turret.resetTurretEncoder();
-//        turret.setEncoderOffset();
+        turret.setEncoderOffset();
         intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
 
         // Initialize AutoAligner
@@ -232,9 +232,9 @@ public abstract class BaseTeleOp extends OpMode {
         }
 
         // Preset for gate pickup
-        if (gamepad1.rightBumperWasPressed()) {
-            currentPreset = 2;
-        }
+//        if (gamepad1.rightBumperWasPressed()) {
+//            currentPreset = 2;
+//        }
 
         // Gamepad 2 controls (only for backup in case of robot reset/pinpoint issues)
 

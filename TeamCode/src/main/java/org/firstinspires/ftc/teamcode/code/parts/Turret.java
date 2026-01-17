@@ -61,6 +61,6 @@ public class Turret extends Shooter {
     }
 
     public void setEncoderOffset() {
-        encoderAngleOffset = potentiometer.getAngleDegrees() - getEncoderReportedAngle();
+        encoderAngleOffset = potentiometer.getAngleFromVoltagePoly() - getEncoderReportedAngle();
     }
 }
