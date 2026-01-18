@@ -78,12 +78,12 @@ public class BasicHolonomicDrivetrain {
     //      - double d: The derivative term.
     //      - double f: The feedforward term.
     public void setPositionP(double p) {
-        Log.d("PIDF", "Coefficients Before: " + backLeft.getPIDFCoefficients(DcMotorEx.RunMode.RUN_TO_POSITION));
+//        Log.d("PIDF", "Coefficients Before: " + backLeft.getPIDFCoefficients(DcMotorEx.RunMode.RUN_TO_POSITION));
         backLeft.setPositionPIDFCoefficients(p);
         backRight.setPositionPIDFCoefficients(p);
         frontLeft.setPositionPIDFCoefficients(p);
         frontRight.setPositionPIDFCoefficients(p);
-        Log.d("PIDF", "Coefficients After: " + backLeft.getPIDFCoefficients(DcMotorEx.RunMode.RUN_TO_POSITION));
+//        Log.d("PIDF", "Coefficients After: " + backLeft.getPIDFCoefficients(DcMotorEx.RunMode.RUN_TO_POSITION));
 
     }
 

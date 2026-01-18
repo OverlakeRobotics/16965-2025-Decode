@@ -12,8 +12,8 @@ public class Turret extends Shooter {
     public static int MAX_LIMIT_ANGLE = 145; // 115; // degrees
     public static int MIN_LIMIT_ANGLE = -145; // -115; // degrees
     public static double turretPositionP = 17;
-    public static double turretP = 15; // 10;
-    public static double turretI = 0; // 1;
+    public static double turretP = 10; // 15;
+    public static double turretI = 1; // 0;
     public static double turretD = 2;
     public static double turretF = 0;
     public final int MAX_ANGLE_LIMIT;
@@ -33,7 +33,7 @@ public class Turret extends Shooter {
         this.turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         this.turretMotor.setVelocityPIDFCoefficients(turretP, turretI, turretD, turretF);
-        this.turretMotor.setPositionPIDFCoefficients(turretPositionP);
+//        this.turretMotor.setPositionPIDFCoefficients(turretPositionP);
     }
 
     // CCW is positive, CW is negative

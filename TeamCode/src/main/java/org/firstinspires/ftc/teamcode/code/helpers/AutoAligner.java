@@ -30,7 +30,7 @@ public class AutoAligner {
     public static double hoodAngle = 0;
     public static double aprilAlignOffset = 0;
     public static double kSlipTurretRotationConstant = 0.01;
-    public static double autoAlignBuffer = 5; // degrees
+    public static double autoAlignBuffer = 15; // 5; // degrees
     public static double randomMultiplier = 1;
     public static double randomMultiplierPerp = 1;
 
@@ -98,12 +98,12 @@ public class AutoAligner {
               new PointValues(48, -24, new double[]{0.47, 45, -1}),
 
               // Far points
-              new PointValues(-54, 18, new double[]{0.455, 45, 3.5}),
-              new PointValues(-63, 33, new double[]{0.45, 45, 3}),
-              new PointValues(-48, 0, new double[]{0.46, 45, 1.5}),
-              new PointValues(-54, -18, new double[]{0.455, 45, 1}),
-              new PointValues(-63, -33, new double[]{0.445, 45, 1}),
-              new PointValues(-63, 0, new double[]{0.45, 45, 2})
+//              new PointValues(-54, 18, new double[]{0.455, 45, 3.5}),
+//              new PointValues(-63, 33, new double[]{0.45, 45, 3}),
+//              new PointValues(-48, 0, new double[]{0.46, 45, 1.5}),
+//              new PointValues(-54, -18, new double[]{0.455, 45, 1}),
+//              new PointValues(-63, -33, new double[]{0.445, 45, 1}),
+//              new PointValues(-63, 0, new double[]{0.45, 45, 2})
 
 //              new PointValues(36, 36, new double[]{0.475, 30, 0}),
 //              new PointValues(24, -24, new double[]{0.49, 50, -0.5}),
@@ -154,7 +154,7 @@ public class AutoAligner {
             for (LLResultTypes.FiducialResult tag : aprilTags) {
                 if (tag.getFiducialId() == targetAprilID) {
                     Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
-                    Log.d("Limelight", "using limelight dist");
+//                    Log.d("Limelight", "using limelight dist");
 //                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
 //                        break;
 //                    }
@@ -162,7 +162,7 @@ public class AutoAligner {
                 }
             }
         }
-        Log.d("Limelight", "Pinpoint dist");
+//        Log.d("Limelight", "Pinpoint dist");
         return Math.hypot(goalX - pos.getX(DistanceUnit.INCH), goalY - pos.getY(DistanceUnit.INCH));
     }
 
@@ -217,7 +217,7 @@ public class AutoAligner {
                 }
             }
         }
-        Log.d("Limelight", "Pinpoint fallback");
+//        Log.d("Limelight", "Pinpoint fallback");
         // Fallback on using pinpoint
         return normalize(180 + Math.toDegrees(Math.atan2(
                         goalY - pos.getY(DistanceUnit.INCH),
@@ -420,8 +420,8 @@ public class AutoAligner {
 
             velPar = vx * ux + vy * uy;
             velPerp = vy * ux - vx * uy;
-            Log.d("Move Launch", "velPar: " + velPar);
-            Log.d("Move Launch", "velPerp: " + velPerp);
+//            Log.d("Move Launch", "velPar: " + velPar);
+//            Log.d("Move Launch", "velPerp: " + velPerp);
         }
 
         lastVelPar = velPar;
@@ -437,11 +437,11 @@ public class AutoAligner {
                 0.02,
                 4.0
         );
-        Log.d("Move Launch", "Expected Flight Time: " + t);
+//        Log.d("Move Launch", "Expected Flight Time: " + t);
         if (!Double.isFinite(t) || t <= 0) return -1;
 
         double v = (goalDZ + (g * t * t) / 2) / (t * Math.cos(theta));
-        Log.d("Move Launch", "Wanted Exit Velocity: " + v);
+//        Log.d("Move Launch", "Wanted Exit Velocity: " + v);
 
         double t_test = solveTimeForShot(
                 horizontalDist,
@@ -457,17 +457,17 @@ public class AutoAligner {
         double tps_test = (v_test * 60) / (2 * Math.PI * rhinoWheelRadius * adjustedKSlip) * motorTicksPerRev / 60;
 
         angleOffset = Math.toDegrees(Math.atan2(-velPerp, (horizontalDist / t) - velPar));
-        Log.d("Move Launch", "Angle Offset: " + angleOffset);
+//        Log.d("Move Launch", "Angle Offset: " + angleOffset);
 
         // Calculate RPM from linear velocity
         double rpm = (v * 60) / (2 * Math.PI * rhinoWheelRadius * adjustedKSlip);
         // Scale to motor ticks per second
         // TODO: Check ticks/sec calculation
         double rawTPS = rpm * motorTicksPerRev / 60;
-        if (rawTPS > maxShooterVelocity) {
-            Log.d("Shooter Velocity", "raw vel: " + rawTPS);
-        }
-        Log.d("Shooter Velocity", "Wanted: " + Math.round(rawTPS) + "WantedStationary: " + Math.round(tps_test) + "Actual: " + turret.getShooterVelocity() + "Diff: " + Math.round(rawTPS - tps_test) + "AccDiff: " + Math.round(rawTPS - turret.getShooterVelocity()) + "Power: " + turret.getShooterPower());
+//        if (rawTPS > maxShooterVelocity) {
+//            Log.d("Shooter Velocity", "raw vel: " + rawTPS);
+//        }
+//        Log.d("Shooter Velocity", "Wanted: " + Math.round(rawTPS) + "WantedStationary: " + Math.round(tps_test) + "Actual: " + turret.getShooterVelocity() + "Diff: " + Math.round(rawTPS - tps_test) + "AccDiff: " + Math.round(rawTPS - turret.getShooterVelocity()) + "Power: " + turret.getShooterPower());
         return Range.clip(rpm * motorTicksPerRev / 60, 0, maxShooterVelocity);
     }
 

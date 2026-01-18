@@ -8,13 +8,17 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.code.helpers.Prism.GoBildaPrismDriver;
 import org.firstinspires.ftc.teamcode.code.parts.Intake;
+import org.firstinspires.ftc.teamcode.code.parts.LEDIndicator;
 import org.firstinspires.ftc.teamcode.code.parts.Turret;
 import org.firstinspires.ftc.teamcode.components.GoBildaPinpointOdometry;
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
@@ -23,11 +27,12 @@ import org.firstinspires.ftc.teamcode.system.PathServer;
 @Config
 public abstract class BaseTeleOp extends OpMode {
     protected Limelight3A limelight;
+    public static final ElapsedTime runtime = new ElapsedTime();
 
     // TODO: Check if these are correct
     public static final double yOffset = -156.0; // -168.0 // mm
     public static final double xOffset = 72.0; // -84.0 // mm
-    public static double shooterTolerance = 120; // 80;
+    public static double shooterTolerance = 80; // 80;
     public static double turretTolerance = 5;
 
     public static double hoodAngleVelScale = 0.5;
@@ -61,6 +66,7 @@ public abstract class BaseTeleOp extends OpMode {
     protected boolean autoShooter = true;
 
     protected Intake intake;
+//    protected LEDIndicator ledIndicator;
     protected boolean intakeOn = false;
     protected boolean intakeReversed = false;
 
@@ -109,7 +115,13 @@ public abstract class BaseTeleOp extends OpMode {
         );
 //        turret.resetTurretEncoder();
         turret.setEncoderOffset();
-        intake = new Intake(hardwareMap.get(DcMotorEx.class, "intake"));
+        intake = new Intake(
+                hardwareMap.get(DcMotorEx.class, "intake")
+//                hardwareMap.get(DistanceSensor.class, "distanceSensor")
+        );
+
+//        ledIndicator = new LEDIndicator(hardwareMap.get(GoBildaPrismDriver.class, "prism"));
+//        ledIndicator.setState(Intake.IntakeState.AMBIENT);
 
         // Initialize AutoAligner
         autoAligner = new AutoAligner(driveTrain, turret, limelight, isRedAlliance());
@@ -129,8 +141,15 @@ public abstract class BaseTeleOp extends OpMode {
         Pose2D currentPos = driveTrain.getPosition();
         PathServer.setRobotPose(currentPos);
         autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
+//        double temp = runtime.seconds();
+//        Intake.IntakeState state = intake.getState();
+//        Log.d("LED Latency", "Intake: " + (runtime.seconds() - temp));
+//        Log.d("LED Latency", "State: " + state);
+//        temp = runtime.seconds();
+//        ledIndicator.setState(state);
+//        Log.d("LED Latency", "LED: " + (runtime.seconds() - temp));
 
-        Log.d("Turret Error", "Turret Error: " + (turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()));
+//        Log.d("Turret Error", "Turret Error: " + (turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()));
 
         telemetry.addData("Position", "X: %.2f, Y: %.2f, H: %.2f",
                 currentPos.getX(DistanceUnit.INCH),

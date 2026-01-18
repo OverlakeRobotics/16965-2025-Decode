@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.code.parts.Intake;
 
@@ -25,8 +26,9 @@ public class ColorSorting extends OpMode {
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
         greenSorter = hardwareMap.get(Servo.class, "greenSorter");
         purpleSorter = hardwareMap.get(Servo.class, "purpleSorter");
-        intake = new Intake(hardwareMap.get(DcMotorEx.class, "intakeMotor"));
-
+        intake = new Intake(
+                hardwareMap.get(DcMotorEx.class, "intake")
+        );
         huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
     }
 
