@@ -190,6 +190,10 @@ public abstract class BaseAuto extends OpMode {
         );
         turret.setEncoderOffset();
 //        turret.resetTurretEncoder();
+
+        telemetry.addData("Turret Angle", turret.getTurretCurrentAngle());
+        telemetry.update();
+
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();
@@ -249,6 +253,8 @@ public abstract class BaseAuto extends OpMode {
     public void loop() {
         driveTrain.updatePosition();
         Pose2D pos = driveTrain.getPosition();
+        driveTrain.drive();
+
 //        Log.d("Pinpoint pos", pos.toString());
 //        Log.d("Turret Error/Auto Aim", "Turret Error: " + (turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()));
 //        Log.d("Auto Aim", "Drivetrain Wanted: " + autoAligner.getDrivetrainAutoAlignAngle() + "; Turret Wanted: " + autoAligner.getTurretAutoAlignAngle());
@@ -261,10 +267,9 @@ public abstract class BaseAuto extends OpMode {
         double curTime = runtime.seconds();
         double dt = curTime - lastTime;
         lastTime = curTime;
-        Log.d("Loop Time", "dt: " + dt);
+//        Log.d("Loop Time", "dt: " + dt);
 
         if (pauseTimeLeft <= 0) {
-            driveTrain.drive();
             int nextPointIndex = driveTrain.getNextPointIndex();
 
             if (nextPointIndex == autoAlignIndex && nextPointIndex != -1) {

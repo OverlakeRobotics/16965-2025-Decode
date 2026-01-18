@@ -10,7 +10,7 @@ public class Shooter {
     public final double MAX_VELOCITY = 2800;
     public final double MOTOR_TO_WHEEL_VELOCITY_RATIO = 1.0;
     public static int minHoodAngle = 15;
-    public static int maxHoodAngle = 45;
+    public static int maxHoodAngle = 50; //45;
     private final DcMotorEx shooterMotor1;
     private final DcMotorEx shooterMotor2;
     private final Servo hoodServo;
