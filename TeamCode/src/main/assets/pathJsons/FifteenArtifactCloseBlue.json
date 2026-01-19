@@ -1,97 +1,319 @@
 {
   "version": 1,
-  "createdAt": "2025-12-14T19:21:22.140Z",
+  "createdAt": "2026-01-18T17:14:32.026Z",
   "alliance": "blue",
-  "start": [
-    48,
-    48,
-    180
-  ],
+  "start": {
+    "x": 48,
+    "y": 48,
+    "h": 90
+  },
   "points": [
-    [
-      48,
-      48,
-      180
-    ],
-    [
-      14,
-      14,
-      180
-    ],
-    [
-      -10,
-      22,
-      90
-    ],
-    [
-      -14,
-      59,
-      90
-    ],
-    [
-      14,
-      14,
-      110
-    ],
-    [
-      -12,
-      38,
-      90
-    ],
-    [
-      -12,
-      60,
-      60
-    ],
-    [
-      -11,
-      38,
-      90
-    ],
-    [
-      15,
-      18,
-      110
-    ],
-    [
-      13,
-      30,
-      90
-    ],
-    [
-      13,
-      57,
-      90
-    ],
-    [
-      15,
-      18,
-      110
-    ],
-    [
-      -33,
-      28,
-      90
-    ],
-    [
-      -33,
-      61,
-      90
-    ],
-    [
-      15,
-      18,
-      110
-    ],
-    [
-      -1,
-      48,
-      90
-    ]
+    {
+      "x": 14,
+      "y": 14,
+      "h": 90
+    },
+    {
+      "x": -10,
+      "y": 22,
+      "h": 90
+    },
+    {
+      "x": -13,
+      "y": 60,
+      "h": 90
+    },
+    {
+      "x": 14,
+      "y": 14,
+      "h": 110
+    },
+    {
+      "x": -12,
+      "y": 38,
+      "h": 90
+    },
+    {
+      "x": -11,
+      "y": 60,
+      "h": 60
+    },
+    {
+      "x": -11,
+      "y": 38,
+      "h": 90
+    },
+    {
+      "x": 15,
+      "y": 18,
+      "h": 110
+    },
+    {
+      "x": 13,
+      "y": 30,
+      "h": 90
+    },
+    {
+      "x": 13,
+      "y": 56,
+      "h": 90
+    },
+    {
+      "x": 15,
+      "y": 18,
+      "h": 110
+    },
+    {
+      "x": -33,
+      "y": 28,
+      "h": 90
+    },
+    {
+      "x": -33,
+      "y": 60,
+      "h": 90
+    },
+    {
+      "x": 15,
+      "y": 18,
+      "h": 110
+    },
+    {
+      "x": -1,
+      "y": 48,
+      "h": 90
+    }
+  ],
+  "segments": [
+    {
+      "type": "line",
+      "end": {
+        "x": 14,
+        "y": 14,
+        "h": 90
+      },
+      "samples": [
+        {
+          "x": 14,
+          "y": 14,
+          "h": 90
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": -10,
+        "y": 22,
+        "h": 90
+      },
+      "samples": [
+        {
+          "x": -10,
+          "y": 22,
+          "h": 90
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": -13,
+        "y": 60,
+        "h": 90
+      },
+      "samples": [
+        {
+          "x": -13,
+          "y": 60,
+          "h": 90
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": 14,
+        "y": 14,
+        "h": 110
+      },
+      "samples": [
+        {
+          "x": 14,
+          "y": 14,
+          "h": 110
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": -12,
+        "y": 38,
+        "h": 90
+      },
+      "samples": [
+        {
+          "x": -12,
+          "y": 38,
+          "h": 90
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": -11,
+        "y": 60,
+        "h": 60
+      },
+      "samples": [
+        {
+          "x": -11,
+          "y": 60,
+          "h": 60
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": -11,
+        "y": 38,
+        "h": 90
+      },
+      "samples": [
+        {
+          "x": -11,
+          "y": 38,
+          "h": 90
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": 15,
+        "y": 18,
+        "h": 110
+      },
+      "samples": [
+        {
+          "x": 15,
+          "y": 18,
+          "h": 110
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": 13,
+        "y": 30,
+        "h": 90
+      },
+      "samples": [
+        {
+          "x": 13,
+          "y": 30,
+          "h": 90
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": 13,
+        "y": 56,
+        "h": 90
+      },
+      "samples": [
+        {
+          "x": 13,
+          "y": 56,
+          "h": 90
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": 15,
+        "y": 18,
+        "h": 110
+      },
+      "samples": [
+        {
+          "x": 15,
+          "y": 18,
+          "h": 110
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": -33,
+        "y": 28,
+        "h": 90
+      },
+      "samples": [
+        {
+          "x": -33,
+          "y": 28,
+          "h": 90
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": -33,
+        "y": 60,
+        "h": 90
+      },
+      "samples": [
+        {
+          "x": -33,
+          "y": 60,
+          "h": 90
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": 15,
+        "y": 18,
+        "h": 110
+      },
+      "samples": [
+        {
+          "x": 15,
+          "y": 18,
+          "h": 110
+        }
+      ]
+    },
+    {
+      "type": "line",
+      "end": {
+        "x": -1,
+        "y": 48,
+        "h": 90
+      },
+      "samples": [
+        {
+          "x": -1,
+          "y": 48,
+          "h": 90
+        }
+      ]
+    }
   ],
   "headingMode": "straight",
   "endHeading": 90,
-  "velocity": 120,
+  "velocity": 40,
   "maxAccel": 40,
   "tolerance": 5,
   "snapInches": 1,
@@ -101,139 +323,190 @@
   },
   "tags": [
     {
-      "index": 1,
-      "name": "autoAim",
-      "value": 0
-    },
-    {
       "index": 2,
-      "name": "launchArtifacts",
-      "value": 1.75
-    },
-    {
-      "index": 3,
       "name": "intake",
       "value": 2800
     },
     {
-      "index": 3,
-      "name": "velocity",
-      "value": 60
-    },
-    {
       "index": 4,
-      "name": "intake",
-      "value": 0
-    },
-    {
-      "index": 4,
-      "name": "velocity",
-      "value": 120
-    },
-    {
-      "index": 5,
       "name": "launchArtifacts",
       "value": 1.75
     },
     {
-      "index": 4,
+      "index": 3,
       "name": "autoAim",
       "value": 0
     },
     {
-      "index": 7,
+      "index": 6,
       "name": "intake",
-      "value": 2000
+      "value": 2800
     },
     {
-      "index": 7,
+      "index": 6,
       "name": "pause",
       "value": 1
     },
     {
-      "index": 8,
+      "index": 7,
       "name": "autoAim",
+      "value": 0
+    },
+    {
+      "index": 8,
+      "name": "launchArtifacts",
+      "value": 1.75
+    },
+    {
+      "index": 7,
+      "name": "intake",
       "value": 0
     },
     {
       "index": 9,
-      "name": "launchArtifacts",
-      "value": 1.75
-    },
-    {
-      "index": 8,
-      "name": "intake",
-      "value": 0
-    },
-    {
-      "index": 10,
       "name": "intake",
       "value": 2800
     },
     {
-      "index": 11,
-      "name": "velocity",
-      "value": 120
-    },
-    {
-      "index": 11,
-      "name": "intake",
-      "value": 0
-    },
-    {
-      "index": 11,
+      "index": 10,
       "name": "autoAim",
       "value": 0
+    },
+    {
+      "index": 11,
+      "name": "launchArtifacts",
+      "value": 1.75
     },
     {
       "index": 12,
-      "name": "launchArtifacts",
-      "value": 1.75
-    },
-    {
-      "index": 10,
-      "name": "velocity",
-      "value": 60
-    },
-    {
-      "index": 13,
       "name": "intake",
       "value": 2800
     },
     {
       "index": 13,
-      "name": "velocity",
-      "value": 60
-    },
-    {
-      "index": 14,
-      "name": "intake",
-      "value": 0
-    },
-    {
-      "index": 14,
-      "name": "velocity",
-      "value": 120
-    },
-    {
-      "index": 14,
       "name": "autoAim",
       "value": 0
     },
     {
-      "index": 15,
+      "index": 14,
       "name": "launchArtifacts",
       "value": 1.75
+    },
+    {
+      "index": 5,
+      "name": "velocity",
+      "value": 75
     },
     {
       "index": 6,
       "name": "velocity",
-      "value": 70
+      "value": 120
     },
     {
-      "index": 7,
+      "index": 0,
+      "name": "autoAim",
+      "value": 0
+    },
+    {
+      "index": 1,
       "name": "velocity",
       "value": 120
+    },
+    {
+      "index": 4,
+      "name": "intake",
+      "value": 0
+    },
+    {
+      "index": 11,
+      "name": "intake",
+      "value": 0
+    },
+    {
+      "index": 14,
+      "name": "intake",
+      "value": 0
+    },
+    {
+      "index": 1,
+      "name": "launchArtifacts",
+      "value": 1.75
+    }
+  ],
+  "globals": [
+    {
+      "name": "launchTime",
+      "value": 1.75
+    },
+    {
+      "name": "intakeSpeed",
+      "value": 2800
+    },
+    {
+      "name": "gateVelocity",
+      "value": 75
+    },
+    {
+      "name": "velocity",
+      "value": 120
+    },
+    {
+      "name": "gatePause",
+      "value": 1
+    }
+  ],
+  "tagBindings": [
+    {
+      "tagIndex": 0,
+      "globalName": "intakeSpeed"
+    },
+    {
+      "tagIndex": 1,
+      "globalName": "launchTime"
+    },
+    {
+      "tagIndex": 3,
+      "globalName": "intakeSpeed"
+    },
+    {
+      "tagIndex": 4,
+      "globalName": "gatePause"
+    },
+    {
+      "tagIndex": 6,
+      "globalName": "launchTime"
+    },
+    {
+      "tagIndex": 8,
+      "globalName": "intakeSpeed"
+    },
+    {
+      "tagIndex": 10,
+      "globalName": "launchTime"
+    },
+    {
+      "tagIndex": 11,
+      "globalName": "intakeSpeed"
+    },
+    {
+      "tagIndex": 13,
+      "globalName": "launchTime"
+    },
+    {
+      "tagIndex": 14,
+      "globalName": "gateVelocity"
+    },
+    {
+      "tagIndex": 15,
+      "globalName": "velocity"
+    },
+    {
+      "tagIndex": 17,
+      "globalName": "velocity"
+    },
+    {
+      "tagIndex": 21,
+      "globalName": "launchTime"
     }
   ]
 }

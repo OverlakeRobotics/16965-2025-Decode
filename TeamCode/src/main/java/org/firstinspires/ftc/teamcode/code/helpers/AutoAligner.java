@@ -30,7 +30,7 @@ public class AutoAligner {
     public static double hoodAngle = 0;
     public static double aprilAlignOffset = 0;
     public static double kSlipTurretRotationConstant = 0.01;
-    public static double autoAlignBuffer = 15; // 5; // degrees
+    public static double autoAlignBuffer = 5; // degrees
     public static double randomMultiplier = 1;
     public static double randomMultiplierPerp = 1;
 

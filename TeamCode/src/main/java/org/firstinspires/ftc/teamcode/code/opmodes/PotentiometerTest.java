@@ -32,11 +32,11 @@ public class PotentiometerTest extends OpMode {
     @Override
     public void loop() {
         Log.d("Potentiometer", "Voltage: " + potentiometer.getVoltage());
-        Log.d("Potentiometer", "Angle: " + potentiometer.getAngleDegrees());
+        Log.d("Potentiometer", "Angle: " + potentiometer.getAngleFromVoltagePoly());
         Log.d("Potentiometer", "Encoder Angle: " + calculateAngle());
         Log.d("Mapping", String.format("%f, %f", calculateAngle(), potentiometer.getVoltage()));
         telemetry.addData("Potentiometer Voltage", potentiometer.getVoltage());
-        telemetry.addData("Potentiometer Angle", potentiometer.getAngleDegrees());
+        telemetry.addData("Potentiometer Angle", potentiometer.getAngleFromVoltagePoly());
         telemetry.addData("Encoder Angle", calculateAngle());
         telemetry.update();
     }

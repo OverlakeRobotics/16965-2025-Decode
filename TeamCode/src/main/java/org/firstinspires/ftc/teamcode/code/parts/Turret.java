@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.util.Range;
 @Config
 public class Turret extends Shooter {
     public final double TICKS_PER_DEGREE = 537.7 / 360;
-    public static int MAX_LIMIT_ANGLE = 145; // 115; // degrees
-    public static int MIN_LIMIT_ANGLE = -145; // -115; // degrees
+    public static int MAX_LIMIT_ANGLE = 155; // 115; // degrees
+    public static int MIN_LIMIT_ANGLE = -155; // -115; // degrees
     public static double turretPositionP = 17;
     public static double turretP = 10; // 15;
     public static double turretI = 1; // 0;
