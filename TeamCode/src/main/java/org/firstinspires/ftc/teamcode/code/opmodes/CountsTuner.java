@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 
 @Config
 @TeleOp(name = "Counts Tuner", group = "TeleOp")
+@Disabled
 public class CountsTuner extends OpMode {
     public double yOffset = -168.0; // mm
     public double xOffset = -84.0; // mm

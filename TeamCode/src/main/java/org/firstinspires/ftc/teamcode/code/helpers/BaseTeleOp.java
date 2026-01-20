@@ -66,7 +66,7 @@ public abstract class BaseTeleOp extends OpMode {
     protected boolean autoShooter = true;
 
     protected Intake intake;
-//    protected LEDIndicator ledIndicator;
+    protected LEDIndicator ledIndicator;
     protected boolean intakeOn = false;
     protected boolean intakeReversed = false;
 
@@ -116,12 +116,12 @@ public abstract class BaseTeleOp extends OpMode {
 //        turret.resetTurretEncoder();
         turret.setEncoderOffset();
         intake = new Intake(
-                hardwareMap.get(DcMotorEx.class, "intake")
-//                hardwareMap.get(DistanceSensor.class, "distanceSensor")
+                hardwareMap.get(DcMotorEx.class, "intake"),
+                hardwareMap.get(DistanceSensor.class, "distanceSensor")
         );
 
-//        ledIndicator = new LEDIndicator(hardwareMap.get(GoBildaPrismDriver.class, "prism"));
-//        ledIndicator.setState(Intake.IntakeState.AMBIENT);
+        ledIndicator = new LEDIndicator(hardwareMap.get(GoBildaPrismDriver.class, "prism"));
+        ledIndicator.setState(Intake.IntakeState.AMBIENT);
 
         // Initialize AutoAligner
         autoAligner = new AutoAligner(driveTrain, turret, limelight, isRedAlliance());
@@ -150,6 +150,7 @@ public abstract class BaseTeleOp extends OpMode {
 //        Log.d("LED Latency", "LED: " + (runtime.seconds() - temp));
 
 //        Log.d("Turret Error", "Turret Error: " + (turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()));
+        ledIndicator.setState(intake.getState());
 
         telemetry.addData("Position", "X: %.2f, Y: %.2f, H: %.2f",
                 currentPos.getX(DistanceUnit.INCH),
@@ -364,6 +365,7 @@ public abstract class BaseTeleOp extends OpMode {
 
     @Override
     public void stop() {
+        ledIndicator.setState(Intake.IntakeState.OFF);
         PathServer.stopServer();
     }
 }

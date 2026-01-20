@@ -11,11 +11,6 @@ import org.firstinspires.ftc.teamcode.code.parts.Intake.IntakeState;
 
 @Config
 public class LEDIndicator {
-    private final PrismAnimations.Solid empty = new PrismAnimations.Solid(Color.ORANGE);
-    private final PrismAnimations.Solid passing = new PrismAnimations.Solid(Color.BLUE);
-    private final PrismAnimations.Solid full = new PrismAnimations.Solid(Color.GREEN);
-    private final PrismAnimations.Blink jammed = new PrismAnimations.Blink(Color.RED);
-    private final PrismAnimations.Rainbow ambient = new PrismAnimations.Rainbow();
     private final GoBildaPrismDriver prism;
     private IntakeState currentState;
 
@@ -24,28 +19,30 @@ public class LEDIndicator {
         this.currentState = null;
     }
 
+    // The PrepareLEDIndicatorArtboards OpMode must be run before using the LEDs to program the artboards!
     public void setState(IntakeState state) {
         if (state == currentState) {
-            Log.d("LED Latency", "Skipped");
             return;
         }
         currentState = state;
-        prism.clearAllAnimations();
         switch (state) {
-            case AMBIENT:
-                prism.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, ambient);
-                break;
             case EMPTY:
-                prism.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, empty);
+                prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_0);
                 break;
             case PASSING:
-                prism.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, passing);
+                prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_1);
                 break;
             case FULL:
-                prism.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, full);
+                prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_2);
                 break;
             case JAMMED:
-                prism.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, jammed);
+                prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_3);
+                break;
+            case AMBIENT:
+                prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_4);
+                break;
+            case OFF:
+                prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_5);
                 break;
         }
     }

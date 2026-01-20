@@ -17,8 +17,8 @@ public class IntakeInfo extends OpMode {
     @Override
     public void init() {
         this.intake = new Intake(
-                hardwareMap.get(DcMotorEx.class, "intake")
-//                hardwareMap.get(DistanceSensor.class, "distanceSensor")
+                hardwareMap.get(DcMotorEx.class, "intake"),
+                hardwareMap.get(DistanceSensor.class, "distanceSensor")
         );
     }
 
@@ -30,14 +30,14 @@ public class IntakeInfo extends OpMode {
         if (gamepad1.bWasPressed()) {
             intake.setVelocity(0);
         }
-//        Log.d("Intake Info", "Distance MM" + intake.getDistanceMM());
-//        Log.d("Intake Info", "Velocity" + intake.getVelocity());
-//        Log.d("Intake Info", "Power" + intake.getPower());
-//        Log.d("Intake Info", "Current" + intake.getCurrent());
-//        telemetry.addData("Distance MM", intake.getDistanceMM());
-//        telemetry.addData("Velocity", intake.getVelocity());
-//        telemetry.addData("Power", intake.getPower());
-//        telemetry.addData("Current", intake.getCurrent());
-//        telemetry.update();
+        Log.d("Intake Info", "Distance MM" + intake.getDistanceMM());
+        Log.d("Intake Info", "Velocity" + intake.getVelocity());
+        Log.d("Intake Info", "Power" + intake.getPower());
+        Log.d("Intake Info", "Current" + intake.getCurrent());
+        telemetry.addData("Distance MM", intake.getDistanceMM());
+        telemetry.addData("Velocity", intake.getVelocity());
+        telemetry.addData("Power", intake.getPower());
+        telemetry.addData("Current", intake.getCurrent());
+        telemetry.update();
     }
 }

@@ -1,61 +1,56 @@
 package org.firstinspires.ftc.teamcode.code.opmodes;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.code.helpers.Prism.GoBildaPrismDriver;
 import org.firstinspires.ftc.teamcode.code.helpers.Prism.PrismAnimations;
+import org.firstinspires.ftc.teamcode.code.parts.Intake;
+import org.firstinspires.ftc.teamcode.code.parts.LEDIndicator;
 
 @Config
 @TeleOp(name = "LED Test", group = "TeleOp")
 public class LEDTest extends OpMode {
-    PrismAnimations.Solid solid = new PrismAnimations.Solid();
-    PrismAnimations.Random random = new PrismAnimations.Random();
-    PrismAnimations.PoliceLights policeLights = new PrismAnimations.PoliceLights();
-    public static int red = 0;
-    public static int green = 255;
-    public static int blue = 0;
-    public static float startHue = 0;
-    public static float stopHue = 360;
-    public static float speed = 0.05f;
-    public static boolean doSolid = false;
-    private GoBildaPrismDriver prism;
-    private void prepareSolid(int red, int green, int blue) {
-//        solid.setIndexes(0, 30);
-        solid.setPrimaryColor(red, green, blue);
-//        prism.insertAnimation(GoBildaPrismDriver.LayerHeight.LAYER_1, solid);
-    }
-
-    private void prepareRandom(float startHue, float stopHue, float speed) {
-//        random.setIndexes(0, 30);
-        random.setHues(startHue, stopHue);
-        random.setSpeed(speed);
-//        prism.insertAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, random);
-    }
+    private final ElapsedTime runtime = new ElapsedTime();
+    private LEDIndicator ledIndicator;
+    private Intake intake;
 
     @Override
     public void init() {
-        prism = hardwareMap.get(GoBildaPrismDriver.class, "prism");
-        prepareRandom(startHue, stopHue, speed);
-        prepareSolid(red, green, blue);
+        intake = new Intake(
+                hardwareMap.get(DcMotorEx.class, "intake"),
+                hardwareMap.get(DistanceSensor.class, "distanceSensor")
+        );
+        ledIndicator = new LEDIndicator(hardwareMap.get(GoBildaPrismDriver.class, "prism"));
+        ledIndicator.setState(Intake.IntakeState.AMBIENT);
     }
 
     @Override
     public void loop() {
+        double start = runtime.seconds();
+        ledIndicator.setState(intake.getState());
+        telemetry.addData("Loop Time", runtime.seconds() - start);
+        telemetry.update();
         if (gamepad1.aWasPressed()) {
-            prism.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_0, random);
-            if (doSolid) {
-                prism.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_2, solid);
-            }
+            intake.setVelocity(2800);
         }
 
         if (gamepad1.bWasPressed()) {
-            prism.insertAndUpdateAnimation(GoBildaPrismDriver.LayerHeight.LAYER_1, policeLights);
+            intake.setVelocity(-2800);
         }
 
         if (gamepad1.xWasPressed()) {
-            prism.clearAllAnimations();
+            intake.setVelocity(0);
         }
+    }
+
+    @Override
+    public void stop() {
+        ledIndicator.setState(Intake.IntakeState.OFF);
     }
 }

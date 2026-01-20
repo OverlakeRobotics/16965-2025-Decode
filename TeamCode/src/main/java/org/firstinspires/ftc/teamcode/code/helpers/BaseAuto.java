@@ -48,7 +48,7 @@ public abstract class BaseAuto extends OpMode {
     protected String jsonFilename;
     protected OdometryHolonomicDrivetrain driveTrain;
     private Intake intake;
-//    private LEDIndicator ledIndicator;
+    private LEDIndicator ledIndicator;
     private Turret turret;
     private AutoAligner autoAligner;
     private Limelight3A limelight;
@@ -175,11 +175,11 @@ public abstract class BaseAuto extends OpMode {
         driveTrain.setPositionP(positionP);
 
         intake = new Intake(
-                hardwareMap.get(DcMotorEx.class, "intake")
-//                hardwareMap.get(DistanceSensor.class, "distanceSensor")
+                hardwareMap.get(DcMotorEx.class, "intake"),
+                hardwareMap.get(DistanceSensor.class, "distanceSensor")
         );
-//        ledIndicator = new LEDIndicator(hardwareMap.get(GoBildaPrismDriver.class, "prism"));
-//        ledIndicator.setState(Intake.IntakeState.AMBIENT);
+        ledIndicator = new LEDIndicator(hardwareMap.get(GoBildaPrismDriver.class, "prism"));
+        ledIndicator.setState(Intake.IntakeState.AMBIENT);
         turret = new Turret(
                 hardwareMap.get(DcMotorEx.class, "shooterTop"),
                 hardwareMap.get(DcMotorEx.class, "shooterBottom"),
@@ -258,7 +258,7 @@ public abstract class BaseAuto extends OpMode {
 //        Log.d("Pinpoint pos", pos.toString());
 //        Log.d("Turret Error/Auto Aim", "Turret Error: " + (turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()));
 //        Log.d("Auto Aim", "Drivetrain Wanted: " + autoAligner.getDrivetrainAutoAlignAngle() + "; Turret Wanted: " + autoAligner.getTurretAutoAlignAngle());
-//        ledIndicator.setState(intake.getState());
+        ledIndicator.setState(intake.getState());
 
         autoAligner.updateInterpolation(pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH));
         turret.setTurretAngle(autoAligner.getTurretAutoAlignAngle());
@@ -374,6 +374,6 @@ public abstract class BaseAuto extends OpMode {
 
     @Override
     public void stop() {
-
+        ledIndicator.setState(Intake.IntakeState.OFF);
     }
 }

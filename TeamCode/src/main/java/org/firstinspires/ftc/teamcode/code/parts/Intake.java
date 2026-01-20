@@ -14,26 +14,27 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Config
 public class Intake {
     public enum IntakeState {
-        AMBIENT,
         EMPTY,
         PASSING,
         FULL,
-        JAMMED
+        JAMMED,
+        AMBIENT,
+        OFF
     }
     private static final double DISTANCE_THRESHOLD_MM = 200;
     private static final double MAX_VELOCITY = 2800;
     private final DcMotorEx intakeMotor;
-//    private final DistanceSensor distanceSensor;
-//    private final ElapsedTime runtime = new ElapsedTime();
-//    private double blockedBeginTime = -1;
-//    private double stallBeginTime = -1;
+    private final DistanceSensor distanceSensor;
+    private final ElapsedTime runtime = new ElapsedTime();
+    private double blockedBeginTime = -1;
+    private double stallBeginTime = -1;
     private double wantedVelocity = 0;
 
-    public Intake(DcMotorEx intakeMotor/*, DistanceSensor distanceSensor*/) {
+    public Intake(DcMotorEx intakeMotor, DistanceSensor distanceSensor) {
         this.intakeMotor = intakeMotor;
         this.intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         this.intakeMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-//        this.distanceSensor = distanceSensor;
+        this.distanceSensor = distanceSensor;
     }
 
     public void setVelocity(double velocity) {
@@ -45,43 +46,43 @@ public class Intake {
         return intakeMotor.getVelocity();
     }
 
-//    public double getPower() {
-//        return intakeMotor.getPower();
-//    }
-//
-//    public double getCurrent() {
-//        return intakeMotor.getCurrent(CurrentUnit.AMPS);
-//    }
-//
-//    public boolean isStalling() {
-//        boolean stalling = Math.abs(intakeMotor.getVelocity()) < wantedVelocity * 0.3;
-//        if (!stalling) {
-//            stallBeginTime = -1;
-//            return false;
-//        } else if (stallBeginTime < 0) {
-//            stallBeginTime = runtime.seconds();
-//        }
-//        return runtime.seconds() - stallBeginTime > 0.25;
-//    }
-//
-//    public IntakeState getState() {
-//        if (isStalling()) {
-//            return IntakeState.JAMMED;
-//        }
-//        boolean distanceSensorBlocked = distanceSensor.getDistance(DistanceUnit.MM) < DISTANCE_THRESHOLD_MM;
+    public double getPower() {
+        return intakeMotor.getPower();
+    }
+
+    public double getCurrent() {
+        return intakeMotor.getCurrent(CurrentUnit.AMPS);
+    }
+
+    public boolean isStalling() {
+        boolean stalling = Math.abs(intakeMotor.getVelocity()) < Math.abs(wantedVelocity) * 0.3 && Math.abs(getCurrent()) > 2.5;
+        if (!stalling) {
+            stallBeginTime = -1;
+            return false;
+        } else if (stallBeginTime < 0) {
+            stallBeginTime = runtime.seconds();
+        }
+        return runtime.seconds() - stallBeginTime > 0.25;
+    }
+
+    public IntakeState getState() {
+        if (isStalling()) {
+            return IntakeState.JAMMED;
+        }
+        boolean distanceSensorBlocked = getDistanceMM() < DISTANCE_THRESHOLD_MM;
 //        Log.d("LED Latency", "Dist: " + distanceSensor.getDistance(DistanceUnit.MM));
-//        if (!distanceSensorBlocked) {
-//            blockedBeginTime = -1;
-//            return IntakeState.EMPTY;
-//        } else if (blockedBeginTime < 0) {
-//            blockedBeginTime = runtime.seconds();
-//        }
-//        return runtime.seconds() - blockedBeginTime > 0.5 ? IntakeState.FULL : IntakeState.PASSING;
-//    }
-//
-//    public double getDistanceMM() {
-//        return distanceSensor.getDistance(DistanceUnit.MM);
-//    }
+        if (!distanceSensorBlocked) {
+            blockedBeginTime = -1;
+            return IntakeState.EMPTY;
+        } else if (blockedBeginTime < 0) {
+            blockedBeginTime = runtime.seconds();
+        }
+        return runtime.seconds() - blockedBeginTime > 0.5 ? IntakeState.FULL : IntakeState.PASSING;
+    }
+
+    public double getDistanceMM() {
+        return distanceSensor.getDistance(DistanceUnit.MM);
+    }
 
     public void stop() {
         wantedVelocity = 0;

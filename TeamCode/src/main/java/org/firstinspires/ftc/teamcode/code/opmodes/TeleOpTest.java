@@ -51,8 +51,8 @@ public class TeleOpTest extends OpMode {
         );
 
         intake = new Intake(
-                hardwareMap.get(DcMotorEx.class, "intake")
-//                hardwareMap.get(DistanceSensor.class, "distanceSensor")
+                hardwareMap.get(DcMotorEx.class, "intake"),
+                hardwareMap.get(DistanceSensor.class, "distanceSensor")
         );
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter");
         hoodServo = hardwareMap.get(Servo.class, "hood");

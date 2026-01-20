@@ -27,7 +27,8 @@ public class ColorSorting extends OpMode {
         greenSorter = hardwareMap.get(Servo.class, "greenSorter");
         purpleSorter = hardwareMap.get(Servo.class, "purpleSorter");
         intake = new Intake(
-                hardwareMap.get(DcMotorEx.class, "intake")
+                hardwareMap.get(DcMotorEx.class, "intake"),
+                hardwareMap.get(DistanceSensor.class, "distanceSensor")
         );
         huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
     }
