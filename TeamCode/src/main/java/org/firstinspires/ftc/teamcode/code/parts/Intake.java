@@ -55,14 +55,14 @@ public class Intake {
     }
 
     public boolean isStalling() {
-        boolean stalling = Math.abs(intakeMotor.getVelocity()) < Math.abs(wantedVelocity) * 0.3 && Math.abs(getCurrent()) > 2.5;
+        boolean stalling = Math.abs(intakeMotor.getVelocity()) < Math.abs(wantedVelocity) * 0.2 && Math.abs(getCurrent()) > 3.0;
         if (!stalling) {
             stallBeginTime = -1;
             return false;
         } else if (stallBeginTime < 0) {
             stallBeginTime = runtime.seconds();
         }
-        return runtime.seconds() - stallBeginTime > 0.25;
+        return runtime.seconds() - stallBeginTime > 0.5;
     }
 
     public IntakeState getState() {
@@ -77,7 +77,7 @@ public class Intake {
         } else if (blockedBeginTime < 0) {
             blockedBeginTime = runtime.seconds();
         }
-        return runtime.seconds() - blockedBeginTime > 0.5 ? IntakeState.FULL : IntakeState.PASSING;
+        return runtime.seconds() - blockedBeginTime > 0.3 ? IntakeState.FULL : IntakeState.PASSING;
     }
 
     public double getDistanceMM() {
