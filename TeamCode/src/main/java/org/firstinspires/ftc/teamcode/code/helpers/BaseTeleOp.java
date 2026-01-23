@@ -140,7 +140,7 @@ public abstract class BaseTeleOp extends OpMode {
         driveTrain.updatePosition();
         Pose2D currentPos = driveTrain.getPosition();
         PathServer.setRobotPose(currentPos);
-        autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
+//        autoAligner.updateInterpolation(currentPos.getX(DistanceUnit.INCH), currentPos.getY(DistanceUnit.INCH));
 //        double temp = runtime.seconds();
 //        Intake.IntakeState state = intake.getState();
 //        Log.d("LED Latency", "Intake: " + (runtime.seconds() - temp));
@@ -312,11 +312,14 @@ public abstract class BaseTeleOp extends OpMode {
             }
         }
 
-        if (gamepad2.bWasPressed()) {
+        if (gamepad2.dpadRightWasPressed()) {
 //            autoAligner.resetPinpointPositionFromLimelight();
             double ySign = isRedAlliance() ? 1.0 : -1.0;
             Pose2D currPos = driveTrain.getPosition();
             driveTrain.setPosition(new Pose2D(DistanceUnit.INCH, -63, 63 * ySign, AngleUnit.DEGREES, currPos.getHeading(AngleUnit.DEGREES)));
+        }
+        if (gamepad2.bWasPressed()) {
+            autoAligner.resetPinpointPositionFromLimelight();
         }
         if (gamepad2.xWasPressed()) {
             Pose2D pos = driveTrain.getPosition();

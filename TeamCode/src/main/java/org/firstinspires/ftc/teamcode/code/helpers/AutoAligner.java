@@ -147,22 +147,22 @@ public class AutoAligner {
     }
 
     public double getDistanceToGoal() {
-        LLResult result = limelight.getLatestResult();
+//        LLResult result = limelight.getLatestResult();
         Pose2D pos = driveTrain.getPosition();
-        if (result.isValid()) {
-            List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
-            for (LLResultTypes.FiducialResult tag : aprilTags) {
-                if (tag.getFiducialId() == targetAprilID) {
-                    Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
-//                    Log.d("Limelight", "using limelight dist");
-//                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
-//                        break;
-//                    }
-                    return Math.hypot(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37);
-                }
-            }
-        }
-//        Log.d("Limelight", "Pinpoint dist");
+//        if (result.isValid()) {
+//            List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
+//            for (LLResultTypes.FiducialResult tag : aprilTags) {
+//                if (tag.getFiducialId() == targetAprilID) {
+//                    Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
+////                    Log.d("Limelight", "using limelight dist");
+////                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
+////                        break;
+////                    }
+//                    return Math.hypot(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37);
+//                }
+//            }
+//        }
+////        Log.d("Limelight", "Pinpoint dist");
         return Math.hypot(goalX - pos.getX(DistanceUnit.INCH), goalY - pos.getY(DistanceUnit.INCH));
     }
 

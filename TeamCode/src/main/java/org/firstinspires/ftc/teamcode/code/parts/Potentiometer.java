@@ -18,7 +18,8 @@ public class Potentiometer {
     }
 
     public double getAngleFromVoltagePoly() {
-        double v = getVoltage();
+        // tiny voltage offset because D-shaft prevented 1.202 at zero degrees; now 1.206 at zero degrees.
+        double v = getVoltage() - 0.004;
         return (((((((-319.82121105417582 * v
                 + 3201.2248841083424) * v
                 - 13591.245983901385) * v
