@@ -15,6 +15,8 @@ public class Shooter {
     private final DcMotorEx shooterMotor2;
     private final Servo hoodServo;
     private final Servo blocker;
+
+    private double targetShooterVelocity = 0;
     public static double p = 500;
     public static double i = 1.5;
     public static double d = 5;
@@ -36,12 +38,17 @@ public class Shooter {
 
     public void setShooterVelocity(double velocity) {
         double clippedVelocity = Range.clip(velocity * MOTOR_TO_WHEEL_VELOCITY_RATIO, -MAX_VELOCITY, MAX_VELOCITY);
+        targetShooterVelocity = clippedVelocity;
         shooterMotor1.setVelocity(clippedVelocity);
         shooterMotor2.setVelocity(clippedVelocity);
     }
 
     public double getShooterVelocity() {
         return shooterMotor1.getVelocity() / MOTOR_TO_WHEEL_VELOCITY_RATIO;
+    }
+
+    public double getShooterTargetVelocity() {
+        return targetShooterVelocity;
     }
 
     public double getShooterPower() {

@@ -65,12 +65,12 @@ public abstract class BaseAuto extends OpMode {
 
     public static double hoodAngleVelScale = 0.5;
 
+    public static double turretPreturnConstant = 0; //0.1;
+
     private double wantedShooterVelocity = 0;
     private boolean isShooting;
-    public static double shooterDelay = 0.3;
+    public static double shooterDelay = 0.0; // 0.3;
     private double shooterTimer = 0;
-    public static double shooterTolerance = 80; // 80;
-    public static double turretTolerance = 5;
     public String alliance;
 
     protected Pose2D startPose = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
@@ -228,13 +228,16 @@ public abstract class BaseAuto extends OpMode {
     }
 
     public void autoAim(int pointIndex) {
+        double start = runtime.time();
         Pose2D curTarget = positions[pointIndex];
         positions[pointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH),
                 curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
-        double hoodAngle = autoAligner.getOptimalHoodAngle() - autoAligner.lastVelPar * hoodAngleVelScale;
+        double hoodAngle = autoAligner.getOptimalHoodAngle() - (autoAligner.useShootMove ? autoAligner.lastVelPar * hoodAngleVelScale : 0);
         turret.setHoodAngle(hoodAngle);
         wantedShooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
         turret.setShooterVelocity(wantedShooterVelocity);
+
+        Log.d("Loop Time", "Auto Aim time: " + (runtime.time() - start));
     }
 
     public void shoot(int pointIndex) {
@@ -242,7 +245,7 @@ public abstract class BaseAuto extends OpMode {
         autoAim(pointIndex);
         double shootingIntakeVelocity = 0;
 
-        if (shooterTimer <= 0 && Math.abs(turret.getShooterVelocity() - wantedShooterVelocity) <= shooterTolerance && Math.abs(turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()) <= turretTolerance) {
+        if (shooterTimer <= 0 && autoAligner.readyToShoot()) {
             shootingIntakeVelocity = 2800;
         }
 
@@ -251,23 +254,41 @@ public abstract class BaseAuto extends OpMode {
 
     @Override
     public void loop() {
+
+        double start = runtime.time();
         driveTrain.updatePosition();
         Pose2D pos = driveTrain.getPosition();
         driveTrain.drive();
 
-//        Log.d("Pinpoint pos", pos.toString());
-//        Log.d("Turret Error/Auto Aim", "Turret Error: " + (turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()));
-//        Log.d("Auto Aim", "Drivetrain Wanted: " + autoAligner.getDrivetrainAutoAlignAngle() + "; Turret Wanted: " + autoAligner.getTurretAutoAlignAngle());
+        Log.d("Loop Time", "Drive time: " + (runtime.time() - start));
+
+        start = runtime.time();
+
         ledIndicator.setState(intake.getState());
 
+        Log.d("Loop Time", "LED time: " + (runtime.time() - start));
+
+        start = runtime.time();
         autoAligner.updateInterpolation(pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH));
-        turret.setTurretAngle(autoAligner.getTurretAutoAlignAngle());
-//        turret.setTurretAngle(0);
+        Log.d("Loop Time", "Interpolation time: " + (runtime.time() - start));
+
+        double wantedTurretAngle = autoAligner.getTurretAutoAlignAngle();
+        turret.setTurretAngle(wantedTurretAngle + autoAligner.lastVelPerp * turretPreturnConstant);
+//        Log.d("Velocity", "Vel perp: " + autoAligner.lastVelPerp);
+
+        Log.d("Turret Error", "Turret Error: " + (turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()));
+
+//        Log.d("Turret Angle", "Pinpoint Pos: " + pos.getX(DistanceUnit.INCH) + ", " + pos.getY(DistanceUnit.INCH));
+//        double turretPos = turret.getTurretCurrentAngle();
+//        Log.d("Turret Angle", "Current Turret Angle: " + turretPos);
+//        Log.d("Turret Angle", "Wanted Turret Angle: " + wantedTurretAngle);
+//        Log.d("Turret Angle", "Wanted Turret Angle 2: " + turret.getTurretTargetAngle());
+//        Log.d("Turret Angle", "Difference: " + (wantedTurretAngle - turretPos));
 
         double curTime = runtime.seconds();
         double dt = curTime - lastTime;
         lastTime = curTime;
-//        Log.d("Loop Time", "dt: " + dt);
+        Log.d("Loop Time", "dt: " + dt);
 
         if (pauseTimeLeft <= 0) {
             int nextPointIndex = driveTrain.getNextPointIndex();
@@ -292,7 +313,6 @@ public abstract class BaseAuto extends OpMode {
                     case "pause":
                         if (currTag.value <= 0) break;
                         pauseTimeLeft = currTag.value;
-//                        Log.d("Pause Time Left", "Pause Time Left: " + pauseTimeLeft);
                         pausedIndex = nextPointIndex;
                         driveTrain.setPositionDrive(positions[nextPointIndex - 1]);
                         break;
@@ -328,8 +348,8 @@ public abstract class BaseAuto extends OpMode {
                         if (currTag.value <= 0) break;
                         turret.open();
                         pauseTimeLeft = currTag.value;
-//                        Log.d("Pause Time Left", "Pause Time Left: " + pauseTimeLeft);
                         pausedIndex = nextPointIndex;
+                        driveTrain.setVelocity(30);
                         driveTrain.setPositionDrive(positions[nextPointIndex - 1]);
                         shooterTimer = shooterDelay;
                         isShooting = true;
@@ -346,6 +366,12 @@ public abstract class BaseAuto extends OpMode {
                         isShooting = false;
                         break;
                     }
+                    case "tolerance": {
+                        driveTrain.setTolerance(currTag.value);
+                    }
+                    case "shootWhileMove": {
+                        autoAligner.useShootMove = currTag.value == 1;
+                    }
                 }
                 lastTagIndex++;
             }
@@ -356,9 +382,9 @@ public abstract class BaseAuto extends OpMode {
             pauseTimeLeft -= dt;
             shooterTimer -= dt;
 
-//            Log.d("Pause Time Left", "Pause Time Left: " + pauseTimeLeft);
-
             if (pauseTimeLeft <= 0) {
+                driveTrain.setVelocity(velocity);
+
                 pauseTimeLeft = 0;
                 driveTrain.setPositionDrive(positions, pausedIndex);
                 if (isShooting) {

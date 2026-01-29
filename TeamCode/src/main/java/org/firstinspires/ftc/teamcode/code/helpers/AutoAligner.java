@@ -29,10 +29,16 @@ public class AutoAligner {
     public static double kSlip = 0;
     public static double hoodAngle = 0;
     public static double aprilAlignOffset = 0;
-    public static double kSlipTurretRotationConstant = 0.01;
+    public static double kSlipTurretRotationConstant = 0.01; // 0.01;
     public static double autoAlignBuffer = 5; // degrees
     public static double randomMultiplier = 1;
     public static double randomMultiplierPerp = 1;
+
+    public static double farShooterTolerance = 100;
+    public static double closeShooterTolerance = 150;
+
+    public static double closeDist = 110;
+    public static double turretTolerance = 6;
 
     public static double maxShooterVelocity = 2800;
     public static double goalX;
@@ -53,6 +59,8 @@ public class AutoAligner {
     private final Turret turret;
     private final Limelight3A limelight;
 
+    public boolean useShootMove = true;
+
     public double lastVelPar;
     public double lastVelPerp;
 
@@ -69,33 +77,36 @@ public class AutoAligner {
     }
 
     private final PointValues[] interpolationPoints = {
-//            new PointValues(-48, 0, new double[]{0.44, 50, 0}),
-//            new PointValues(-64, 32, new double[]{0.425, 50, 1}),
-//            new PointValues(-64, -32, new double[]{0.42, 50, 0}),
-//            new PointValues(-55, 17, new double[]{0.435, 50, 1}),
-//            new PointValues(-55, -17, new double[]{0.425, 50, 1}),
-              new PointValues(-45, 0, new double[]{0.47, 50, 1.5}),
-              new PointValues(-54, 18, new double[]{0.47, 50, 1}),
-              new PointValues(-54, -18, new double[]{0.47, 50, 1}),
-              new PointValues(-63, 33, new double[]{0.47, 50, 3}),
+//              new PointValues(-45, 0, new double[]{0.47, 50, 1.5}),
+//              new PointValues(-54, 18, new double[]{0.47, 50, 1}),
+//              new PointValues(-54, -18, new double[]{0.47, 50, 1}),
+//              new PointValues(-63, 33, new double[]{0.47, 50, 3}),
+              new PointValues(-63.3, 33, new double[]{0.475, 50, 4}),
+              new PointValues(-54, 18, new double[]{0.475, 50, 3.5}),
+              new PointValues(-48, -0, new double[]{0.472, 50, 3}),
+              new PointValues(-63.3, 0, new double[]{0.47, 50, 2.5}),
+              new PointValues(-54, -18, new double[]{0.467, 50, 1.5}),
+              new PointValues(-63.3, -30, new double[]{0.457, 50, 0.5}),
 
-//              new PointValues(25, 25, new double[]{0.5, 44, 0}),
-//              new PointValues(14, 14, new double[]{0.52, 50, 0}),
 
-//              new PointValues(24, 24, new double[]{0.49, 40, 0}),
-//              new PointValues(0, 0, new double[]{0.51, 50, 0}),
               // Close points
-              new PointValues(0, 0, new double[]{0.47, 45, 0}),
-              new PointValues(39, 39, new double[]{0.47, 25, 0}),
-              new PointValues(24, 24, new double[]{0.47, 35, 0}),
-              new PointValues(48, 0, new double[]{0.46, 37, -2}),
-              new PointValues(24, 0, new double[]{0.47, 40, 1}),
-              new PointValues(48, 24, new double[]{0.465, 28, -1}),
-              new PointValues(30, 42, new double[]{0.475, 27, 1}),
-              new PointValues(6, 18, new double[]{0.48, 42, 1}),
-              new PointValues(24, -24, new double[]{0.46, 45, -2}),
-              new PointValues(39, -39, new double[]{0.46, 45, -1}),
-              new PointValues(48, -24, new double[]{0.47, 45, -1}),
+              new PointValues(0, 0, new double[]{0.5, 50, 0}),
+              new PointValues(21, 21, new double[]{0.525, 50, 0}),
+              new PointValues(33, 33, new double[]{0.51, 35, 0}),
+              new PointValues(45, 45, new double[]{0.495, 23, 0}),
+              new PointValues(7, 18, new double[]{0.51, 50, 0}),
+              new PointValues(39, 15, new double[]{0.5, 40, -1}),
+//              new PointValues(0, 0, new double[]{0.47, 45, 0}),
+//              new PointValues(39, 39, new double[]{0.47, 25, 0}),
+//              new PointValues(24, 24, new double[]{0.47, 35, 0}),
+//              new PointValues(48, 0, new double[]{0.46, 37, -2}),
+//              new PointValues(24, 0, new double[]{0.47, 40, 1}),
+//              new PointValues(48, 24, new double[]{0.465, 28, -1}),
+//              new PointValues(30, 42, new double[]{0.475, 27, 1}),
+//              new PointValues(6, 18, new double[]{0.48, 42, 1}),
+//              new PointValues(24, -24, new double[]{0.46, 45, -2}),
+//              new PointValues(39, -39, new double[]{0.46, 45, -1}),
+//              new PointValues(48, -24, new double[]{0.47, 45, -1}),
 
               // Far points
 //              new PointValues(-54, 18, new double[]{0.455, 45, 3.5}),
@@ -104,16 +115,6 @@ public class AutoAligner {
 //              new PointValues(-54, -18, new double[]{0.455, 45, 1}),
 //              new PointValues(-63, -33, new double[]{0.445, 45, 1}),
 //              new PointValues(-63, 0, new double[]{0.45, 45, 2})
-
-//              new PointValues(36, 36, new double[]{0.475, 30, 0}),
-//              new PointValues(24, -24, new double[]{0.49, 50, -0.5}),
-//              new PointValues(48, 0, new double[]{0.51, 50, -1.5}),
-//              new PointValues(36, -36, new double[]{0.49, 50, -2.5})
-//
-//            new PointValues(0, 0, new double[]{0.45, 50, -2}),
-//            new PointValues(39, 39, new double[]{0.425, 27, -1}),
-//            new PointValues(39, -39, new double[]{0.435, 50, -2}),
-//            new PointValues(48, 0, new double[]{0.47, 50, -2}),
     };
 
     public AutoAligner(OdometryHolonomicDrivetrain driveTrain, Turret turret, Limelight3A limelight, boolean isRed) {
@@ -162,13 +163,21 @@ public class AutoAligner {
 //                }
 //            }
 //        }
-////        Log.d("Limelight", "Pinpoint dist");
+//        Log.d("Limelight", "Pinpoint dist");
         return Math.hypot(goalX - pos.getX(DistanceUnit.INCH), goalY - pos.getY(DistanceUnit.INCH));
     }
 
     public double getDistanceToApril() {
         Pose2D pos = driveTrain.getPosition();
         return Math.hypot(aprilX - pos.getX(DistanceUnit.INCH), aprilY - pos.getY(DistanceUnit.INCH));
+    }
+
+    public boolean readyToShoot() {
+        double dist = getDistanceToGoal();
+        double shooterTolerance = dist < closeDist ? closeShooterTolerance : farShooterTolerance;
+        double shooterError = Math.abs(turret.getShooterVelocity() - turret.getShooterTargetVelocity());
+        double turretError = Math.abs(turret.getTurretTargetAngle() - turret.getTurretCurrentAngle());
+        return (shooterError <= shooterTolerance) && (turretError <= turretTolerance);
     }
 
     public void resetPinpointPositionFromLimelight() {
@@ -213,7 +222,7 @@ public class AutoAligner {
 //                    double limelightAngle = turretAngle - tag.getTargetXDegrees();
 //                    Log.d("Turret Debug", "Limelight wanted: " + limelightAngle);
 //                    return limelightAngle;
-                    return turretAngle - tag.getTargetXDegrees() + aprilAlignOffset + angleOffset;
+                    return turretAngle - tag.getTargetXDegrees() + aprilAlignOffset + (useShootMove ? angleOffset : 0);
                 }
             }
         }
@@ -395,7 +404,7 @@ public class AutoAligner {
     public double getShooterVelocityFromAngle(double theta) {
         double horizontalDist = getDistanceToGoal();
 
-        double adjustedKSlip = kSlip + kSlipTurretRotationConstant * Math.abs(turret.getTurretCurrentAngle()) / 180;
+        double adjustedKSlip = kSlip + horizontalDist > closeDist ? kSlipTurretRotationConstant * Math.abs(turret.getTurretCurrentAngle()) / 180 : 0;
         // Convert theta to radians
         theta = Math.toRadians(theta);
 

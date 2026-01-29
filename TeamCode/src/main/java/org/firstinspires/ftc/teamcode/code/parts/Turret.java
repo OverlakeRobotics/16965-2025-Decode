@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.code.parts;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -38,7 +40,9 @@ public class Turret extends Shooter {
 
     // CCW is positive, CW is negative
     public void setTurretAngle(double angle) {
-        turretMotor.setTargetPosition((int) Math.round(Range.clip(angle - encoderAngleOffset, MIN_ANGLE_LIMIT, MAX_ANGLE_LIMIT) * 4 * TICKS_PER_DEGREE));
+        int targetAngle = (int) Math.round((Range.clip(angle, MIN_ANGLE_LIMIT, MAX_ANGLE_LIMIT) - encoderAngleOffset) * 4 * TICKS_PER_DEGREE);
+
+        turretMotor.setTargetPosition(targetAngle);
         turretMotor.setVelocity(TURRET_VELOCITY);
     }
 
@@ -61,6 +65,7 @@ public class Turret extends Shooter {
     }
 
     public void setEncoderOffset() {
+        resetTurretEncoder();
         encoderAngleOffset = potentiometer.getAngleFromVoltagePoly() - getEncoderReportedAngle();
     }
 }
