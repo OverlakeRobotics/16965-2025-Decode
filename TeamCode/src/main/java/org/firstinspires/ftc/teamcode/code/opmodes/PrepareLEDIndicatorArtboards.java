@@ -13,8 +13,7 @@ import org.firstinspires.ftc.teamcode.code.helpers.Prism.PrismAnimations;
 public class PrepareLEDIndicatorArtboards extends LinearOpMode {
     public static int ANIMATION_BRIGHTNESS = 100;
     private final PrismAnimations.Solid empty = new PrismAnimations.Solid(Color.MAGENTA);
-    private final PrismAnimations.Solid one = new PrismAnimations.Solid(Color.YELLOW);
-    private final PrismAnimations.Solid two = new PrismAnimations.Solid(Color.BLUE);
+    private final PrismAnimations.Solid passing = new PrismAnimations.Solid(Color.BLUE);
     private final PrismAnimations.Solid full = new PrismAnimations.Solid(Color.GREEN);
     private final PrismAnimations.Blink jammed = new PrismAnimations.Blink(Color.RED, Color.TRANSPARENT, 500, 250);
     private final PrismAnimations.RainbowSnakes ambient = new PrismAnimations.RainbowSnakes();
@@ -30,12 +29,11 @@ public class PrepareLEDIndicatorArtboards extends LinearOpMode {
         waitForStart();
 
         program(GoBildaPrismDriver.Artboard.ARTBOARD_0, empty, "EMPTY");
-        program(GoBildaPrismDriver.Artboard.ARTBOARD_1, one, "ONE");
-        program(GoBildaPrismDriver.Artboard.ARTBOARD_2, two, "TWO");
-        program(GoBildaPrismDriver.Artboard.ARTBOARD_3, full, "FULL");
-        program(GoBildaPrismDriver.Artboard.ARTBOARD_4, jammed, "JAMMED");
-        program(GoBildaPrismDriver.Artboard.ARTBOARD_5, ambient, "AMBIENT");
-        program(GoBildaPrismDriver.Artboard.ARTBOARD_6, off, "OFF");
+        program(GoBildaPrismDriver.Artboard.ARTBOARD_1, passing, "PASSING");
+        program(GoBildaPrismDriver.Artboard.ARTBOARD_2, full, "FULL");
+        program(GoBildaPrismDriver.Artboard.ARTBOARD_3, jammed, "JAMMED");
+        program(GoBildaPrismDriver.Artboard.ARTBOARD_4, ambient, "AMBIENT");
+        program(GoBildaPrismDriver.Artboard.ARTBOARD_5, off, "OFF");
 
         prism.clearAllAnimations();
         telemetry.addLine("Done programming Prism Artboards.");

@@ -29,23 +29,20 @@ public class LEDIndicator {
             case EMPTY:
                 prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_0);
                 break;
-            case ONE:
+            case PASSING:
                 prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_1);
                 break;
-            case TWO:
+            case FULL:
                 prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_2);
                 break;
-            case FULL:
+            case JAMMED:
                 prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_3);
                 break;
-            case JAMMED:
+            case AMBIENT:
                 prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_4);
                 break;
-            case AMBIENT:
-                prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_5);
-                break;
             case OFF:
-                prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_6);
+                prism.loadAnimationsFromArtboard(GoBildaPrismDriver.Artboard.ARTBOARD_5);
                 break;
         }
     }

@@ -14,8 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Intake {
     public enum IntakeState {
         EMPTY,
-        ONE,
-        TWO,
+        PASSING,
         FULL,
         JAMMED,
         AMBIENT,
@@ -27,19 +26,19 @@ public class Intake {
     private static final double MAX_VELOCITY = 2800;
     private final DcMotorEx intakeMotor;
     private final DistanceSensor lowerDistanceSensor;
-    private final NormalizedColorSensor middleColorSensor;
+    private final DistanceSensor middleDistanceSensor;
     private final NormalizedColorSensor upperColorSensor;
     private final ElapsedTime runtime = new ElapsedTime();
-//    private double blockedBeginTime = -1;
+    private double middleBlockedBeginTime = -1;
     private double stallBeginTime = -1;
     private double wantedVelocity = 0;
 
-    public Intake(DcMotorEx intakeMotor, DistanceSensor lowerDistanceSensor, NormalizedColorSensor middleColorSensor, NormalizedColorSensor upperColorSensor) {
+    public Intake(DcMotorEx intakeMotor, DistanceSensor lowerDistanceSensor, DistanceSensor middleDistanceSensor, NormalizedColorSensor upperColorSensor) {
         this.intakeMotor = intakeMotor;
         this.intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         this.intakeMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         this.lowerDistanceSensor = lowerDistanceSensor;
-        this.middleColorSensor = middleColorSensor;
+        this.middleDistanceSensor = middleDistanceSensor;
         this.upperColorSensor = upperColorSensor;
     }
 
@@ -75,28 +74,19 @@ public class Intake {
         if (isStalling()) {
             return IntakeState.JAMMED;
         }
-        int lowerBlocked = getLowerDistanceMM() < LOWER_DISTANCE_THRESHOLD_MM ? 1 : 0;
-        int middleBlocked = getMiddleDistanceMM() < MIDDLE_DISTANCE_THRESHOLD_MM ? 1 : 0;
-        int upperBlocked = getUpperDistanceMM() < UPPER_DISTANCE_THRESHOLD_MM ? 1 : 0;
-        int totalBlocked = lowerBlocked + middleBlocked + upperBlocked;
-        switch(totalBlocked) {
-            case 1:
-                return IntakeState.ONE;
-            case 2:
-                return IntakeState.TWO;
-            case 3:
-                return IntakeState.FULL;
-            default:
-                return IntakeState.EMPTY;
-        }
+        boolean lowerBlocked = getLowerDistanceMM() < LOWER_DISTANCE_THRESHOLD_MM;
+        boolean middleBlocked = getMiddleDistanceMM() < MIDDLE_DISTANCE_THRESHOLD_MM;
 //        Log.d("LED Latency", "Dist: " + distanceSensor.getDistance(DistanceUnit.MM));
-//        if (!distanceSensorBlocked) {
-//            blockedBeginTime = -1;
-//            return IntakeState.EMPTY;
-//        } else if (blockedBeginTime < 0) {
-//            blockedBeginTime = runtime.seconds();
-//        }
-//        return runtime.seconds() - blockedBeginTime > 0.3 ? IntakeState.FULL : IntakeState.PASSING;
+        if (!middleBlocked) {
+            middleBlockedBeginTime = -1;
+            if (!lowerBlocked) {
+                return IntakeState.EMPTY;
+            }
+            return IntakeState.PASSING;
+        } else if (middleBlockedBeginTime < 0) {
+            middleBlockedBeginTime = runtime.seconds();
+        }
+        return runtime.seconds() - middleBlockedBeginTime > 0.3 && lowerBlocked ? IntakeState.FULL : IntakeState.PASSING;
     }
 
     public double getLowerDistanceMM() {
@@ -104,11 +94,7 @@ public class Intake {
     }
 
     public double getMiddleDistanceMM() {
-        if (middleColorSensor instanceof DistanceSensor) {
-            return ((DistanceSensor) middleColorSensor).getDistance(DistanceUnit.MM);
-        } else {
-            return -1;
-        }
+        return middleDistanceSensor.getDistance(DistanceUnit.MM);
     }
 
     public double getUpperDistanceMM() {
