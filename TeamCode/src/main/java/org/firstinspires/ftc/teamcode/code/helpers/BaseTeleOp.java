@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -115,7 +116,9 @@ public abstract class BaseTeleOp extends OpMode {
         turret.setEncoderOffset();
         intake = new Intake(
                 hardwareMap.get(DcMotorEx.class, "intake"),
-                hardwareMap.get(DistanceSensor.class, "distanceSensor")
+                hardwareMap.get(DistanceSensor.class, "distanceSensor"),
+                hardwareMap.get(NormalizedColorSensor.class, "middleColorSensor"),
+                hardwareMap.get(NormalizedColorSensor.class, "upperColorSensor")
         );
 
         ledIndicator = new LEDIndicator(hardwareMap.get(GoBildaPrismDriver.class, "prism"));
@@ -359,6 +362,9 @@ public abstract class BaseTeleOp extends OpMode {
 //        telemetry.addData("Turret Given Target Angle", turretAngle);
 //        telemetry.addData("Turret Current Angle", turret.getTurretCurrentAngle());
 //        telemetry.addData("Turret True Target Angle", turret.getTurretTargetAngle());
+//        telemetry.addData("Shooter Top Current Velocity", turret.getShooter1Velocity());
+//        telemetry.addData("Shooter Bottom Current Velocity", turret.getShooter2Velocity());
+//        telemetry.addData("Wanted Shooter Velocity", shooterVelocity);
         telemetry.update();
     }
 

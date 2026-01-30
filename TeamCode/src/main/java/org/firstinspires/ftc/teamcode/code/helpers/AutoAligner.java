@@ -175,7 +175,7 @@ public class AutoAligner {
     public boolean readyToShoot() {
         double dist = getDistanceToGoal();
         double shooterTolerance = dist < closeDist ? closeShooterTolerance : farShooterTolerance;
-        double shooterError = Math.abs(turret.getShooterVelocity() - turret.getShooterTargetVelocity());
+        double shooterError = Math.abs(turret.getShooter1Velocity() - turret.getShooterTargetVelocity());
         double turretError = Math.abs(turret.getTurretTargetAngle() - turret.getTurretCurrentAngle());
         return (shooterError <= shooterTolerance) && (turretError <= turretTolerance);
     }
@@ -404,7 +404,7 @@ public class AutoAligner {
     public double getShooterVelocityFromAngle(double theta) {
         double horizontalDist = getDistanceToGoal();
 
-        double adjustedKSlip = kSlip + horizontalDist > closeDist ? kSlipTurretRotationConstant * Math.abs(turret.getTurretCurrentAngle()) / 180 : 0;
+        double adjustedKSlip = kSlip + (horizontalDist > closeDist ? kSlipTurretRotationConstant * Math.abs(turret.getTurretCurrentAngle()) / 180 : 0);
         // Convert theta to radians
         theta = Math.toRadians(theta);
 
@@ -463,7 +463,7 @@ public class AutoAligner {
                 4.0
         );
         double v_test = (goalDZ + (g * t_test * t_test) / 2) / (t_test * Math.cos(theta));
-        double tps_test = (v_test * 60) / (2 * Math.PI * rhinoWheelRadius * adjustedKSlip) * motorTicksPerRev / 60;
+//        double tps_test = (v_test * 60) / (2 * Math.PI * rhinoWheelRadius * adjustedKSlip) * motorTicksPerRev / 60;
 
         angleOffset = Math.toDegrees(Math.atan2(-velPerp, (horizontalDist / t) - velPar));
 //        Log.d("Move Launch", "Angle Offset: " + angleOffset);
@@ -477,7 +477,8 @@ public class AutoAligner {
 //            Log.d("Shooter Velocity", "raw vel: " + rawTPS);
 //        }
 //        Log.d("Shooter Velocity", "Wanted: " + Math.round(rawTPS) + "WantedStationary: " + Math.round(tps_test) + "Actual: " + turret.getShooterVelocity() + "Diff: " + Math.round(rawTPS - tps_test) + "AccDiff: " + Math.round(rawTPS - turret.getShooterVelocity()) + "Power: " + turret.getShooterPower());
-        return Range.clip(rpm * motorTicksPerRev / 60, 0, maxShooterVelocity);
+//        Log.d("Shooter", String.format("Horizontal Dist: %.5f, K-Slip: %.5f, RPM: %f, RawTPS: %f, Hood Angle: %f", horizontalDist, adjustedKSlip, rpm, rawTPS, theta));
+        return Range.clip(rawTPS, 0, maxShooterVelocity);
     }
 
     public double getOptimalHoodAngle() {

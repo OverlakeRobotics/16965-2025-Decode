@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -52,7 +53,9 @@ public class TeleOpTest extends OpMode {
 
         intake = new Intake(
                 hardwareMap.get(DcMotorEx.class, "intake"),
-                hardwareMap.get(DistanceSensor.class, "distanceSensor")
+                hardwareMap.get(DistanceSensor.class, "distanceSensor"),
+                hardwareMap.get(NormalizedColorSensor.class, "middleColorSensor"),
+                hardwareMap.get(NormalizedColorSensor.class, "upperColorSensor")
         );
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter");
         hoodServo = hardwareMap.get(Servo.class, "hood");

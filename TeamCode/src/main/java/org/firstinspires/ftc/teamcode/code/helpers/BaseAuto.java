@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -176,7 +177,9 @@ public abstract class BaseAuto extends OpMode {
 
         intake = new Intake(
                 hardwareMap.get(DcMotorEx.class, "intake"),
-                hardwareMap.get(DistanceSensor.class, "distanceSensor")
+                hardwareMap.get(DistanceSensor.class, "distanceSensor"),
+                hardwareMap.get(NormalizedColorSensor.class, "middleColorSensor"),
+                hardwareMap.get(NormalizedColorSensor.class, "upperColorSensor")
         );
         ledIndicator = new LEDIndicator(hardwareMap.get(GoBildaPrismDriver.class, "prism"));
         ledIndicator.setState(Intake.IntakeState.AMBIENT);

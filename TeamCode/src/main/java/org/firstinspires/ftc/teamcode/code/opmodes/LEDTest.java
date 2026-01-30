@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.code.helpers.Prism.GoBildaPrismDriver;
@@ -24,7 +25,9 @@ public class LEDTest extends OpMode {
     public void init() {
         intake = new Intake(
                 hardwareMap.get(DcMotorEx.class, "intake"),
-                hardwareMap.get(DistanceSensor.class, "distanceSensor")
+                hardwareMap.get(DistanceSensor.class, "distanceSensor"),
+                hardwareMap.get(NormalizedColorSensor.class, "middleColorSensor"),
+                hardwareMap.get(NormalizedColorSensor.class, "upperColorSensor")
         );
         ledIndicator = new LEDIndicator(hardwareMap.get(GoBildaPrismDriver.class, "prism"));
         ledIndicator.setState(Intake.IntakeState.AMBIENT);

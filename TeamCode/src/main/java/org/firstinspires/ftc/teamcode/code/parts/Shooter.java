@@ -43,8 +43,12 @@ public class Shooter {
         shooterMotor2.setVelocity(clippedVelocity);
     }
 
-    public double getShooterVelocity() {
+    public double getShooter1Velocity() {
         return shooterMotor1.getVelocity() / MOTOR_TO_WHEEL_VELOCITY_RATIO;
+    }
+
+    public double getShooter2Velocity() {
+        return shooterMotor2.getVelocity() / MOTOR_TO_WHEEL_VELOCITY_RATIO;
     }
 
     public double getShooterTargetVelocity() {
