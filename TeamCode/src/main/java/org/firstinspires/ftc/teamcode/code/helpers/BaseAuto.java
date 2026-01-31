@@ -228,10 +228,13 @@ public abstract class BaseAuto extends OpMode {
         Arrays.sort(tags);
         driveTrain.setPositionDrive(positions);
         turret.close();
+
+        if (autoAligner.getDistanceToGoal() > AutoAligner.closeDist) {
+            shooterDelay = 0.5;
+        }
     }
 
     public void autoAim(int pointIndex) {
-        double start = runtime.time();
         Pose2D curTarget = positions[pointIndex];
         positions[pointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH),
                 curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
@@ -240,7 +243,7 @@ public abstract class BaseAuto extends OpMode {
         wantedShooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
         turret.setShooterVelocity(wantedShooterVelocity);
 
-        Log.d("Loop Time", "Auto Aim time: " + (runtime.time() - start));
+//        Log.d("Loop Time", "Auto Aim time: " + (runtime.time() - start));
     }
 
     public void shoot(int pointIndex) {
@@ -257,29 +260,17 @@ public abstract class BaseAuto extends OpMode {
 
     @Override
     public void loop() {
-
-        double start = runtime.time();
         driveTrain.updatePosition();
         Pose2D pos = driveTrain.getPosition();
         driveTrain.drive();
 
-        Log.d("Loop Time", "Drive time: " + (runtime.time() - start));
+//        ledIndicator.setState(Intake.IntakeState.AMBIENT);
 
-        start = runtime.time();
-
-        ledIndicator.setState(intake.getState());
-
-        Log.d("Loop Time", "LED time: " + (runtime.time() - start));
-
-        start = runtime.time();
         autoAligner.updateInterpolation(pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH));
-        Log.d("Loop Time", "Interpolation time: " + (runtime.time() - start));
 
         double wantedTurretAngle = autoAligner.getTurretAutoAlignAngle();
         turret.setTurretAngle(wantedTurretAngle + autoAligner.lastVelPerp * turretPreturnConstant);
 //        Log.d("Velocity", "Vel perp: " + autoAligner.lastVelPerp);
-
-        Log.d("Turret Error", "Turret Error: " + (turret.getTurretTargetAngle() - turret.getTurretCurrentAngle()));
 
 //        Log.d("Turret Angle", "Pinpoint Pos: " + pos.getX(DistanceUnit.INCH) + ", " + pos.getY(DistanceUnit.INCH));
 //        double turretPos = turret.getTurretCurrentAngle();
@@ -291,7 +282,7 @@ public abstract class BaseAuto extends OpMode {
         double curTime = runtime.seconds();
         double dt = curTime - lastTime;
         lastTime = curTime;
-        Log.d("Loop Time", "dt: " + dt);
+//        Log.d("Loop Time", "dt: " + dt);
 
         if (pauseTimeLeft <= 0) {
             int nextPointIndex = driveTrain.getNextPointIndex();

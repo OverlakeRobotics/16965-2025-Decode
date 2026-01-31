@@ -29,7 +29,7 @@ import java.util.List;
 public class AprilTagFollow extends OpMode {
     public static Turret turret;
     public static Limelight3A limelight;
-    public static int tagId = 20;
+    public static int tagId = 24;
 
     @Override
     public void init() {
@@ -41,7 +41,7 @@ public class AprilTagFollow extends OpMode {
                 hardwareMap.get(Servo.class, "blocker"),
                 hardwareMap.get(AnalogInput.class, "potentiometer")
         );
-        turret.resetTurretEncoder();
+        turret.setEncoderOffset();
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.code.parts;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -21,7 +23,7 @@ public class Intake {
         OFF
     }
     private static final double LOWER_DISTANCE_THRESHOLD_MM = 200;
-    private static final double MIDDLE_DISTANCE_THRESHOLD_MM = 50;
+    private static final double MIDDLE_DISTANCE_THRESHOLD_MM = 100;
     private static final double UPPER_DISTANCE_THRESHOLD_MM = 100;
     private static final double MAX_VELOCITY = 2800;
     private final DcMotorEx intakeMotor;
@@ -74,6 +76,7 @@ public class Intake {
         if (isStalling()) {
             return IntakeState.JAMMED;
         }
+
         boolean lowerBlocked = getLowerDistanceMM() < LOWER_DISTANCE_THRESHOLD_MM;
         boolean middleBlocked = getMiddleDistanceMM() < MIDDLE_DISTANCE_THRESHOLD_MM;
 //        Log.d("LED Latency", "Dist: " + distanceSensor.getDistance(DistanceUnit.MM));
