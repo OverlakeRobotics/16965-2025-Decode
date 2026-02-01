@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.code.helpers;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -70,7 +68,7 @@ public abstract class BaseAuto extends OpMode {
 
     private double wantedShooterVelocity = 0;
     private boolean isShooting;
-    public static double shooterDelay = 0.0; // 0.3;
+    public double shooterDelay = 0.0; // 0.5;
     private double shooterTimer = 0;
     public String alliance;
 
@@ -171,6 +169,15 @@ public abstract class BaseAuto extends OpMode {
                 hardwareMap.get(DcMotorEx.class, "frontRight"),
                 new GoBildaPinpointOdometry(pinpointDriver)
         );
+        turret = new Turret(
+                hardwareMap.get(DcMotorEx.class, "shooterTop"),
+                hardwareMap.get(DcMotorEx.class, "shooterBottom"),
+                hardwareMap.get(DcMotorEx.class, "turret"),
+                hardwareMap.get(Servo.class, "hood"),
+                hardwareMap.get(Servo.class, "blocker"),
+                hardwareMap.get(AnalogInput.class, "potentiometer")
+        );
+        turret.resetTurretEncoder();
 
 //        driveTrain.setVelocityPIDFCoefficients(p, i, d, f);
         driveTrain.setPositionP(positionP);
@@ -183,14 +190,6 @@ public abstract class BaseAuto extends OpMode {
         );
         ledIndicator = new LEDIndicator(hardwareMap.get(GoBildaPrismDriver.class, "prism"));
         ledIndicator.setState(Intake.IntakeState.AMBIENT);
-        turret = new Turret(
-                hardwareMap.get(DcMotorEx.class, "shooterTop"),
-                hardwareMap.get(DcMotorEx.class, "shooterBottom"),
-                hardwareMap.get(DcMotorEx.class, "turret"),
-                hardwareMap.get(Servo.class, "hood"),
-                hardwareMap.get(Servo.class, "blocker"),
-                hardwareMap.get(AnalogInput.class, "potentiometer")
-        );
         turret.setEncoderOffset();
 //        turret.resetTurretEncoder();
 
@@ -229,15 +228,15 @@ public abstract class BaseAuto extends OpMode {
         driveTrain.setPositionDrive(positions);
         turret.close();
 
-        if (autoAligner.getDistanceToGoal() > AutoAligner.closeDist) {
-            shooterDelay = 0.5;
-        }
+//        if (autoAligner.getDistanceToGoal() > AutoAligner.closeDist) {
+//            shooterDelay = 0.5;
+//        }
     }
 
     public void autoAim(int pointIndex) {
         Pose2D curTarget = positions[pointIndex];
         positions[pointIndex] = new Pose2D(DistanceUnit.INCH, curTarget.getX(DistanceUnit.INCH),
-                curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
+                curTarget.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngleWithTurret());
         double hoodAngle = autoAligner.getOptimalHoodAngle() - (autoAligner.useShootMove ? autoAligner.lastVelPar * hoodAngleVelScale : 0);
         turret.setHoodAngle(hoodAngle);
         wantedShooterVelocity = autoAligner.getShooterVelocityFromAngle(hoodAngle);
@@ -327,7 +326,7 @@ public abstract class BaseAuto extends OpMode {
                         }
                         autoAlignIndex = nextPointIndex;
                         Pose2D curTarget2 = positions[nextPointIndex];
-                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget2.getX(DistanceUnit.INCH), curTarget2.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
+                        positions[nextPointIndex] = new Pose2D(DistanceUnit.INCH, curTarget2.getX(DistanceUnit.INCH), curTarget2.getY(DistanceUnit.INCH), AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngleWithTurret());
                         break;
                     }
                     case "shooterVelocity": {

@@ -81,6 +81,10 @@ public class GoBildaPinpointOdometry implements OdometryModule {
         pinpoint.resetPosAndIMU();
     }
 
+    public void recalibrate() {
+        pinpoint.recalibrateIMU();
+    }
+
     public double getVelocity() {
         return Math.hypot(pinpoint.getVelX(DistanceUnit.INCH), pinpoint.getVelY(DistanceUnit.INCH));
     }

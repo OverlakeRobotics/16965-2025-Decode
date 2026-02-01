@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.code.helpers;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -235,12 +233,31 @@ public class AutoAligner {
 //        return pinpointAngle;
     }
 
+    public double getDrivetrainAutoAlignAngleNoTurret() {
+        Pose2D pos = driveTrain.getPosition();
+        double drivetrainAngle = pos.getHeading(AngleUnit.DEGREES);
+        LLResult result = limelight.getLatestResult();
+        if (result.isValid()) {
+            List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult tag : aprilTags) {
+                if (tag.getFiducialId() == targetAprilID) {
+                    return drivetrainAngle - tag.getTargetXDegrees() + aprilAlignOffset + (useShootMove ? angleOffset : 0);
+                }
+            }
+        }
+        // Fallback on using pinpoint
+        return normalize(180 + Math.toDegrees(Math.atan2(
+                goalY - pos.getY(DistanceUnit.INCH),
+                goalX - pos.getX(DistanceUnit.INCH)
+        )));
+    }
+
     public double getTurretAutoAlignAngle() {
         double rawAngle = getRawTurretAutoAlignAngle();
         return Range.clip(rawAngle, turret.MIN_ANGLE_LIMIT, turret.MAX_ANGLE_LIMIT);
     }
 
-    public double getDrivetrainAutoAlignAngle() {
+    public double getDrivetrainAutoAlignAngleWithTurret() {
         double rawTurretAngle = getRawTurretAutoAlignAngle();
         double drivetrainAngle = driveTrain.getPosition().getHeading(AngleUnit.DEGREES);
         if (rawTurretAngle >= turret.MIN_ANGLE_LIMIT && rawTurretAngle <= turret.MAX_ANGLE_LIMIT) {

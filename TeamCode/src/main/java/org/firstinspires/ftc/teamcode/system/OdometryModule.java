@@ -23,6 +23,11 @@ public interface OdometryModule {
     // Behavior: Resets the odometry sensors heading and position to 0.
     void reset();
 
+    // Behavior: Recalibrates the sensor for this odometry if it has one.
+    default void recalibrate() {
+        throw new UnsupportedOperationException("This odometry cannot recalibrate!");
+    }
+
     // Behavior: Gets the velocity of the bot in the x direction.
     // Returns: The velocity of the bot in the x direction.
     default double getXVelocity() {

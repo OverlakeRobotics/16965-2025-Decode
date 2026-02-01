@@ -23,7 +23,7 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
     private double pathTolerance = 4;
     private boolean doPositionHeadingCorrection;
     private boolean positionDriveUsingOdometry;
-    private final OdometryModule odometry;
+    public final OdometryModule odometry;
     private double lastHeading;
     private Pose2D currentPosition;
     private Pose2D wantedPosition;

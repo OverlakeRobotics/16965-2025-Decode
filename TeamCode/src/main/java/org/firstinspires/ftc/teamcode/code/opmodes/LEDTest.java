@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.code.helpers.Prism.PrismAnimations;
 import org.firstinspires.ftc.teamcode.code.parts.Intake;
 import org.firstinspires.ftc.teamcode.code.parts.LEDIndicator;
 
+@Disabled
 @Config
 @TeleOp(name = "LED Test", group = "TeleOp")
 public class LEDTest extends OpMode {

@@ -111,4 +111,6 @@ public class AprilTagOdometry implements OdometryModule {
     public void reset() {
         setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
     }
+
+    public void recalibrate() {}
 }

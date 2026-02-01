@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.code.helpers;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -96,6 +94,7 @@ public abstract class BaseTeleOp extends OpMode {
 
         GoBildaPinpointDriver pinpointDriver = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpointDriver.setOffsets(xOffset, yOffset, DistanceUnit.MM);
+        pinpointDriver.recalibrateIMU();
         driveTrain = new OdometryHolonomicDrivetrain(
                 hardwareMap.get(DcMotorEx.class, "backLeft"),
                 hardwareMap.get(DcMotorEx.class, "backRight"),
@@ -159,7 +158,7 @@ public abstract class BaseTeleOp extends OpMode {
                 currentPos.getHeading(AngleUnit.DEGREES));
 
         // Use AutoAligner to get wanted heading and distance
-        double wantedHeading = autoAligner.getDrivetrainAutoAlignAngle();
+        double wantedHeading = autoTurret ? autoAligner.getDrivetrainAutoAlignAngleWithTurret() : autoAligner.getDrivetrainAutoAlignAngleNoTurret();
 
         if (currentPreset >= 0 && (Math.abs(gamepad1.left_stick_x) > 0.001 || Math.abs(gamepad1.left_stick_y) > 0.001 || Math.abs(gamepad1.right_stick_x) > 0.001)) {
             currentPreset = -1;
@@ -176,7 +175,7 @@ public abstract class BaseTeleOp extends OpMode {
                 Pose2D nextPoint = preset.poses[driveTrain.getNextPointIndex()];
                 preset.poses[driveTrain.getNextPointIndex()] = new Pose2D(DistanceUnit.INCH,
                         nextPoint.getX(DistanceUnit.INCH), nextPoint.getY(DistanceUnit.INCH),
-                        AngleUnit.DEGREES, autoAligner.getDrivetrainAutoAlignAngle());
+                        AngleUnit.DEGREES, wantedHeading);
             }
         } else {
             double turn = -gamepad1.right_stick_x * velocity;
@@ -277,22 +276,22 @@ public abstract class BaseTeleOp extends OpMode {
         // B: Reset pinpoint position based on limelight
         // X: Reset pinpoint heading to 0
 
-        if (!autoShooter) {
-            if (gamepad2.rightBumperWasPressed()) {
-                shooterVelocity = Math.round(shooterVelocity / 100) * 100;
-                shooterVelocity += 100;
-            }
-            if (gamepad2.leftBumperWasPressed()) {
-                shooterVelocity = Math.round(shooterVelocity / 100) * 100;
-                shooterVelocity -= 100;
-            }
-            if (gamepad2.dpadUpWasPressed()) {
-                hoodAngle += 2;
-            }
-            if (gamepad2.dpadDownWasPressed()) {
-                hoodAngle -= 2;
-            }
-        }
+//        if (!autoShooter) {
+//            if (gamepad2.rightBumperWasPressed()) {
+//                shooterVelocity = Math.round(shooterVelocity / 100) * 100;
+//                shooterVelocity += 100;
+//            }
+//            if (gamepad2.leftBumperWasPressed()) {
+//                shooterVelocity = Math.round(shooterVelocity / 100) * 100;
+//                shooterVelocity -= 100;
+//            }
+//            if (gamepad2.dpadUpWasPressed()) {
+//                hoodAngle += 2;
+//            }
+//            if (gamepad2.dpadDownWasPressed()) {
+//                hoodAngle -= 2;
+//            }
+//        }
 
         if (gamepad2.aWasPressed()) {
             autoTurret = !autoTurret;
@@ -309,11 +308,16 @@ public abstract class BaseTeleOp extends OpMode {
 
             if (gamepad2.yWasPressed()) {
                 turret.resetTurretEncoder();
+                turret.setEncoderOffset();
                 turretAngle = 0;
             }
         }
 
-        if (gamepad2.dpadRightWasPressed()) {
+        // MAKE SURE THE ROBOT IS STATIONARY FOR AT LEAST 0.3 SECONDS AFTER USING THIS FUNCTION
+        if (gamepad2.rightBumperWasPressed()) {
+            driveTrain.odometry.recalibrate();
+        }
+        if (gamepad2.leftBumperWasPressed()) {
 //            autoAligner.resetPinpointPositionFromLimelight();
             double ySign = isRedAlliance() ? 1.0 : -1.0;
             Pose2D currPos = driveTrain.getPosition();
