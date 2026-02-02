@@ -23,7 +23,7 @@ public interface OdometryModule {
     // Behavior: Resets the odometry sensors heading and position to 0.
     void reset();
 
-    // Behavior: Recalibrates the sensor for this odometry if it has one.
+    // Behavior: Recalibrates the sensor for this odometry if it has this function.
     default void recalibrate() {
         throw new UnsupportedOperationException("This odometry cannot recalibrate!");
     }
