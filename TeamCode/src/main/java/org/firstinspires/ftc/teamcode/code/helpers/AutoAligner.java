@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.code.helpers;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -220,11 +222,13 @@ public class AutoAligner {
 //                    double limelightAngle = turretAngle - tag.getTargetXDegrees();
 //                    Log.d("Turret Debug", "Limelight wanted: " + limelightAngle);
 //                    return limelightAngle;
+                    Log.d("Turret", "Using limelight");
                     return turretAngle - tag.getTargetXDegrees() + aprilAlignOffset + (useShootMove ? angleOffset : 0);
                 }
             }
         }
-//        Log.d("Limelight", "Pinpoint fallback");
+        Log.d("Turret", "Using pinpoint");
+//        Log.d("Limelight", "Pinpoint fallback");/
         // Fallback on using pinpoint
         return normalize(180 + Math.toDegrees(Math.atan2(
                         goalY - pos.getY(DistanceUnit.INCH),

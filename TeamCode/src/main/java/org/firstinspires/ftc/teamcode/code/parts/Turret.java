@@ -24,6 +24,7 @@ public class Turret extends Shooter {
     private final DcMotorEx turretMotor;
     private final Potentiometer potentiometer;
     public double encoderAngleOffset;
+    public static boolean usePID = true;
     public Turret(DcMotorEx shooterMotor1, DcMotorEx shooterMotor2, DcMotorEx turretMotor, Servo hoodServo, Servo blocker, AnalogInput potentiometer) {
         super(shooterMotor1, shooterMotor2, hoodServo, blocker);
         this.MAX_ANGLE_LIMIT = MAX_LIMIT_ANGLE;
@@ -34,12 +35,16 @@ public class Turret extends Shooter {
         this.turretMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         this.turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        this.turretMotor.setVelocityPIDFCoefficients(turretP, turretI, turretD, turretF);
+        if (usePID) {
+            this.turretMotor.setVelocityPIDFCoefficients(turretP, turretI, turretD, turretF);
+        }
+
 //        this.turretMotor.setPositionPIDFCoefficients(turretPositionP);
     }
 
     // CCW is positive, CW is negative
     public void setTurretAngle(double angle) {
+        Log.d("Turret", "Set wanted turret angle to: " + angle + " degrees");
         int targetAngle = (int) Math.round((Range.clip(angle, MIN_ANGLE_LIMIT, MAX_ANGLE_LIMIT) - encoderAngleOffset) * 4 * TICKS_PER_DEGREE);
 
         turretMotor.setTargetPosition(targetAngle);
@@ -58,6 +63,7 @@ public class Turret extends Shooter {
         turretMotor.setVelocity(0);
         turretMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         turretMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        Log.d("Turret", "Turret Reset Angle: " + turretMotor.getCurrentPosition());
     }
 
     private double getEncoderReportedAngle() {
@@ -67,5 +73,6 @@ public class Turret extends Shooter {
     public void setEncoderOffset() {
         resetTurretEncoder();
         encoderAngleOffset = potentiometer.getAngleFromVoltagePoly() - getEncoderReportedAngle();
+        Log.d("Turret", "Set encoder angle offset: " + encoderAngleOffset);
     }
 }

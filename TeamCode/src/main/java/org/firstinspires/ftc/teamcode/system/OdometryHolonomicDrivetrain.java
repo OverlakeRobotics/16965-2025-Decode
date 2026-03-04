@@ -193,6 +193,12 @@ public class OdometryHolonomicDrivetrain extends BasicHolonomicDrivetrain {
                 normalize(currentPosition.getHeading(AngleUnit.DEGREES)));
     }
 
+    // TODO: Don't keep this; just a test
+    public double getHeadingCorrectionVelocity(double backupHeadingDegrees) {
+        return P_GAIN * normalize(normalize(wantedPosition.getHeading(AngleUnit.DEGREES)) -
+                normalize(backupHeadingDegrees));
+    }
+
     // Behavior: Updates the position of the robot. This needs to be called in the loop for accurate
     //           positioning.
     public void updatePosition() {
