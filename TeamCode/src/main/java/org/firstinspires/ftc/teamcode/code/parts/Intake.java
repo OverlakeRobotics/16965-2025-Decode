@@ -108,6 +108,13 @@ public class Intake {
         }
     }
 
+    public int getNumArtifactsInRamp() {
+        int lowerBlocked = getLowerDistanceMM() < LOWER_DISTANCE_THRESHOLD_MM ? 1 : 0;
+        int middleBlocked = getMiddleDistanceMM() < MIDDLE_DISTANCE_THRESHOLD_MM ? 1 : 0;
+        int upperBlocked = getUpperDistanceMM() < UPPER_DISTANCE_THRESHOLD_MM ? 1 : 0;
+        return lowerBlocked + middleBlocked + upperBlocked;
+    }
+
     public void stop() {
         wantedVelocity = 0;
         this.setVelocity(wantedVelocity);

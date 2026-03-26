@@ -305,7 +305,9 @@ public abstract class BaseTeleOp extends OpMode {
 //        if (gamepad1.dpadLeftWasPressed()) {
 //            autoTurret = !autoTurret;
 //        }
-
+//        if (gamepad1.dpadUpWasReleased()){
+//            pinpointDriver
+//        }
         double intakeVelocity = intakeOn ? (intakeReversed ? -2800 : 2800) : 0;
 
         if (gamepad1.a) {
@@ -411,11 +413,11 @@ public abstract class BaseTeleOp extends OpMode {
         }
 
         // TODO: Don't use this; just a test
-        if (gamepad2.rightTriggerWasPressed()) {
-            this.useBackupIMU = true;
-        } else if (gamepad2.leftTriggerWasPressed()) {
-            this.useBackupIMU = false;
-        }
+//        if (gamepad2.rightBumperWasPressed()) {
+//            this.useBackupIMU = true;
+//        } else if (gamepad2.leftTriggerWasPressed()) {
+//            this.useBackupIMU = false;
+//        }
 
 //        if (gamepad2.aWasPressed()) {
 //            shooterVelocity = 2000;
