@@ -110,9 +110,9 @@ public abstract class BaseTeleOp extends OpMode {
         return new Preset[]{
                 new Preset(
                         new PresetPoint(
-                                new Pose2D(DistanceUnit.INCH, -54, 15 * ySign, AngleUnit.DEGREES, 0),
-                                velocity,
-                                8
+                                new Pose2D(DistanceUnit.INCH, -38, 33 * ySign, AngleUnit.DEGREES, 0),
+                                60,
+                                2
                         ),
                         true
                 ),
@@ -319,6 +319,12 @@ public abstract class BaseTeleOp extends OpMode {
             }
         } else {
             turret.close();
+        }
+
+        // Preset for far position
+        if (gamepad1.leftBumperWasPressed()) {
+            currentPreset = 0;
+            driveTrain.setPositionDrive(this.presetPositions[0].poses);
         }
 
         // Preset for gate pickup
