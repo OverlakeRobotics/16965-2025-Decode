@@ -10,10 +10,12 @@ import org.firstinspires.ftc.teamcode.system.PathServer;
 @Config
 @Autonomous(name = "Path Planner", group = "Autonomous")
 public class PathPlanner extends BaseAuto {
+    public static double sDelay = 0;
     @Override
     public void init() {
         PathServer.startServer();
         super.readJson = false;
+        super.shooterDelay = sDelay;
         super.init();
     }
 

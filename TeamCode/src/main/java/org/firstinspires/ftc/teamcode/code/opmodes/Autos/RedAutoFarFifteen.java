@@ -12,7 +12,7 @@ public class RedAutoFarFifteen extends BaseAuto {
     public void init() {
         super.readJson = true;
         super.jsonFilename = "pathJsons/FifteenArtifactFarRed.json";
-        super.shooterDelay = 0.5;
+        super.shooterDelay = 0.4;
         super.init();
     }
 }

@@ -246,7 +246,7 @@ public abstract class BaseTeleOp extends OpMode {
                         AngleUnit.DEGREES, wantedHeading);
             }
         } else {
-            double turn = -gamepad1.right_stick_x * velocity;
+            double turn = -gamepad1.right_stick_x * velocity / 1.25;
 
             if (gamepad1.y) {
                 autoLock = true;

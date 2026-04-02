@@ -34,7 +34,7 @@ public class AutoAligner {
     public static double randomMultiplier = 1;
     public static double randomMultiplierPerp = 1;
 
-    public static double farShooterTolerance = 100;
+    public static double farShooterTolerance = 80;
     public static double closeShooterTolerance = 150;
 
     public static double closeDist = 110;
@@ -82,6 +82,7 @@ public class AutoAligner {
 //              new PointValues(-54, -18, new double[]{0.47, 50, 1}),
 //              new PointValues(-63, 33, new double[]{0.47, 50, 3}),
               new PointValues(-63.3, 33, new double[]{0.475, 50, 4 - 0.5}),
+//              new PointValues(-64, 33, new double[]{0.47, 50, 5}),
               new PointValues(-54, 18, new double[]{0.475, 50, 3.5 - 0.5}),
               new PointValues(-48, -0, new double[]{0.472, 50, 3 - 0.5}),
               new PointValues(-63.3, 0, new double[]{0.47, 50, 2.5}),
