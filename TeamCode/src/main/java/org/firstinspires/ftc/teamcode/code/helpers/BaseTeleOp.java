@@ -143,7 +143,8 @@ public abstract class BaseTeleOp extends OpMode {
 
         GoBildaPinpointDriver pinpointDriver = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpointDriver.setOffsets(xOffset, yOffset, DistanceUnit.MM);
-        pinpointDriver.recalibrateIMU();
+        // No longer doing this because found out that issue was limelight freeze frame
+//        pinpointDriver.recalibrateIMU();
         driveTrain = new OdometryHolonomicDrivetrain(
                 hardwareMap.get(DcMotorEx.class, "backLeft"),
                 hardwareMap.get(DcMotorEx.class, "backRight"),

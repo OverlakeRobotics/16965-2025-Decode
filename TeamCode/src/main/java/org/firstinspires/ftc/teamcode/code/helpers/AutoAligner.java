@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.code.helpers;
 
+import android.graphics.Point;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -81,7 +82,14 @@ public class AutoAligner {
 //              new PointValues(-54, 18, new double[]{0.47, 50, 1}),
 //              new PointValues(-54, -18, new double[]{0.47, 50, 1}),
 //              new PointValues(-63, 33, new double[]{0.47, 50, 3}),
-              new PointValues(-63.3, 33, new double[]{0.475, 50, 4 - 0.5}),
+            // NEW POINTS
+              new PointValues(-63.3, 12, new double[]{0.473, 50, 4}),
+              new PointValues(-60, -12, new double[]{0.47, 50, 1}),
+              new PointValues(-60, -12, new double[]{0.47, 50, 1}),
+              new PointValues(-60, -27, new double[]{0.46, 50, 2}),
+              new PointValues(-57, 0, new double[]{0.47, 50, 3}),
+            // OLD
+              new PointValues(-63.3, 33, new double[]{0.473, 50, 4}),
 //              new PointValues(-64, 33, new double[]{0.47, 50, 5}),
               new PointValues(-54, 18, new double[]{0.475, 50, 3.5 - 0.5}),
               new PointValues(-48, -0, new double[]{0.472, 50, 3 - 0.5}),
