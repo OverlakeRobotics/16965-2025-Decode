@@ -182,6 +182,9 @@ public abstract class BaseTeleOp extends OpMode {
         // Initialize AutoAligner
         autoAligner = new AutoAligner(driveTrain, turret, limelight, isRedAlliance());
 
+        AutoAligner.farShooterTolerance = 60;
+        AutoAligner.turretTolerance = 2;
+
         presetPositions = getPresetPositions();
         PathServer.startServer();
     }
@@ -348,11 +351,15 @@ public abstract class BaseTeleOp extends OpMode {
         // Following three only work when autoTurret is off
         // D-Pad Right: Increase turret angle by 5 degrees (CCW)
         // D-Pad Left: Decrease turret angle by 5 degrees (CW)
-        // Y: Reset turret encoder to 0
+        // Y: Reset turret encoder and sync it to potentiometer, set turret to 0 degrees
 
         // PINPOINT BACKUP
         // B: Reset pinpoint position based on limelight
         // X: Reset pinpoint heading to 0
+
+        // OTHER BACKUP
+        // Left Bumper: Corner Reset (own human player zone; any heading)
+        // Right Bumper: Toggle Limelight (if it freeze frames)
 
 //        if (!autoShooter) {
 //            if (gamepad2.rightBumperWasPressed()) {
@@ -391,9 +398,12 @@ public abstract class BaseTeleOp extends OpMode {
             }
         }
 
-        // MAKE SURE THE ROBOT IS STATIONARY FOR AT LEAST 0.3 SECONDS AFTER USING THIS FUNCTION
+//        // MAKE SURE THE ROBOT IS STATIONARY FOR AT LEAST 0.3 SECONDS AFTER USING THIS FUNCTION
+//        if (gamepad2.rightBumperWasPressed()) {
+//            driveTrain.odometry.recalibrate();
+//        }
         if (gamepad2.rightBumperWasPressed()) {
-            driveTrain.odometry.recalibrate();
+            autoAligner.toggleLimelight();
         }
         if (gamepad2.leftBumperWasPressed()) {
 //            autoAligner.resetPinpointPositionFromLimelight();
@@ -454,6 +464,7 @@ public abstract class BaseTeleOp extends OpMode {
 //        telemetry.addData("Shooter Top Current Velocity", turret.getShooter1Velocity());
 //        telemetry.addData("Shooter Bottom Current Velocity", turret.getShooter2Velocity());
 //        telemetry.addData("Wanted Shooter Velocity", shooterVelocity);
+        telemetry.addData("Limelight", autoAligner.limelightEnabled ? "ON" : "OFF");
         telemetry.update();
     }
 

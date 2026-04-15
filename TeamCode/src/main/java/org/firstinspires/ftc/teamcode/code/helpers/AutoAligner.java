@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.code.helpers;
 
-import android.graphics.Point;
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -61,6 +58,7 @@ public class AutoAligner {
     private final Limelight3A limelight;
 
     public boolean useShootMove = true;
+    public boolean limelightEnabled = true;
 
     public double lastVelPar;
     public double lastVelPerp;
@@ -190,6 +188,7 @@ public class AutoAligner {
     }
 
     public void resetPinpointPositionFromLimelight() {
+        if (!limelightEnabled) return;
         Pose2D pos = driveTrain.getPosition();
         LLResult result = limelight.getLatestResult();
         if (result.isValid()) {
@@ -205,38 +204,40 @@ public class AutoAligner {
 
     public double getRawTurretAutoAlignAngle() {
         Pose2D pos = driveTrain.getPosition();
-        double turretAngle = turret.getTurretCurrentAngle();
-        LLResult result = limelight.getLatestResult();
-//        double pinpointAngle = normalize(180 + Math.toDegrees(Math.atan2(
-//                goalY - pos.getY(DistanceUnit.INCH),
-//                goalX - pos.getX(DistanceUnit.INCH)
-//        )) - pos.getHeading(AngleUnit.DEGREES));
-//        Log.d("Turret Debug", "Pinpoint wanted: " + pinpointAngle);
-        if (result.isValid()) {
-            List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
-            for (LLResultTypes.FiducialResult tag : aprilTags) {
-                if (tag.getFiducialId() == targetAprilID) {
-                    // Testing making it aim not directly at apriltag, doesnt completely work
-//                    Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
-//                    Log.d("Limelight", "See tag");
-//                    Log.d("Limelight", "Pose: " + robotPose);
-////                    driveTrain.setPosition(new Pose2D(DistanceUnit.METER, -robotPose.x, -robotPose.y, AngleUnit.DEGREES, pos.getHeading(AngleUnit.DEGREES)));
-//                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
-////                        Log.d("Limelight", "Pos off");
-//                        break;
-//                    }
-//                    return normalize(180 + Math.toDegrees(Math.atan2(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37)) - pos.getHeading(AngleUnit.DEGREES));
+        if (limelightEnabled) {
+            double turretAngle = turret.getTurretCurrentAngle();
+            LLResult result = limelight.getLatestResult();
+            //        double pinpointAngle = normalize(180 + Math.toDegrees(Math.atan2(
+            //                goalY - pos.getY(DistanceUnit.INCH),
+            //                goalX - pos.getX(DistanceUnit.INCH)
+            //        )) - pos.getHeading(AngleUnit.DEGREES));
+            //        Log.d("Turret Debug", "Pinpoint wanted: " + pinpointAngle);
+            if (result.isValid()) {
+                List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
+                for (LLResultTypes.FiducialResult tag : aprilTags) {
+                    if (tag.getFiducialId() == targetAprilID) {
+                        // Testing making it aim not directly at apriltag, doesnt completely work
+                        //                    Position robotPose = tag.getRobotPoseFieldSpace().getPosition();
+                        //                    Log.d("Limelight", "See tag");
+                        //                    Log.d("Limelight", "Pose: " + robotPose);
+                        ////                    driveTrain.setPosition(new Pose2D(DistanceUnit.METER, -robotPose.x, -robotPose.y, AngleUnit.DEGREES, pos.getHeading(AngleUnit.DEGREES)));
+                        //                    if (Math.hypot(robotPose.x * 39.37 + pos.getX(DistanceUnit.INCH), robotPose.y * 39.37 + pos.getY(DistanceUnit.INCH)) > 30) {
+                        ////                        Log.d("Limelight", "Pos off");
+                        //                        break;
+                        //                    }
+                        //                    return normalize(180 + Math.toDegrees(Math.atan2(goalY + robotPose.y * 39.37, goalX + robotPose.x * 39.37)) - pos.getHeading(AngleUnit.DEGREES));
 
-                    // Return limelight angle if it sees the tag
-//                    double limelightAngle = turretAngle - tag.getTargetXDegrees();
-//                    Log.d("Turret Debug", "Limelight wanted: " + limelightAngle);
-//                    return limelightAngle;
-                    Log.d("Turret", "Using limelight");
-                    return turretAngle - tag.getTargetXDegrees() + aprilAlignOffset + (useShootMove ? angleOffset : 0);
+                        // Return limelight angle if it sees the tag
+                        //                    double limelightAngle = turretAngle - tag.getTargetXDegrees();
+                        //                    Log.d("Turret Debug", "Limelight wanted: " + limelightAngle);
+                        //                    return limelightAngle;
+//                        Log.d("Turret", "Using limelight");
+                        return turretAngle - tag.getTargetXDegrees() + aprilAlignOffset + (useShootMove ? angleOffset : 0);
+                    }
                 }
             }
         }
-        Log.d("Turret", "Using pinpoint");
+//        Log.d("Turret", "Using pinpoint");
 //        Log.d("Limelight", "Pinpoint fallback");/
         // Fallback on using pinpoint
         return normalize(180 + Math.toDegrees(Math.atan2(
@@ -248,13 +249,15 @@ public class AutoAligner {
 
     public double getDrivetrainAutoAlignAngleNoTurret() {
         Pose2D pos = driveTrain.getPosition();
-        double drivetrainAngle = pos.getHeading(AngleUnit.DEGREES);
-        LLResult result = limelight.getLatestResult();
-        if (result.isValid()) {
-            List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
-            for (LLResultTypes.FiducialResult tag : aprilTags) {
-                if (tag.getFiducialId() == targetAprilID) {
-                    return drivetrainAngle - tag.getTargetXDegrees() + aprilAlignOffset + (useShootMove ? angleOffset : 0);
+        if (limelightEnabled) {
+            double drivetrainAngle = pos.getHeading(AngleUnit.DEGREES);
+            LLResult result = limelight.getLatestResult();
+            if (result.isValid()) {
+                List<LLResultTypes.FiducialResult> aprilTags = result.getFiducialResults();
+                for (LLResultTypes.FiducialResult tag : aprilTags) {
+                    if (tag.getFiducialId() == targetAprilID) {
+                        return drivetrainAngle - tag.getTargetXDegrees() + aprilAlignOffset + (useShootMove ? angleOffset : 0);
+                    }
                 }
             }
         }
@@ -541,6 +544,10 @@ public class AutoAligner {
     // Work in progress
     public double getOptimalShooterVelocity() {
         return Math.min(900 + (getDistanceToGoal() / 156) * 900, 1800);
+    }
+
+    public void toggleLimelight() {
+        limelightEnabled = !limelightEnabled;
     }
 
     private double normalize(double angle) {

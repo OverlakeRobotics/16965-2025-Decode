@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.code.helpers;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
@@ -27,6 +30,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.stream.Stream;
 
 import org.firstinspires.ftc.teamcode.system.OdometryHolonomicDrivetrain;
 import org.firstinspires.ftc.teamcode.system.PathServer;
@@ -51,6 +56,7 @@ public abstract class BaseAuto extends OpMode {
     private Turret turret;
     private AutoAligner autoAligner;
     private Limelight3A limelight;
+    private HuskyLens huskyLens;
     private final ElapsedTime runtime = new ElapsedTime();
 
     protected Pose2D[] positions;
@@ -66,6 +72,10 @@ public abstract class BaseAuto extends OpMode {
 
     public static double turretPreturnConstant = 0; //0.1;
 
+    public static double huskyLensXP = 0.1;
+    public static int huskyLensCenter = 160;
+//    public static int searchVelocity = 1500;
+
     private double wantedShooterVelocity = 0;
     private boolean isShooting;
     public double shooterDelay = 0.0; // 0.5;
@@ -78,7 +88,9 @@ public abstract class BaseAuto extends OpMode {
     private double pauseTimeLeft = 0;
     private int pausedIndex = -1;
     private int autoAlignIndex = -1;
-
+    private boolean searchingForArtifacts = false;
+    private boolean pickingUp = false;
+    private int searchEndIndex = -1;
     // Gets the data for a path from a json, as a string.
     public void parseJsonFromString() throws IOException, JSONException {
         BufferedReader br = new BufferedReader(jsonReader);
@@ -200,6 +212,11 @@ public abstract class BaseAuto extends OpMode {
         limelight.pipelineSwitch(0);
         limelight.start();
         autoAligner = new AutoAligner(driveTrain, turret, limelight, false);
+
+        AutoAligner.farShooterTolerance = 80;
+        AutoAligner.turretTolerance = 6;
+
+        huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
     }
 
     @Override
@@ -284,6 +301,36 @@ public abstract class BaseAuto extends OpMode {
 //        Log.d("Loop Time", "dt: " + dt);
 
         if (pauseTimeLeft <= 0) {
+            if (searchingForArtifacts) {
+                if (driveTrain.getNextPointIndex() > searchEndIndex) {
+                    searchingForArtifacts = false;
+                    pickingUp = false;
+                    searchEndIndex = -1;
+                    intake.setVelocity(0);
+//                    driveTrain.setVelocity(velocity);
+                }
+                HuskyLens.Block largestBlock = Stream.of(huskyLens.blocks()).max(Comparator.comparingDouble(block -> block.width * block.height)).orElse(null);
+
+                double error = 0;
+                if (largestBlock != null) {
+                    double targetX = largestBlock.x;
+                    error = (targetX - huskyLensCenter) * huskyLensXP;
+                    if (!pickingUp) {
+                        intake.setVelocity(2800);
+                        pickingUp = true;
+                    }
+                }
+
+                if (pickingUp) {
+                    positions[searchEndIndex] = new Pose2D(
+                            DistanceUnit.INCH,
+                            pos.getX(DistanceUnit.INCH) + error,
+                            67,
+                            AngleUnit.DEGREES,
+                            pos.getHeading(AngleUnit.DEGREES)
+                    );
+                }
+            }
             int nextPointIndex = driveTrain.getNextPointIndex();
 
             if (nextPointIndex == autoAlignIndex && nextPointIndex != -1) {
@@ -361,9 +408,18 @@ public abstract class BaseAuto extends OpMode {
                     }
                     case "tolerance": {
                         driveTrain.setTolerance(currTag.value);
+                        break;
                     }
                     case "shootWhileMove": {
                         autoAligner.useShootMove = currTag.value == 1;
+                        break;
+                    }
+                    case "autoArtifactPickup": {
+//                        driveTrain.setVelocity(searchVelocity);
+                        searchEndIndex = nextPointIndex;
+                        pickingUp = false;
+                        searchingForArtifacts = true;
+                        break;
                     }
                 }
                 lastTagIndex++;
