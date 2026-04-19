@@ -12,7 +12,7 @@ public class BlueAutoFarCycle extends BaseAuto {
     public void init() {
         super.readJson = true;
         super.jsonFilename = "pathJsons/CycleFarBlue.json";
-        super.shooterDelay = 0.5;
+        super.shooterDelay = 0.4;
         super.init();
     }
 }

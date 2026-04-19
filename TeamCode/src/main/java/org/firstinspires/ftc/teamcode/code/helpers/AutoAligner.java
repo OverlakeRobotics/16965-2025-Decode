@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.code.helpers;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -36,7 +38,8 @@ public class AutoAligner {
     public static double closeShooterTolerance = 150;
 
     public static double closeDist = 110;
-    public static double turretTolerance = 6;
+    public static double closeTurretTolerance = 6;
+    public static double farTurretTolerance = 2;
 
     public static double maxShooterVelocity = 2800;
     public static double goalX;
@@ -182,8 +185,10 @@ public class AutoAligner {
     public boolean readyToShoot() {
         double dist = getDistanceToGoal();
         double shooterTolerance = dist < closeDist ? closeShooterTolerance : farShooterTolerance;
+        double turretTolerance = dist < closeDist ? closeTurretTolerance : farTurretTolerance;
         double shooterError = Math.abs(turret.getShooter1Velocity() - turret.getShooterTargetVelocity());
         double turretError = Math.abs(turret.getTurretTargetAngle() - turret.getTurretCurrentAngle());
+//        Log.d("Tolerance", String.format("Dist: %.4f; Shooter: %f; Turret: %f", dist, shooterTolerance, turretTolerance));
         return (shooterError <= shooterTolerance) && (turretError <= turretTolerance);
     }
 

@@ -183,7 +183,7 @@ public abstract class BaseTeleOp extends OpMode {
         autoAligner = new AutoAligner(driveTrain, turret, limelight, isRedAlliance());
 
         AutoAligner.farShooterTolerance = 60;
-        AutoAligner.turretTolerance = 2;
+        AutoAligner.farTurretTolerance = 2;
 
         presetPositions = getPresetPositions();
         PathServer.startServer();

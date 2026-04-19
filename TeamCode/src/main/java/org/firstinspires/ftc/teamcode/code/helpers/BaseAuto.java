@@ -214,7 +214,7 @@ public abstract class BaseAuto extends OpMode {
         autoAligner = new AutoAligner(driveTrain, turret, limelight, false);
 
         AutoAligner.farShooterTolerance = 80;
-        AutoAligner.turretTolerance = 6;
+        AutoAligner.farTurretTolerance = 6;
 
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
     }
